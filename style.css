@@ -1,0 +1,162 @@
+* {
+    box-sizing: border-box;
+    user-select: none;
+    touch-action: none;
+}
+
+body {
+    margin: 0;
+    background: white;
+    font-family: sans-serif;
+    height: 100vh;
+}
+
+/* Шапка сайта — современная версия */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    background: #f5f5f5; /* светло-серый фон */
+    color: #222; /* темный текст */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* мягкая тень */
+    z-index: 1000;
+    border-bottom: 1px solid #ddd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.site-header .logo {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.site-header .header-text h1 {
+    margin: 0;
+    font-size: 1.5rem; /* крупнее */
+    font-weight: 600;
+}
+
+.site-header .update-text {
+    display: block;
+    font-size: 1rem; /* чуть больше */
+    opacity: 0.7;
+    color: #555; /* чуть темнее для контраста */
+}
+
+/* Контейнер сцены и кнопок */
+.main-container {
+    padding-top: 80px; /* место под шапку */
+    height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Canvas */
+canvas {
+    border: 1px solid black;
+    background: white;
+    max-width: 100%;
+}
+
+/* Контейнер кнопок */
+.controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30vh;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    pointer-events: none;
+}
+
+/* Зоны управления */
+.left,
+.right {
+    width: 45%;
+    display: flex;
+    pointer-events: auto;
+}
+
+.left {
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.right {
+    justify-content: flex-end;
+    align-items: flex-end;
+    gap: 14px;
+}
+
+/* Кнопки */
+button {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    font-size: 24px;
+    opacity: 0.65;
+}
+
+/* Прыжок выше */
+#btn-jump {
+    align-self: flex-start;
+    margin-bottom: 60px;
+}
+
+/* 📱 Мобильная версия */
+@media (max-width: 768px) {
+    .controls {
+        height: 35vh;
+        padding: 10px;
+    }
+
+    .right {
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    #btn-jump {
+        margin: 0;
+        align-self: auto;
+    }
+
+    button {
+        width: 70px;
+        height: 70px;
+        font-size: 26px;
+    }
+
+    canvas {
+        height: 250px;
+    }
+}
+
+/* ПК */
+@media (min-width: 769px) {
+    .controls {
+        height: auto;
+        bottom: 10px;
+        padding: 16px;
+    }
+
+    button {
+        width: 52px;
+        height: 52px;
+        font-size: 20px;
+        opacity: 0.35;
+    }
+
+    canvas {
+        height: 300px;
+    }
+}

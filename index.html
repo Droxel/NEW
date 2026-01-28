@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Jump Cube</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- Шапка сайта -->
+<header class="site-header">
+    <div class="logo">
+             <!-- Вставляем твой SVG -->
+        <svg width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bubbleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4facfe"/>
+              <stop offset="100%" stop-color="#00f2fe"/>
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <ellipse cx="40" cy="70" rx="12" ry="3" fill="rgba(0,0,0,0.07)">
+            <animate attributeName="rx" values="12;8;12" dur="1.6s" repeatCount="indefinite"/>
+          </ellipse>
+
+          <g filter="url(#glow)" fill="none" stroke="url(#bubbleGradient)" stroke-linecap="round">
+            <circle cx="40" cy="35" r="22" stroke-width="2.5">
+              <animate attributeName="cy" values="35;30;35" dur="1.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="53" cy="46" r="8" stroke-width="2">
+              <animate attributeName="cy" values="46;41;46" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="23" cy="51" r="4" stroke-width="1.8">
+              <animate attributeName="cy" values="51;47;51" dur="1.4s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+        </svg>
+    </div>
+    <div class="header-text">
+        <h1>Игра по улучшением</h1>
+        <span class="update-text">0 Обновлений</span>
+    </div>
+</header>
+
+<!-- Новый контейнер для всей сцены и кнопок -->
+<div class="main-container">
+    <!-- Canvas -->
+    <canvas id="game" width="600" height="300"></canvas>
+
+    <!-- Кнопки управления -->
+    <div class="controls">
+        <div class="left">
+            <button id="btn-left">⬅</button>
+        </div>
+        <div class="right">
+            <button id="btn-jump">⤴</button>
+            <button id="btn-right">➡</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+
+</html>
