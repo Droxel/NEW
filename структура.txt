@@ -1,0 +1,21 @@
+������� ����� ⮬� Windows 10
+��਩�� ����� ⮬�: D6BE-FD12
+C:.
+|   index.html
+|   script.js
+|   style.css
+|   �������.txt
+|   
++---assets
+|       cube.svg
+|       tree1.svg
+|       tree2.svg
+|       
+\---src
+        braw.js
+        config.js
+        input.js
+        main.js
+        player.js
+        world.js
+        

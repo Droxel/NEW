@@ -1,5 +1,7 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const cubeImage = new Image();
+cubeImage.src = "cube.svg";
 
 const groundY = 230;
 const gravity = 0.6;
@@ -86,10 +88,16 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "#000";
-    ctx.fillRect(cube.x, cube.y, cube.size, cube.size);
+    ctx.drawImage(
+        cubeImage,
+        cube.x,
+        cube.y,
+        cube.size,
+        cube.size
+    );
 
     ctx.fillRect(0, groundY + cube.size, canvas.width, 2);
 }
+
 
 update();
