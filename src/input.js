@@ -8,7 +8,9 @@ export let moveRight = false;
 
 export function setupInput(player) {
 
+  // =====================
   // ⌨️ КЛАВИАТУРА
+  // =====================
   document.addEventListener("keydown", e => {
     if (e.code === "KeyA") moveLeft = true;
     if (e.code === "KeyD") moveRight = true;
@@ -20,14 +22,50 @@ export function setupInput(player) {
     if (e.code === "KeyD") moveRight = false;
   });
 
-  // 🖱 КЛИК ПО ТОРГОВЦУ И МЕНЮ
+  // =====================
+  // 📱 МОБИЛЬНЫЕ КНОПКИ
+  // =====================
+  const leftBtn  = document.getElementById("left");
+  const rightBtn = document.getElementById("right");
+  const jumpBtn  = document.getElementById("jump");
+
+  if (leftBtn && rightBtn && jumpBtn) {
+
+    // ⬅️ влево
+    leftBtn.addEventListener("touchstart", e => {
+      e.preventDefault();
+      moveLeft = true;
+    });
+    leftBtn.addEventListener("touchend", () => {
+      moveLeft = false;
+    });
+
+    // ➡️ вправо
+    rightBtn.addEventListener("touchstart", e => {
+      e.preventDefault();
+      moveRight = true;
+    });
+    rightBtn.addEventListener("touchend", () => {
+      moveRight = false;
+    });
+
+    // ⬆️ прыжок
+    jumpBtn.addEventListener("touchstart", e => {
+      e.preventDefault();
+      player.jump();
+    });
+  }
+
+  // =====================
+  // 🖱 / 📱 КЛИК ПО КАНВАСУ
+  // =====================
   const canvas = document.getElementById("game");
 
-  canvas.addEventListener("click", e => {
-    const mx = e.offsetX + cameraX;
-    const my = e.offsetY + cameraY;
+  function handlePointer(x, y) {
+    const mx = x + cameraX;
+    const my = y + cameraY;
 
-    // 🟪 клик по торговцу
+    // 🟪 торговец
     if (merchant.active && merchant.isPlayerNear) {
       if (
         mx > merchant.x &&
@@ -40,7 +78,22 @@ export function setupInput(player) {
       }
     }
 
-    // 🎨 клик по цветам
-    merchantUI.click(e.offsetX, e.offsetY);
+    merchantUI.click(x, y);
+  }
+
+  // 🖱 мышь
+  canvas.addEventListener("click", e => {
+    handlePointer(e.offsetX, e.offsetY);
+  });
+
+  // 📱 палец
+  canvas.addEventListener("touchstart", e => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    handlePointer(x, y);
   });
 }
