@@ -1,9 +1,10 @@
+// time.js
 export const time = {
 
-  // ⏳ сутки
-  dayLength: 15,     // 8 минут
-  nightLength: 15,   // 7 минут
-  cycleLength: 30,   // всего 15 минут
+  // ⏳ длительность фаз (в секундах)
+  dayLength: 480,
+  nightLength: 420,
+  cycleLength: 900,
 
   current: 0,
 
@@ -11,17 +12,24 @@ export const time = {
     this.current += dt;
 
     if (this.current >= this.cycleLength) {
-      this.current = 0;
+      this.current -= this.cycleLength;
     }
   },
 
-  // 🌗 плавный переход день ↔ ночь
-getNightFactor() {
+  // 🌗 фактор ночи: 0 (день) → 1 (ночь)
+  getNightFactor() {
+    const t = this.current / this.cycleLength;
+    return (1 - Math.cos(t * Math.PI * 2)) / 2;
+  },
 
-  // t = 0 → 1 (полный цикл суток)
-  let t = this.current / this.cycleLength;
+  // 🌅 фактор утра: 0 → 1 → 0 (только утром)
+  getMorningFactor() {
+    const t = this.current / this.cycleLength;
 
-  // 🌗 Волна ночи (идеально зациклена)
-  return (1 - Math.cos(t * Math.PI * 2)) / 2;
-}
+    // утро — первая четверть цикла
+    if (t < 0 || t > 0.25) return 0;
+
+    const x = t / 0.25;
+    return Math.sin(x * Math.PI);
+  }
 };

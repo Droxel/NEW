@@ -4,103 +4,169 @@ import { CONFIG } from "./config.js";
 export const world = {
   trees: [],
 
-  // размеры деревьев
+  step: 40,
+
   treeWidth: 200,
   treeHeight: 230,
 
-  // крайние точки мира
   farLeft: 0,
   farRight: 0,
-// =====================
-// 🌄 РЕЛЬЕФ ЗЕМЛИ
-// =====================
-getGroundY(x) {
-  const baseY = CONFIG.groundY;
 
-  // большие холмы
-  const big =
-    Math.sin(x * 0.002) * 40;
-
-  // мелкая дрожь
-  const small =
-    Math.sin(x * 0.01) * 10;
-
-  // редкие длинные формы
-  const wide =
-    Math.sin(x * 0.0007) * 60;
-
-  let y = baseY + big + small + wide;
-
-  // 🌿 ПЛАТО (ровные участки)
-  const plateauNoise = Math.sin(x * 0.0003);
-
-  if (Math.abs(plateauNoise) < 0.15) {
-    y = baseY + wide * 0.4; // почти ровно
-  }
-
-  return y;
-},
-
+  craters: [],
 
   // =====================
-  // генерация деревьев
+  // 🌄 ЧИСТАЯ ЗЕМЛЯ (БЕЗ КРАТЕРОВ)
   // =====================
- 
-  generateTree(x, toLeft = false) {
-   const y = this.getGroundY(x);
+  getBaseGroundY(x) {
+    const base = CONFIG.groundY;
 
-const tree = {
-  x,
-  y,
-  width: this.treeWidth,
-  height: this.treeHeight
-};
+    const mega  = Math.sin(x * 0.00008) * 260;
+    const big   = Math.sin(x * 0.0003)  * 140;
+    const mid   = Math.sin(x * 0.0012)  * 50;
+    const small = Math.sin(x * 0.006)   * 12;
 
-
-    if (toLeft) {
-      this.trees.unshift(tree);
-    } else {
-      this.trees.push(tree);
-    }
+    return base + mega + big + mid + small;
   },
 
   // =====================
-  // начальная генерация
+  // 🌍 ЗЕМЛЯ С КРАТЕРАМИ
+  // =====================
+  getGroundY(x) {
+    let y = this.getBaseGroundY(x);
+
+    for (const c of this.craters) {
+      const d = Math.abs(x - c.x);
+      if (d < c.radius) {
+        const t = d / c.radius;
+        const smooth = 1 - t * t;
+        y += smooth * c.depth;
+      }
+    }
+
+    return y;
+  },
+
+  // =====================
+  // 🌲 ДЕРЕВЬЯ
+  // =====================
+  generateTree(x, toLeft = false) {
+
+  // 1️⃣ не в кратере и не у края кратера
+  for (const c of this.craters) {
+    const d = Math.abs(x - c.x);
+    if (d < c.radius + 20) return; // +20 — защита от берегов
+  }
+
+  // 2️⃣ высота земли
+  // ширина дерева
+const half = this.treeWidth / 2;
+
+// берём несколько точек под деревом
+let groundMax = -Infinity;
+
+for (let dx = -half; dx <= half; dx += 10) {
+  const gy = this.getGroundY(x + dx);
+  if (gy > groundMax) groundMax = gy;
+}
+
+const y = groundMax;
+
+
+  // 3️⃣ проверка воды
+  for (const c of this.craters) {
+    if (!c.hasWater) continue;
+
+    if (x > c.leftEdgeX && x < c.rightEdgeX) {
+      if (y < c.waterLevel + 5) return; // дерево в воде ❌
+    }
+  }
+
+  // 4️⃣ проверка уклона (чтобы не висели)
+  const yL = this.getGroundY(x - 10);
+  const yR = this.getGroundY(x + 10);
+
+  if (Math.abs(yL - yR) > 18) return; // слишком крутой склон
+
+  // ✅ всё ок — создаём дерево
+  const tree = {
+    x,
+    y,
+    width: this.treeWidth,
+    height: this.treeHeight
+  };
+
+  if (toLeft) this.trees.unshift(tree);
+  else this.trees.push(tree);
+},
+
+  // =====================
+  // 🛠 ИНИЦИАЛИЗАЦИЯ МИРА
   // =====================
   init() {
+    // --- деревья ---
     this.trees = [];
 
-    let x = -5 * 120;
+    let x = -600;
     this.farLeft = x;
     this.farRight = x;
 
-    while (x < 10 * 120) {
-      const spacing = 50 + Math.random() * 150;
-
+    while (x < 1200) {
       this.generateTree(x);
       this.farRight = x;
+      x += 80 + Math.random() * 140;
+    }
 
-      x += spacing;
+    // --- кратеры ---
+    this.craters = [];
+
+    let cx = -1500;
+    while (cx < 4000) {
+
+      if (Math.random() < 0.4) {
+        const x0 = cx + Math.random() * 600;
+        const radius = 140 + Math.random() * 180;
+        const depth = 40 + Math.random() * 140;
+
+        // ⬇️ БЕРЕГА СЧИТАЕМ ПО ЧИСТОЙ ЗЕМЛЕ
+        const leftEdgeX  = x0 - radius;
+        const rightEdgeX = x0 + radius;
+
+        const leftEdgeY  = this.getBaseGroundY(leftEdgeX);
+        const rightEdgeY = this.getBaseGroundY(rightEdgeX);
+
+        const waterLevel = Math.min(leftEdgeY, rightEdgeY);
+
+        this.craters.push({
+          x: x0,
+          radius,
+          depth,
+          hasWater: depth > 90,
+
+          leftEdgeX,
+          rightEdgeX,
+          leftEdgeY,
+          rightEdgeY,
+
+          waterLevel
+        });
+      }
+
+      cx += 600;
     }
   },
 
   // =====================
-  // обновление мира
+  // 🔄 ОБНОВЛЕНИЕ МИРА
   // =====================
   update(playerX) {
-    // ===== ВПРАВО =====
-    while (playerX + CONFIG.width > this.farRight) {
-      const spacing = 50 + Math.random() * 150;
-      this.farRight += spacing;
 
+    while (playerX + CONFIG.width > this.farRight) {
+      this.farRight += 80 + Math.random() * 140;
       this.generateTree(this.farRight);
     }
 
-    // ===== ВЛЕВО =====
     while (playerX - CONFIG.width < this.farLeft) {
-      const spacing = 50 + Math.random() * 150;
-      this.farLeft -= spacing;
-
+      this.farLeft -= 80 + Math.random() * 140;
       this.generateTree(this.farLeft, true);
     }
   }

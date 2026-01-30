@@ -5,13 +5,16 @@ import { setupInput, moveLeft, moveRight } from "./input.js";
 import { world } from "./world.js";
 import { draw } from "./braw.js";
 import { time } from "./time.js";
-
+import { merchant } from "./merchant.js";
+import { merchantUI } from "./merchant_ui.js";
 // canvas
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 // создаём мир
 world.init();
+
+merchant.spawnNearPlayer(player);
 
 // управление
 setupInput(player);
@@ -44,7 +47,10 @@ else {
   player.targetLookX = 0;
 }
 
-  // обновление игрока
+merchant.update(player, dt);
+
+merchantUI.update(); // 👈 ВАЖНО
+// обновление игрока
   player.update();
   
   // мир
@@ -52,6 +58,8 @@ else {
 
   // рендер
   draw(ctx, player, world, time);
+
+  merchantUI.draw(ctx);
 
   requestAnimationFrame(gameLoop);
 }

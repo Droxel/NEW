@@ -2,27 +2,47 @@
 import { CONFIG } from "./config.js";
 import { world } from "./world.js";
 
-
 export const player = {
+  // ======================
+  // 🧊 ПОЗИЦИЯ И РАЗМЕР
+  // ======================
   x: 100,
   y: CONFIG.groundY,
   size: 30,
 
+  // 🎨 ЦВЕТ КУБИКА (ДЛЯ ТОРГОВЛИ)
+  color: "#000000",
+
+  // ======================
+  // 🏃 ФИЗИКА
+  // ======================
   velocityX: 0,
   velocityY: 0,
   onGround: true,
 
+  // ======================
+  // 👀 НАПРАВЛЕНИЕ И ВЗГЛЯД
+  // ======================
   direction: 0,
   lookX: 0,
   targetLookX: 0,
 
+  // ======================
+  // 🧊 АНИМАЦИЯ ФОРМЫ
+  // ======================
   scaleX: 1,
   scaleY: 1,
 
+  // ======================
+  // 👁 МОРГАНИЕ
+  // ======================
   blink: 0,
   blinkTimer: 0,
   justLanded: false,
 
+  // ======================
+  // ⬆️ ПРЫЖОК
+  // ======================
   jump() {
     if (this.onGround) {
       this.velocityY = -CONFIG.jumpPower;
@@ -30,6 +50,9 @@ export const player = {
     }
   },
 
+  // ======================
+  // 🔄 ОБНОВЛЕНИЕ
+  // ======================
   update() {
     // ⬅️➡️ движение
     this.x += this.velocityX;
@@ -39,25 +62,28 @@ export const player = {
     this.y += this.velocityY;
 
     // ======================
-    // 🌍 ЗЕМЛЯ (БЕЗ КАМНЕЙ)
+    // 🌍 ЗЕМЛЯ
     // ======================
     const groundY = world.getGroundY(this.x);
 
-if (this.y >= groundY) {
-  if (!this.onGround) this.justLanded = true;
+    if (this.y >= groundY) {
+      if (!this.onGround) this.justLanded = true;
 
-  this.y = groundY;
-  this.velocityY = 0;
-  this.onGround = true;
-} else {
-  this.onGround = false;
-}
+      this.y = groundY;
+      this.velocityY = 0;
+      this.onGround = true;
+    } else {
+      this.onGround = false;
+    }
 
-
-    // 👀 взгляд
+    // ======================
+    // 👀 ПЛАВНЫЙ ВЗГЛЯД
+    // ======================
     this.lookX += (this.targetLookX - this.lookX) * 0.15;
 
-    // 🧊 squash & stretch
+    // ======================
+    // 🧊 SQUASH & STRETCH
+    // ======================
     if (!this.onGround) {
       this.scaleY += (1.15 - this.scaleY) * 0.2;
       this.scaleX += (0.9 - this.scaleX) * 0.2;
@@ -66,7 +92,9 @@ if (this.y >= groundY) {
       this.scaleY += (1 - this.scaleY) * 0.25;
     }
 
-    // 👁 моргание
+    // ======================
+    // 👁 МОРГАНИЕ
+    // ======================
     this.blinkTimer++;
 
     if (this.blinkTimer > 180 && Math.random() < 0.02) {
