@@ -1,5 +1,5 @@
 // merchant.js
-import { world } from "./world.js";
+import { world } from "./world/world.js";
 
 export const merchant = {
   active: false,

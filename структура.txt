@@ -2,7 +2,7 @@
 ��਩�� ����� ⮬�: D6BE-FD12
 C:.
 |   index.html
-|   script.js
+| 
 |   style.css
 |   �������.txt
 |   
@@ -18,4 +18,5 @@ C:.
         main.js
         player.js
         world.js
-        
+        time.js
+        merchant.js

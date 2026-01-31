@@ -1,0 +1,63 @@
+Структура папок тома Windows 10
+Серийный номер тома: D6BE-FD12
+C:.
+|   index.html
+|   structure.txt
+|   style.css
+|   структура.txt
+|   
++---assets
+|       cam.svg
+|       cube.svg
+|       tree1.svg
+|       tree2.svg
+|       
+\---src
+    |   braw.js
+    |   config.js
+    |   input.js
+    |   main.js
+    |   merchant.js
+    |   merchant_ui.js
+    |   player.js
+    |   time.js
+    |   
+    +---bosses
+    |   |   Boss.js
+    |   |   BossManager.js
+    |   |   
+    |   +---cubeBoss
+    |   |       CubeBoss.js
+    |   |       cubeBossConfig.js
+    |   |       
+    |   +---entities
+    |   |       Entity.js
+    |   |       
+    |   \---states
+    |           BossState.js
+    |           JumpAttackState.js
+    |           SleepState.js
+    |           TiredState.js
+    |           
+    +---We don't use old files
+    |       script.js
+    |       world.js
+    |       
+    \---world
+        |   heightmap.js
+        |   seed.js
+        |   world.js
+        |   
+        +---biomes
+        |       biomeMap.js
+        |       jungle.js
+        |       plains.js
+        |       
+        +---generators
+        |       craters.js
+        |       trees.js
+        |       water.js
+        |       
+        \---rules
+                placement.js
+                

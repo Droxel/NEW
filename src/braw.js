@@ -34,7 +34,8 @@ export let cameraX = 0;
 export let cameraY = 0;
 
 
-export function draw(ctx, player, world, time) {
+export function draw(ctx, player, world, time, boss) {
+
 
   // =========================
   // 🎥 КАМЕРА СЛЕДУЕТ ЗА ИГРОКОМ
@@ -225,44 +226,29 @@ world.trees.forEach(tree => {
 // =========================
 // 💧 ВОДА (ПО САМОМУ НИЗКОМУ БЕРЕГУ)
 // =========================
-ctx.fillStyle = "rgba(70,120,200,0.75)";
+/*ctx.fillStyle = "rgba(70,120,200,0.75)";
 
-for (const c of world.craters) {
-  if (!c.hasWater) continue;
-
-  const leftX = Math.floor(c.leftEdgeX);
-  const rightX = Math.ceil(c.rightEdgeX);
-  const waterY = c.waterLevel + player.size;
+for (const w of world.water) {
+  const leftX = Math.floor(w.left);
+  const rightX = Math.ceil(w.right);
+  const waterY = w.level;
 
   ctx.beginPath();
 
-  // ── верх воды: ВСЕГДА строго горизонтально ──
+  // верх воды
   ctx.moveTo(leftX, waterY);
   ctx.lineTo(rightX, waterY);
 
-  // ── дно воды: по форме кратера ──
+  // дно воды = РЕАЛЬНАЯ ЗЕМЛЯ
   for (let x = rightX; x >= leftX; x--) {
-    const d = Math.abs(x - c.x);
-
-    let y = world.getBaseGroundY(x) + player.size;
-
-    if (d < c.radius) {
-      const t = d / c.radius;
-      const smooth = 1 - t * t;
-      y += smooth * c.depth;
-    }
-
-    // ⛔ никогда не выше воды
-    y = Math.max(y, waterY);
-
+    const y = Math.max(world.getGroundY(x), waterY);
     ctx.lineTo(x, y);
   }
 
   ctx.closePath();
   ctx.fill();
 }
-
-
+*/
   // =========================
   // 🟥 КУБИК
   // =========================
@@ -280,41 +266,34 @@ for (const c of world.craters) {
     ctx.closePath();
   }
 
-  ctx.save();
-  ctx.translate(
-    player.x + player.size / 2,
-    player.y + player.size / 2
-  );
-  ctx.scale(player.scaleX, player.scaleY);
+ctx.save();
+ctx.translate(player.x + player.size / 2, player.y + player.size / 2);
+ctx.rotate(player.rotation);
+ctx.scale(player.scaleX, player.scaleY);
 
- ctx.fillStyle = player.color;
+// 🟥 куб
+ctx.fillStyle = player.color;
+roundRect(ctx, -player.size / 2, -player.size / 2, player.size, player.size, 6);
+ctx.fill();
 
-  roundRect(
-    ctx,
-    -player.size / 2,
-    -player.size / 2,
-    player.size,
-    player.size,
-    6
-  );
-  ctx.fill();
-  ctx.restore();
+// 👀 глаза
+const eyeY = -5;
+const look = player.lookX;
 
-  // 👀 глаза
-  const eyeY = player.y + 10;
-  const look = player.lookX;
+ctx.fillStyle = "white";
+ctx.beginPath();
+ctx.arc(-7, eyeY, 4, 0, Math.PI * 2);
+ctx.arc(7, eyeY, 4, 0, Math.PI * 2);
+ctx.fill();
 
-  ctx.fillStyle = "white";
-  ctx.beginPath();
-  ctx.arc(player.x + 8, eyeY, 4, 0, Math.PI * 2);
-  ctx.arc(player.x + player.size - 8, eyeY, 4, 0, Math.PI * 2);
-  ctx.fill();
+ctx.fillStyle = "black";
+ctx.beginPath();
+ctx.arc(-7 + look, eyeY, 2, 0, Math.PI * 2);
+ctx.arc(7 + look, eyeY, 2, 0, Math.PI * 2);
+ctx.fill();
 
-  ctx.fillStyle = "black";
-  ctx.beginPath();
-  ctx.arc(player.x + 8 + look, eyeY, 2, 0, Math.PI * 2);
-  ctx.arc(player.x + player.size - 8 + look, eyeY, 2, 0, Math.PI * 2);
-  ctx.fill();
+ctx.restore();
+
 
 // =========================
 // 🟪 СТРАНСТВУЮЩИЙ КУБИК
@@ -428,6 +407,98 @@ function roundedRect(x, y, w, h, r) {
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
+}
+
+
+// =========================
+// 🧊 БОСС-КУБ (УЛУЧШЕННЫЙ ВИЗУАЛ)
+// =========================
+if (boss && boss.isAlive) {
+  ctx.save();
+
+  const size = boss.size;
+  const x = boss.x - size / 2;
+  const y = boss.y - size;
+  const radius = 14;
+
+  // =========================
+  // 🔴 ТЕЛО (СКРУГЛЁННОЕ)
+  // =========================
+  ctx.fillStyle = boss.isVulnerable ? "#b22222" : "#555";
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 12;
+
+  ctx.beginPath();
+  ctx.roundRect(x, y, size, size, radius);
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+
+  // =========================
+  // 👿 ГЛАЗА
+  // =========================
+  const eyeY = y + size * 0.35;
+  const eyeOffset = size * 0.22;
+
+  // белки
+  ctx.fillStyle = "#eee";
+  ctx.beginPath();
+  ctx.ellipse(boss.x - eyeOffset, eyeY, 7, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(boss.x + eyeOffset, eyeY, 7, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // зрачки
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(boss.x - eyeOffset + 2, eyeY, 3, 0, Math.PI * 2);
+  ctx.arc(boss.x + eyeOffset - 2, eyeY, 3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // =========================
+  // 😠 БРОВИ
+  // =========================
+  ctx.strokeStyle = "#111";
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  ctx.moveTo(boss.x - eyeOffset - 10, eyeY - 10);
+  ctx.lineTo(boss.x - eyeOffset + 6, eyeY - 6);
+
+  ctx.moveTo(boss.x + eyeOffset + 10, eyeY - 10);
+  ctx.lineTo(boss.x + eyeOffset - 6, eyeY - 6);
+  ctx.stroke();
+
+  // =========================
+  // 😬 РОТ (ЗЛОЙ)
+  // =========================
+  ctx.strokeStyle = "#111";
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  ctx.moveTo(boss.x - 18, y + size * 0.65);
+  ctx.lineTo(boss.x + 18, y + size * 0.65);
+  ctx.stroke();
+
+  // =========================
+  // ❤️ ХП БАР
+  // =========================
+  const barWidth = 90;
+  const barHeight = 8;
+  const hpPercent = boss.hp / boss.maxHp;
+
+  const bx = boss.x - barWidth / 2;
+  const by = y - 14;
+
+  ctx.fillStyle = "#300";
+  ctx.fillRect(bx, by, barWidth, barHeight);
+
+  ctx.fillStyle = hpPercent < 0.3 ? "#e33" : "#6f0";
+  ctx.fillRect(bx, by, barWidth * hpPercent, barHeight);
+
+  ctx.strokeStyle = "#000";
+  ctx.strokeRect(bx, by, barWidth, barHeight);
+
+  ctx.restore();
 }
 
 
