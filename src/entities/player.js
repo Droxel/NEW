@@ -1,0 +1,228 @@
+import { CONFIG } from "../core/config.js";
+import { world } from "../world/world.js";
+import { Bubble } from "./Bubble.js";
+import { GrapplingHook } from "./GrapplingHook.js";
+export const player = {
+    // ХАРАКТЕРИСТИКИ
+    hp: 3,
+    maxHp: 3,
+    invulnerableTimer: 0,
+    timeSinceLastHit: 0,
+    regenTimer: 0,
+    bubbleInstance: null,
+    potionCooldown: 0,
+
+    // СОСТОЯНИЕ И ПОЗИЦИЯ
+    rotation: 0,
+    rotationSpeed: 0,
+    rotationDir: 0,
+    x: 100,
+    y: CONFIG.groundY,
+    size: 30, // Размер игрока (высота)
+    color: "#140858",
+    velocityX: 0,
+    velocityY: 0,
+    onGround: true,
+    direction: 0,
+    lookX: 0,
+    targetLookX: 0,
+    scaleX: 1,
+    scaleY: 1,
+    blink: 0,
+    blinkTimer: 0,
+    justLanded: false,
+isFlying: false, // НОВОЕ: флаг полета
+    flySpeed: 10,    // Скорость полета
+    hook: null,
+hasHookInInventory: false, // Будем переключать при подборе
+    takeDamage(amount) {
+        if (this.invulnerableTimer > 0) return;
+        this.hp -= amount;
+        this.invulnerableTimer = 60;
+        this.timeSinceLastHit = 0;
+        this.regenTimer = 0;
+        console.log("Player hit! HP:", this.hp);
+    },
+
+jump() {
+        // НОВОЕ: Если мы висим на крюке, пробел/прыжок отцепляет нас
+        if (this.hook && this.hook.active && this.hook.hooked) {
+            this.hook.release();
+            this.velocityY = -CONFIG.jumpPower;
+            this.onGround = false;
+            return;
+        }
+
+        if (this.onGround) {
+            this.velocityY = -CONFIG.jumpPower;
+            this.onGround = false;
+            // Добавляем эффект вращения
+            if (this.velocityX !== 0) {
+                this.rotationDir = Math.sign(this.velocityX);
+                this.rotationSpeed = 0.25;
+            }
+        }
+    },
+    // ПРОВЕРКА СТОЛКНОВЕНИЙ СО СТЕНАМИ (Блоки данжа)
+    checkWallCollisions(axis) {
+        if (!world.chunkManager) return;
+
+        const chunkId = world.chunkManager.getChunkId(this.x);
+        const chunk = world.chunkManager.chunks.get(chunkId);
+        if (!chunk || !chunk.objects) return;
+
+        // Сбрасываем флаг земли перед проверкой Y, если мы падаем
+        // Но если мы уже нашли землю в этом кадре, не сбрасываем
+        // if (axis === 'y' && this.velocityY > 0) this.onGround = false; 
+
+        for (let obj of chunk.objects) {
+            // Проверяем только стены данжа
+            if (obj.type !== "dungeon_wall") continue;
+
+            // AABB Коллизия
+            if (
+                this.x < obj.x + obj.width &&
+                this.x + this.size > obj.x &&
+                this.y < obj.y + obj.height && // this.y - это ВЕРХ игрока (обычно), но у тебя логика отрисовки может отличаться
+                this.y + this.size > obj.y 
+            ) {
+                if (axis === 'x') {
+                    if (this.velocityX > 0) { // Движемся вправо -> врезаемся левой стороной стены
+                        this.x = obj.x - this.size;
+                    } else if (this.velocityX < 0) { // Движемся влево -> врезаемся правой стороной
+                        this.x = obj.x + obj.width;
+                    }
+                    this.velocityX = 0;
+                }
+                
+                if (axis === 'y') {
+                    if (this.velocityY > 0) { // Падаем вниз -> встаем на пол
+                        this.y = obj.y - this.size; 
+                        this.velocityY = 0;
+                        this.onGround = true; // МЫ НА БЛОКЕ!
+                    } else if (this.velocityY < 0) { // Прыгаем вверх -> бьемся головой
+                        this.y = obj.y + obj.height;
+                        this.velocityY = 0;
+                    }
+                }
+            }
+        }
+    },
+
+update() {
+    // Если игрок мертв, не даем ему двигаться и обновляться
+    if (this.hp <= 0) {
+        this.velocityX = 0;
+        this.velocityY = 0;
+        return; 
+    }
+    // 1. ТАЙМЕРЫ И РЕГЕНЕРАЦИЯ (без изменений)
+    if (this.invulnerableTimer > 0) this.invulnerableTimer--;
+    if (this.potionCooldown > 0) this.potionCooldown--;
+    if (this.hp < this.maxHp) {
+        this.timeSinceLastHit++;
+        if (this.timeSinceLastHit > 300) {
+            this.regenTimer++;
+            if (this.regenTimer >= 180) {
+                this.hp++;
+                this.regenTimer = 0;
+            }
+        }
+    }
+
+    // 2. ДВИЖЕНИЕ (ГЛАВНОЕ ИСПРАВЛЕНИЕ)
+    // Мы разделяем логику: либо КРЮК, либо ПОЛЕТ, либо ОБЫЧНАЯ ФИЗИКА
+   // 2. ДВИЖЕНИЕ
+    if (this.hook && this.hook.active && this.hook.hooked) {
+        // РЕЖИМ КРЮКА
+        this.onGround = false;
+        this.rotation = 0;
+        
+        // Маленький хак: если мы висим, внешние силы (типа инерции от бега) не должны на нас влиять
+        if (Math.abs(this.velocityX) > 16) this.velocityX = 0; 
+        if (Math.abs(this.velocityY) > 16) this.velocityY = 0;
+    }
+    else if (this.isFlying) {
+        // РЕЖИМ ПОЛЕТА
+        this.x += this.velocityX * 1.5; 
+        this.y += this.velocityY * 1.5;
+        this.onGround = false;
+        this.rotation = 0; 
+    } 
+    else {
+        // ОБЫЧНЫЙ РЕЖИМ (Гравитация и ходьба)
+        
+        // Движение по X
+        this.x += this.velocityX;
+        this.checkWallCollisions('x');
+
+        // Движение по Y (Гравитация)
+        this.velocityY += CONFIG.gravity;
+        this.y += this.velocityY;
+        
+        this.onGround = false; // Сбрасываем, чтобы checkWallCollisions или земля его поставили в true
+        this.checkWallCollisions('y');
+
+        // ПРОВЕРКА ПОВЕРХНОСТИ (Ландшафт)
+        const groundY = world.getHeight(this.x);
+        const dist = this.y - groundY;
+
+        // Магнитим к земле, только если падаем и находимся близко
+        if (dist >= 0 && this.velocityY >= 0 && dist < 150) {
+            if (!this.onGround) this.justLanded = true;
+            this.y = groundY;
+            this.velocityY = 0;
+            this.onGround = true;
+        }
+    }
+
+    // 3. ВИЗУАЛЬНЫЕ ЭФФЕКТЫ (Оставляем как было)
+    this.lookX += (this.targetLookX - this.lookX) * 0.15;
+    if (!this.onGround) {
+        this.scaleY += (1.15 - this.scaleY) * 0.2;
+        this.scaleX += (0.9 - this.scaleX) * 0.2;
+    } else {
+        this.scaleX += (1 - this.scaleX) * 0.25;
+        this.scaleY += (1 - this.scaleY) * 0.25;
+    }
+
+    // Блики и вращение
+    this.blinkTimer++;
+    if (this.blinkTimer > 180 && Math.random() < 0.02) {
+        this.blink = 1;
+        this.blinkTimer = 0;
+    }
+    this.blink += (0 - this.blink) * 0.2;
+
+    if (!this.onGround && this.rotationDir !== 0 && !(this.hook && this.hook.active)) {
+        this.rotation += this.rotationSpeed * this.rotationDir;
+    } else if (this.onGround) {
+        const snapped = Math.round(this.rotation / (Math.PI / 2)) * (Math.PI / 2);
+        this.rotation += (snapped - this.rotation) * 0.3;
+    }
+
+    // 4. ОБНОВЛЕНИЕ СИСТЕМ (Инвентарь и Крюк)
+    if (this.inventory && this.inventory.bubbleSlots && this.inventory.bubbleSlots[0]) {
+        if (!this.bubbleInstance) this.bubbleInstance = new Bubble(this);
+        this.bubbleInstance.update(this.inventory.bubbleSlots[1]);
+    } else {
+        this.bubbleInstance = null;
+    }
+
+    // Проверка наличия крюка
+    let foundHook = false;
+    if (this.inventory && this.inventory.mainSlots) {
+        foundHook = this.inventory.mainSlots.some(item => item && item.id === 'hook');
+    }
+
+    if (foundHook !== this.hasHookInInventory) {
+        this.hasHookInInventory = foundHook;
+        const joy = document.getElementById("hook-joystick-container");
+        if (joy) joy.style.display = foundHook ? "block" : "none";
+    }
+
+    // ВАЖНО: Вызываем обновление крюка в самом конце
+    if (this.hook) this.hook.update();
+}
+
+};

@@ -1,0 +1,46 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+  <defs>
+    <!-- Основной радужный градиент -->
+    <radialGradient id="rainbowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00FFFF">
+        <animate attributeName="stop-color"
+                 values="#00FFFF; #8A2BE2; #00FF7F; #FF3B3B; #00FFFF"
+                 dur="3s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#8A2BE2">
+        <animate attributeName="stop-color"
+                 values="#8A2BE2; #00FF7F; #FF3B3B; #00FFFF; #8A2BE2"
+                 dur="3s" repeatCount="indefinite"/>
+      </stop>
+    </radialGradient>
+
+    <!-- Свечение (чуть сильнее для эффекта магии) -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Внешний ореол (мягкое пульсирующее облако) -->
+  <circle cx="32" cy="32" r="22" fill="url(#rainbowGrad)" opacity="0.3" filter="url(#glow)">
+    <animate attributeName="r" values="20;25;20" dur="3s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- Основная пульсирующая эссенция -->
+  <circle cx="32" cy="32" r="18" fill="url(#rainbowGrad)" filter="url(#glow)">
+    <!-- Пульсация размера -->
+    <animate attributeName="r" values="16;19;16" dur="2s" repeatCount="indefinite"/>
+    
+    <!-- Легкое смещение центра для эффекта "плавания" -->
+    <animate attributeName="cx" values="31;33;31" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="32;31;32" dur="5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Ядро (белый блик для блеска) -->
+  <circle cx="28" cy="28" r="5" fill="white" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
+  </circle>
+</svg>

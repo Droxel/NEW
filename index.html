@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Игра</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="hook-joystick-container" style="
+    display: none; /* Скрыт по умолчанию */
+    position: fixed; 
+    bottom: 160px;
+    right: 30px; 
+    width: 120px; 
+    height: 120px; 
+    background: rgba(0,0,0,0.3); 
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%; 
+    touch-action: none;
+    z-index: 1000; 
+    display: block;
+">
+    <div id="hook-joystick-stick" style="
+        position: absolute; 
+        top: 35px; 
+        left: 35px; 
+        width: 50px; 
+        height: 50px; 
+        background: #5c3a21; 
+        border: 2px solid #fff; 
+        border-radius: 50%;
+        pointer-events: none;
+    "></div>
+</div>
+  <div class="game-wrapper">
+    <div class="game-box" id="game-box">
+      <div id="health-ui"></div> 
+
+      <div id="game-over-screen">
+        <div class="over-content">
+          <h1>ТЫ ПОГИБ</h1>
+          <button onclick="location.reload()">ВОЗРОДИТЬСЯ</button>
+        </div>
+      </div>
+
+      <canvas id="game" width="600" height="300"></canvas>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="move">
+      <button id="left">◀</button>
+      <button id="right">▶</button>
+    </div>
+
+<div class="actions" style="display: flex; gap: 15px; align-items: flex-end;">
+    <button id="heal-btn" style="width: 50px; height: 50px; background-color: #444; color: white;">H</button>
+    
+
+    
+    <button id="jump" style="width: 70px; height: 70px; z-index: 101;">▲</button>
+</div>
+  </div>
+
+  <script type="module" src="src/core/main.js"></script>
+</body>
+</html>

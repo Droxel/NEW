@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="10 30 44 31" xmlns="http://www.w3.org/2000/svg">
+  <!-- Левый горшок (с розой) -->
+  <rect x="12" y="48" width="12" height="12" fill="#a0522d" stroke="#5d4037" stroke-width="2"/>
+  <rect x="17" y="38" width="2" height="10" fill="#388e3c"/>
+  <rect x="14" y="34" width="8" height="6" fill="#e91e63" rx="1"/>
+
+  <!-- Правый горшок (с кактусом) -->
+  <rect x="40" y="48" width="12" height="12" fill="#a0522d" stroke="#5d4037" stroke-width="2"/>
+  <rect x="42" y="32" width="8" height="16" fill="#4caf50" stroke="#2e7d32" stroke-width="2"/>
+  <rect x="43" y="36" width="2" height="2" fill="#1b5e20"/>
+  <rect x="47" y="42" width="2" height="2" fill="#1b5e20"/>
+</svg>

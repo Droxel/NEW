@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 64" width="32" height="64">
+
+    <!-- Основание -->
+    <rect x="6" y="54" width="20" height="6" rx="2"
+          fill="#3e5f3e"/>
+
+    <!-- Столб -->
+    <rect x="8" y="4" width="16" height="50" rx="4"
+          fill="#5f8a5f"/>
+
+    <!-- Глаза -->
+    <circle cx="13" cy="18" r="2" fill="#cfeecf"/>
+    <circle cx="19" cy="18" r="2" fill="#cfeecf"/>
+
+    <!-- Лианы -->
+    <path d="M10 24 C14 30 10 38 14 46"
+          stroke="#2f4f2f"
+          stroke-width="1"
+          fill="none"/>
+
+    <path d="M22 22 C18 30 22 38 18 48"
+          stroke="#2f4f2f"
+          stroke-width="1"
+          fill="none"/>
+
+</svg>

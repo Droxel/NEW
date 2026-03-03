@@ -1,0 +1,22 @@
+        <svg xmlns="http://www.w3.org/2000/svg" width="120" height="300" viewBox="38 15 24 78">
+            <defs>
+                <filter id="crystalGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
+                </filter>
+            </defs>
+
+            <!-- Посох -->
+            <rect x="47" y="40" width="6" height="50" rx="2" fill="#5d3a1a" transform="rotate(-10, 50, 65)" />
+            
+            <!-- Крепление -->
+            <path d="M45,45 Q50,42 55,45 L53,52 Q48,49 43,52 Z" fill="#a0522d" stroke="#5c3317" stroke-width="0.5" />
+
+            <!-- Кристалл -->
+            <g>
+                <polygon points="50,15 62,35 50,50 38,35" fill="#00ffff" opacity="0.8" filter="url(#crystalGlow)">
+                    <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1s" repeatCount="indefinite" />
+                </polygon>
+                <polygon points="50,18 58,35 50,45 42,35" fill="#e0ffff" stroke="#008b8b" stroke-width="1" />
+                <line x1="50" y1="20" x2="48" y2="35" stroke="#008b8b" stroke-width="0.5" />
+            </g>
+        </svg>

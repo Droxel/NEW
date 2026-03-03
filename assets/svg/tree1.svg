@@ -1,0 +1,30 @@
+<svg width="200" height="230" viewBox="0 0 200 230"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Дерево -->
+  <g>
+    <!-- Крона (колышется) -->
+    <g>
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        values="-1.5 100 170; 1.5 100 170; -1.5 100 170"
+        dur="3.5s"
+        repeatCount="indefinite"
+        keyTimes="0;0.5;1"
+        keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+        calcMode="spline"/>
+
+      <!-- Основная крона -->
+      <circle cx="100" cy="95" r="45" fill="#58D68D"/>
+      <circle cx="75" cy="105" r="30" fill="#2ECC71"/>
+      <circle cx="125" cy="105" r="30" fill="#2ECC71"/>
+      <circle cx="100" cy="65" r="28" fill="#27AE60"/>
+    </g>
+
+    <!-- Ствол -->
+    <polygon points="90,140 110,140 125,230 75,230"
+             fill="#8B5A2B"/>
+  </g>
+
+</svg>

@@ -1,0 +1,17 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Внешняя обводка (темная) -->
+  <rect x="5" y="11" width="22" height="16" rx="5" fill="#333333"/> 
+  
+  <!-- Основное тело камня -->
+  <rect x="7" y="13" width="18" height="12" rx="4" fill="#707070"/>
+
+  <!-- Неровность сверху (чтобы не был просто кирпичом) -->
+  <rect x="10" y="9" width="12" height="4" rx="2" fill="#333333"/> <!-- Обводка верха -->
+  <rect x="12" y="11" width="8" height="3" rx="1" fill="#707070"/> <!-- Тело верха -->
+
+  <!-- Минималистичный блик (светлая грань) -->
+  <rect x="9" y="15" width="4" height="2" rx="1" fill="#909090"/>
+  
+  <!-- Небольшая выемка/текстура -->
+  <rect x="18" y="20" width="3" height="2" rx="1" fill="#505050"/>
+</svg>

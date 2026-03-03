@@ -1,0 +1,15 @@
+
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Верёвочка -->
+  <line x1="16" y1="2" x2="16" y2="12" stroke="#8d6e63" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Сердечко -->
+  <path d="M16 12
+           C13 9, 7 11, 16 20
+           C25 11, 19 9, 16 12 Z"
+        fill="#f44336"
+        stroke="#b71c1c"
+        stroke-width="1.5"/>
+
+</svg>

@@ -1,0 +1,358 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Запрещаем скролл вообще */
+  background: #000; /* Черный фон для "ушей" если экран слишком длинный */
+}
+
+/* Обертка на весь экран */
+.game-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Арена теперь адаптивная */
+.game-box {
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  border: none; /* Убираем рамку, она только ест место */
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Канвас растягивается, сохраняя пропорции */
+canvas {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover; /* Или contain, если не хочешь обрезать края */
+}
+
+/* Кнопки управления теперь ПОВЕРХ игры */
+.controls {
+  position: absolute; /* Не fixed, а absolute внутри wrapper */
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 100; /* Чтобы были выше канваса */
+  padding: 0 40px;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+}
+
+.controls button {
+  pointer-events: auto; /* Возвращаем кликабельность кнопкам */
+  opacity: 0.7; /* Делаем чуть прозрачными, чтобы не перекрывать обзор */
+}
+
+/* Стили для кнопки лечения */
+#heal-btn {
+    transition: opacity 0.2s, filter 0.2s;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Если неактивна (нет зелья или кд) */
+#heal-btn.inactive {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+#jump {
+  margin-bottom: 20px;
+}
+
+/* Интерфейс здоровья */
+#health-ui {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 5px;
+  z-index: 10;
+}
+
+.heart {
+  width: 20px;
+  height: 20px;
+  background-color: #ff3333;
+  /* Поворот */
+  transform: rotate(45deg);
+  position: relative;
+  transition: all 0.2s;
+  /* Тень для объема */
+  box-shadow: -1px 1px 2px rgba(0,0,0,0.5);
+
+  /* --- ГЛАВНОЕ ИЗМЕНЕНИЕ --- */
+  /* Отрицательный отступ снизу. Заставляет следующий ряд "наехать" на этот.
+     Поиграй с этим значением: -10px (меньше наложение), -18px (сильнее наложение). */
+  margin-bottom: -14px;
+  /* Небольшой отступ сверху, чтобы компенсировать поворот первого ряда */
+  margin-top: 10px;
+}
+
+.heart::before,
+.heart::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background-color: #ff3333;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.heart::before { top: -10px; left: 0; }
+.heart::after { top: 0; left: -10px; }
+
+.heart.empty, .heart.empty::before, .heart.empty::after {
+  background-color: #444; 
+}
+
+/* Анимация при ударе */
+.game-box.shake {
+  animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-2px, 0, 0); }
+  40%, 60% { transform: translate3d(2px, 0, 0); }
+}
+
+/* Экран проигрыша */
+#game-over-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.over-content {
+  text-align: center;
+  color: white;
+}
+
+.over-content h1 {
+  font-size: 40px;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px black;
+}
+
+.over-content button {
+  padding: 15px 30px;
+  font-size: 20px;
+  cursor: pointer;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.over-content button:hover {
+  transform: scale(1.1);
+  background: #eee;
+}
+
+/* 🎒 Кнопка рюкзака */
+.inventory-toggle {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+.inventory-toggle img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+}
+
+/* 📦 Контейнер инвентаря */
+.inventory-overlay {
+    display: none;
+    flex-direction: row; 
+    align-items: flex-start;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 15px; 
+    gap: 20px;
+    background: rgba(0,0,0,0.85); 
+    border-radius: 10px;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.inventory-overlay.active {
+    display: flex;
+}
+
+.grid {
+    display: grid;
+    gap: 6px;
+    margin: 0 auto;
+}
+
+.main-grid { grid-template-columns: repeat(5, 32px); }
+.accessory-grid { grid-template-columns: repeat(3, 32px); }
+.currency-grid { grid-template-columns: repeat(1, 32px); }
+
+/* 🔲 Слоты */
+.slot {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    user-select: none;
+}
+
+.slot:hover {
+    border-color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.2);
+}
+
+.inventory-overlay h3 {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+    font-weight: normal;
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* Хотбар внутри арены */
+#hotbar {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    z-index: 10;
+}
+/* Подсказка предмета */
+.item-tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-size: 12px;
+    pointer-events: none; /* Чтобы не мешала кликам */
+    z-index: 2000;
+    display: none;
+    max-width: 200px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.item-tooltip b {
+    display: block;
+    color: #ffd700;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.item-tooltip i {
+    color: #aaa;
+}
+/* Контейнер для кнопок действий слева */
+.inventory-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-right: 15px; /* Отступ от сетки рюкзака */
+}
+
+.use-btn {
+    width: 60px;
+    height: 60px;
+    background: #4a4a4a;
+    border: 2px solid #222;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+/* Когда кнопка активна (выбран фрукт или зелье) */
+.use-btn.active {
+    opacity: 1;
+    filter: none;
+    background: #5cb85c;
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(92, 184, 92, 0.6);
+}
+
+.use-btn img {
+    width: 80%;
+    height: 80%;
+}
+
+/* Подсветка выбранного слота */
+.slot.selected {
+    border-color: #ffeb3b !important;
+    box-shadow: inset 0 0 8px #ffeb3b;
+    background: rgba(255, 235, 59, 0.1);
+}
+.slot, .slot img {
+    touch-action: none; /* Запрещает браузеру пытаться скроллить страницу, когда ты тащишь предмет */
+    -webkit-user-drag: none; /* Запрещает системный драг-энд-дроп картинок */
+}
+/* Интерфейс здоровья */
+#health-ui {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  /* Разрешаем перенос на новую строку */
+  flex-wrap: wrap;
+  /* Ограничиваем ширину. 260px должно хватить ровно на 10 плотно стоящих сердец */
+  width: 260px;
+  /* Зазор: 0 по вертикали, 6px по горизонтали между сердцами */
+  gap: 0 6px;
+  z-index: 10;
+  /* Небольшой отступ справа, чтобы повернутые сердца не обрезались экраном */
+  padding-right: 10px;
+}

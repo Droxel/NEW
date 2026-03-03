@@ -1,0 +1,26 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- РУКОЯТЬ -->
+  <rect x="14" y="16" width="4" height="12" rx="1" fill="#5D3A1A"/>
+  <rect x="15" y="18" width="2" height="8" fill="#79553D"/>
+
+  <!-- Основание под набалдашником -->
+  <rect x="13" y="14" width="6" height="2" fill="#D4AF37"/>
+
+  <!-- ГОЛОВА БУЛАВЫ -->
+  <rect x="10" y="4" width="12" height="11" rx="2" fill="#4A4A4A"/>
+  <rect x="11" y="5" width="10" height="9" rx="1" fill="#707070"/>
+
+  <!-- Блики и текстура -->
+  <rect x="11" y="5" width="4" height="4" fill="#A0A0A0"/>
+  <rect x="17" y="10" width="4" height="4" fill="#505050"/>
+
+  <!-- Шипы -->
+  <rect x="8" y="8" width="2" height="4" rx="1" fill="#4A4A4A"/>
+  <rect x="22" y="8" width="2" height="4" rx="1" fill="#4A4A4A"/>
+  <rect x="14" y="2" width="4" height="2" rx="1" fill="#707070"/>
+
+  <!-- Нижний набалдашник -->
+  <rect x="13" y="27" width="6" height="3" rx="1" fill="#D4AF37"/>
+
+</svg>

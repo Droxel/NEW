@@ -1,0 +1,36 @@
+<svg width="200" height="230" viewBox="0 0 200 230"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Ёлка -->
+  <g>
+    <!-- Крона (качается) -->
+    <g>
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        values="-2 100 170; 2 100 170; -2 100 170"
+        dur="3s"
+        repeatCount="indefinite"
+        keyTimes="0;0.5;1"
+        keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+        calcMode="spline"/>
+
+      <!-- Нижний ярус -->
+      <polygon points="100,45 35,170 165,170"
+               fill="#2ECC71"/>
+
+      <!-- Средний ярус -->
+      <polygon points="100,25 55,145 145,145"
+               fill="#27AE60"/>
+
+      <!-- Верхний ярус -->
+      <polygon points="100,8 70,115 130,115"
+               fill="#229954"/>
+    </g>
+
+    <!-- Ствол -->
+    <polygon points="85,170 115,170 125,230 75,230"
+             fill="#8B5A2B"/>
+  </g>
+
+</svg>

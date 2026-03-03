@@ -1,0 +1,32 @@
+<svg width="160" height="360" viewBox="0 0 160 360" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 🌳 Ствол (толстый, массивный) -->
+  <path
+    d="M70 360
+       C60 310, 55 260, 58 210
+       C60 160, 70 110, 78 70
+       C86 110, 96 160, 98 210
+       C101 260, 96 310, 90 360 Z"
+    fill="#5b3a1e"
+    stroke="#3b2413"
+    stroke-width="4"
+  />
+
+  <!-- 🌿 Лианы -->
+  <path d="M65 90 C50 140, 55 200, 45 260" stroke="#2f8f4e" stroke-width="4" fill="none"/>
+  <path d="M90 100 C105 150, 95 220, 110 300" stroke="#2b7f45" stroke-width="3" fill="none"/>
+  <path d="M75 120 C70 180, 80 240, 70 320" stroke="#3aa96f" stroke-width="2" fill="none"/>
+
+  <!-- 🍃 Крона (многослойная, плотная) -->
+  <ellipse cx="80" cy="55" rx="60" ry="35" fill="#1f7a3f"/>
+  <ellipse cx="45" cy="75" rx="40" ry="30" fill="#238b4e"/>
+  <ellipse cx="115" cy="75" rx="40" ry="30" fill="#238b4e"/>
+  <ellipse cx="80" cy="95" rx="65" ry="40" fill="#1b6b37"/>
+
+  <!-- 🌱 Доп. джунглевая листва -->
+  <ellipse cx="30" cy="95" rx="22" ry="15" fill="#2fa866"/>
+  <ellipse cx="130" cy="95" rx="22" ry="15" fill="#2fa866"/>
+  <ellipse cx="55" cy="115" rx="28" ry="18" fill="#2c9f5f"/>
+  <ellipse cx="105" cy="115" rx="28" ry="18" fill="#2c9f5f"/>
+
+</svg>

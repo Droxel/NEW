@@ -1,0 +1,21 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Рукоять (слева) -->
+  <rect x="2" y="14" width="6" height="4" rx="1" fill="#5D3A1A"/>
+  <rect x="3" y="15" width="2" height="2" fill="#79553D"/>
+  
+  <!-- Гарда (вертикальная) -->
+  <rect x="8" y="10" width="3" height="12" rx="1" fill="#D4AF37"/>
+  <rect x="8" y="15" width="3" height="2" fill="#FFD700"/>
+
+  <!-- Лезвие (основа) -->
+  <rect x="11" y="13" width="10" height="6" fill="#B0C4DE"/>
+  <rect x="11" y="13" width="10" height="3" fill="#D1E0F0"/> <!-- Светлая сторона -->
+  
+  <!-- Сглаженный слом (теперь по горизонтали) -->
+  <rect x="21" y="13" width="2" height="2" fill="#D1E0F0"/>
+  <rect x="20" y="15" width="2" height="2" fill="#B0C4DE"/>
+  <rect x="21" y="17" width="3" height="2" fill="#B0C4DE"/>
+
+  <!-- Тень у основания лезвия (вертикальная полоска у гарды) -->
+  <rect x="11" y="13" width="1" height="6" fill="#708090"/>
+</svg>

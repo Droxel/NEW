@@ -1,0 +1,42 @@
+<svg width="150" height="250" viewBox="15 0 35 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Угли -->
+  <rect x="22" y="52" width="20" height="4" fill="#3e2723" />
+
+  <!-- Поленья -->
+  <rect x="16" y="50" width="32" height="6" rx="1" fill="#5d4037" stroke="#3e2723" stroke-width="2" transform="rotate(-10 32 53)"/>
+  <rect x="16" y="50" width="32" height="6" rx="1" fill="#6d4c41" stroke="#3e2723" stroke-width="2" transform="rotate(15 32 53)"/>
+
+  <!-- Пламя -->
+  <path d="M24 50 L32 20 L40 50 Z" fill="#ff3d00" opacity="0.8">
+    <animate attributeName="d" values="M24 50 L32 20 L40 50 Z; M24 50 L32 25 L40 50 Z; M24 50 L32 20 L40 50 Z" dur="0.6s" repeatCount="indefinite" />
+  </path>
+
+  <!-- Сердце пламени -->
+  <rect x="28" y="35" width="8" height="15" fill="#ff9100">
+    <animate attributeName="height" values="15;10;18;15" dur="0.4s" repeatCount="indefinite" />
+    <animate attributeName="y" values="35;40;32;35" dur="0.4s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- Искры -->
+  <rect x="30" y="42" width="4" height="8" fill="#ffea00">
+    <animate attributeName="opacity" values="1;0.5;1" dur="0.3s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- Дым -->
+  <rect x="30" y="15" width="4" height="4" fill="#9e9e9e" opacity="0">
+    <animate attributeName="y" values="30;0" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0;0.6;0" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="x" values="30;34;28;30" dur="2s" repeatCount="indefinite" />
+  </rect>
+  
+  <rect x="34" y="10" width="3" height="3" fill="#bdbdbd" opacity="0">
+    <animate attributeName="y" values="25;-5" dur="2.5s" begin="0.5s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0;0.4;0" dur="2.5s" repeatCount="indefinite" />
+    <animate attributeName="x" values="34;30;36;34" dur="2.5s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- Отсвет -->
+  <circle cx="32" cy="56" r="12" fill="#ff6d00" opacity="0.2">
+    <animate attributeName="r" values="10;14;10" dur="1s" repeatCount="indefinite" />
+  </circle>
+</svg>
