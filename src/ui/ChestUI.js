@@ -206,11 +206,24 @@ export class ChestUI {
         this.refresh();
     }
 
-    close() {
-        this.isOpen = false;
-        this.overlay.style.display = 'none';
-        if (this.currentChest) this.currentChest.isOpen = false;
+close() {
+    this.isOpen = false;
+    this.overlay.style.display = 'none';
+    
+    // ИСПРАВЛЕНИЕ: Прячем подсказку при закрытии сундука
+    if (this.inventoryUI) {
+        this.inventoryUI.hideTooltip();
     }
+    
+    // Также сбрасываем индекс выбора, чтобы при следующем открытии 
+    // старый предмет не считался "выбранным"
+    this.selectedIndex = null;
+
+    if (this.currentChest) {
+        this.currentChest.isOpen = false;
+        this.currentChest = null; // Очищаем ссылку на сундук
+    }
+}
 
     refresh() {
         if (!this.currentChest) return;
@@ -220,6 +233,16 @@ export class ChestUI {
             const item = this.currentChest.slots[i];
             const slotDiv = slots[i];
             slotDiv.innerHTML = "";
+
+        slotDiv.onmouseenter = (e) => {
+    if (item && !isDraggingThis) {
+        this.inventoryUI.showTooltip(item, e);
+    }
+};
+
+slotDiv.onmouseleave = () => {
+    this.inventoryUI.hideTooltip();
+};    
 
             // Стилизация выделения
             const isSelected = (this.selectedIndex === i);

@@ -178,7 +178,9 @@ function gameLoop(now) {
         allNPCs.forEach(npc => npc.update(player, dt));
         
         player.update();
-
+        
+        if (window.inventoryUI) window.inventoryUI.update();
+        
         mobManager.update(dt, player);
         mobManager.updateDropsLogic(dt, player, playerInventory);
         petManager.update(dt, player, mobManager.mobs, droppedItems);

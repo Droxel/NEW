@@ -25,7 +25,16 @@ export function setupInput(player) {
     if (e.code === "KeyE") {
         checkStatueInteraction(player);
     }
-  });
+  
+if (e.code === "KeyR") {
+    // Вызываем метод лечения у игрока (убедись, что в классе Player есть метод eatPotion или usePotion)
+    if (typeof player.eatPotion === 'function') {
+        player.eatPotion();
+    } else if (typeof player.usePotion === 'function') {
+        player.usePotion();
+    }
+}
+});
 
   document.addEventListener("keyup", e => {
     if (e.code === "KeyA") moveLeft = false;

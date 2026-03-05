@@ -11,49 +11,50 @@ export const mobManager = {
     particles: [], 
     drops: [], 
     spawnTimer: 0,
-    maxMobs: 60, 
+    maxMobs: 30, 
 
-    update(dt, player) {
+update(dt, player) {
         if (!player) return;
 
-        // 1. Обновляем каждого моба и проверяем урон по игроку
-        this.mobs.forEach(mob => {
+        // Расстояние, дальше которого моб считается "забытым" и удаляется (в пикселях)
+        const despawnDistance = 1500;
+
+        // 1. Обновляем каждого моба и проверяем взаимодействия
+        for (let i = 0; i < this.mobs.length; i++) {
+            const mob = this.mobs[i];
+
+            // --- ЗАЩИТА ОТ МОБНОГО АПОКАЛИПСИСА (DESPAWN) ---
+            const distToPlayerX = Math.abs(player.x - mob.x);
+            // Если моб слишком далеко от игрока по горизонтали — помечаем на удаление
+            if (distToPlayerX > despawnDistance) {
+                mob.markedForDeletion = true;
+                continue; 
+            }
+            // ------------------------------------------------
+
             mob.update(dt, player, this.mobs);
-
-// --- ЛОГИКА ВЗАИМОДЕЙСТВИЯ С МОБОМ ---
-if (player.hp > 0 && !mob.isDead) {
-    const dx = (player.x + player.size / 2) - (mob.x + mob.width / 2);
-    const dy = (player.y + player.size / 2) - (mob.y + mob.height / 2);
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    // Если произошло столкновение (дистанция меньше порога)
-    if (dist < 40) {
-        // 1. ПРОВЕРКА НА ПРЫЖОК СВЕРХУ
-        // Проверяем: нижняя точка игрока выше «плеч» моба И игрок падает вниз (velocityY > 0)
-        const isJumpingOnTop = (player.y + player.size) < (mob.y + mob.height * 0.5) && player.velocityY > 0;
-
-        if (isJumpingOnTop) {
-            // Игрок прыгнул сверху! 
-            mob.takeDamage(10); // Наносим урон мобу (если в Mob.js есть такой метод)
-            player.velocityY = -12; // Заставляем игрока подпрыгнуть от моба (как в Марио)
             
-            // Можно добавить частицы или звук прыжка
-            console.log("Напрыгнул сверху!"); 
-        } 
-        // 2. ОБЫЧНЫЙ УРОН (если не прыгнули сверху и нет неуязвимости)
-        else if (player.invulnerableTimer <= 0) {
-            player.hp -= 1;
-            player.invulnerableTimer = 60; 
-
-            // Отталкивание игрока (knockback)
-            const kDir = Math.sign(dx);
-            player.velocityX = kDir * 10;
+            if (player.hp > 0 && !mob.isDead) {
+                const dx = (player.x + player.size / 2) - (mob.x + mob.width / 2);
+                const dy = (player.y + player.size / 2) - (mob.y + mob.height / 2);
+                
+                // Проверка коллизии (квадрат расстояния < 40^2)
+                if ((dx * dx + dy * dy) < 1600) {
+                    const isJumpingOnTop = (player.y + player.size) < (mob.y + mob.height * 0.5) && player.velocityY > 0;
+                    
+                    if (isJumpingOnTop) {
+                        mob.takeDamage(10);
+                        player.velocityY = -12;
+                    } else if (player.invulnerableTimer <= 0) {
+                        player.hp -= 1;
+                        player.invulnerableTimer = 60; 
+                        player.velocityX = Math.sign(dx) * 10;
+                    }
+                }
+            }
         }
-    }
-}
-        });
 
-        // 2. Очищаем список от удаленных мобов
+        // 2. Очищаем список (удаляем убитых и тех, кто слишком далеко)
         this.mobs = this.mobs.filter(mob => !mob.markedForDeletion);
         
         // 3. Уменьшаем таймер неуязвимости игрока
@@ -65,18 +66,22 @@ if (player.hp > 0 && !mob.isDead) {
         this.updateParticles();
         this.updateDropsLogic(dt, player, player.inventory); 
         this.handleSpawning(player);
-    }, // <-- ВОТ ЭТУ СКОБКУ ТЫ ЗАБЫЛ
+    },
 
     updateParticles() {
-        this.particles.forEach(p => {
+        // Оптимизированный цикл для частиц (убираем forEach для производительности)
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
             p.x += p.vx;
             p.y += p.vy;
             p.life -= 0.05;
-            p.vy += 0.2; 
-        });
-        this.particles = this.particles.filter(p => p.life > 0);
+            p.vy += 0.2; // гравитация для частиц
+            
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+            }
+        }
     },
-
     spawnUraniumParticle(x, y) {
         for (let i = 0; i < 8; i++) {
             this.particles.push({
@@ -109,17 +114,24 @@ if (player.hp > 0 && !mob.isDead) {
         const chunk = world.chunkManager.chunks.get(chunkId);
         if (!chunk || !chunk.objects) return false;
 
-        return chunk.objects.some(obj => 
-            (obj.type === "dungeon_wall" || obj.type === "dungeon_block") &&
-            x >= obj.x && x <= obj.x + obj.width &&
-            y >= obj.y && y <= obj.y + obj.height
-        );
+// Обычный цикл прерывается сразу, как только нашли совпадение (return true)
+const objs = chunk.objects;
+for (let i = 0; i < objs.length; i++) {
+    const obj = objs[i];
+    if ((obj.type === "dungeon_wall" || obj.type === "dungeon_block") &&
+        x >= obj.x && x <= obj.x + obj.width &&
+        y >= obj.y && y <= obj.y + obj.height) {
+        return true; 
+    }
+}
+return false;
     },
 
-    handleSpawning(player) {
+handleSpawning(player) {
         this.spawnTimer++;
         if (this.spawnTimer < 90) return; 
         this.spawnTimer = 0;
+        
         if (this.mobs.length >= this.maxMobs) return;
 
         const dir = Math.random() > 0.5 ? 1 : -1;
@@ -223,33 +235,39 @@ if (player.hp > 0 && !mob.isDead) {
     },
 
 draw(ctx) {
-        // Мобы рисуются здесь (их тоже поправим на Шаге 2)
-        this.mobs.forEach(mob => mob.draw(ctx));
-        
-        // Исправленная отрисовка лута (без - cameraX)
-        this.drops.forEach(drop => {
-            const drawX = drop.x; // УБРАЛИ ВЫЧИТАНИЕ КАМЕРЫ!
-            const drawY = drop.y; // УБРАЛИ ВЫЧИТАНИЕ КАМЕРЫ!
-            const hover = Math.sin(Date.now() / 200) * 3;
-            
-            if (assets.crystal && assets.crystal.complete && assets.crystal.naturalWidth > 0) {
-                ctx.drawImage(assets.crystal, drawX, drawY + hover, drop.size, drop.size);
-            } else {
-                ctx.fillStyle = "#00FFFF"; 
-                ctx.fillRect(drawX, drawY + hover, drop.size, drop.size);
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 2;
-                ctx.strokeRect(drawX, drawY + hover, drop.size, drop.size);
-            }
-        });
+    // Определяем границы видимости камеры
+    const leftView = cameraX - 100;
+    const rightView = cameraX + CONFIG.width + 100;
 
-        // Исправленная отрисовка частиц
-        this.particles.forEach(p => {
+    // Рисуем только тех мобов, которые в кадре
+    for (let i = 0; i < this.mobs.length; i++) {
+        const m = this.mobs[i];
+        if (m.x + m.width > leftView && m.x < rightView) {
+            m.draw(ctx);
+        }
+    }
+
+    // Рисуем лут (кристаллы) только в кадре
+    const now = Date.now();
+    for (let i = 0; i < this.drops.length; i++) {
+        const d = this.drops[i];
+        if (d.x + d.size > leftView && d.x < rightView) {
+            const hover = Math.sin(now / 200) * 3;
+            if (assets.crystal?.complete) {
+                ctx.drawImage(assets.crystal, d.x, d.y + hover, d.size, d.size);
+            }
+        }
+    }
+
+    // Частицы
+    for (let i = 0; i < this.particles.length; i++) {
+        const p = this.particles[i];
+        if (p.x > leftView && p.x < rightView) {
             ctx.fillStyle = p.color || "#39FF14"; 
             ctx.globalAlpha = p.life; 
-            // УБРАЛИ ВЫЧИТАНИЕ КАМЕРЫ ЗДЕСЬ ТОЖЕ!
             ctx.fillRect(p.x, p.y, p.size, p.size);
-            ctx.globalAlpha = 1.0;
-        });
+        }
     }
+    ctx.globalAlpha = 1.0;
+}
 };

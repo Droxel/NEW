@@ -223,6 +223,43 @@ update() {
 
     // ВАЖНО: Вызываем обновление крюка в самом конце
     if (this.hook) this.hook.update();
-}
+},
+/* Внутри объекта player в src/entities/player.js */
 
+eatPotion() {
+    // 1. Проверяем кулдаун и не полное ли здоровье
+    if (this.potionCooldown > 0) return;
+    if (this.hp >= this.maxHp) return;
+
+    // 2. Ищем зелье ВО ВСЕМ инвентаре (а не только в первых 5 слотах)
+    if (!this.inventory || !this.inventory.mainSlots) return;
+    
+    // Ищем индекс предмета 'potion_hp' во всем массиве mainSlots
+    const potionIndex = this.inventory.mainSlots.findIndex(item => item && item.id === 'potion_hp');
+
+    if (potionIndex !== -1) {
+        // 3. Применяем эффект
+        this.hp = Math.min(this.hp + 5, this.maxHp);
+        
+        // 4. Уменьшаем количество зелий
+        this.inventory.mainSlots[potionIndex].count--;
+
+        // Если зелья кончились — удаляем предмет из слота
+        if (this.inventory.mainSlots[potionIndex].count <= 0) {
+            this.inventory.mainSlots[potionIndex] = null;
+        }
+
+        // 5. Запускаем кулдаун (300 кадров = 5 секунд при 60 FPS)
+        this.potionCooldown = 300;
+        
+        console.log("❤️ Здоровье восстановлено! HP:", this.hp);
+        
+        // Обновляем UI (используем правильную ссылку на экземпляр)
+        if (window.inventoryUIInstance) {
+            window.inventoryUIInstance.refresh(); 
+        }
+    } else {
+        console.log("❌ Зелья 'potion_hp' нет в инвентаре");
+    }
+}
 };

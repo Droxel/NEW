@@ -1,4 +1,4 @@
-// Inventory.js 
+// src/core/Inventory.js 
 export class Inventory {
     constructor() {
         this.mainSlots = new Array(15).fill(null); 
@@ -7,6 +7,7 @@ export class Inventory {
         this.bubbleSlots = new Array(2).fill(null); // НОВОЕ: 0 - Пузырь, 1 - Оружие
         this.maxStack = 99; 
     }
+
     // Универсальный метод добавления
     addItem(item) {
         if (!item) return false;
@@ -17,6 +18,23 @@ export class Inventory {
         }
 
         const amountToAdd = item.count || 1;
+
+        // --- ЗАЩИТА ОТ ДЮПА ЧАСТИЧНОГО ПОДБОРА ---
+        // Считаем, есть ли место под весь стак, чтобы не было "фантомных" остатков
+        let availableSpace = 0;
+        for (let slot of this.mainSlots) {
+            if (slot === null) {
+                availableSpace += this.maxStack;
+            } else if (slot.id === item.id) {
+                availableSpace += this.maxStack - slot.count;
+            }
+        }
+
+        if (availableSpace < amountToAdd) {
+            console.log("🎒 Инвентарь полон! Нельзя подобрать этот стак.");
+            return false; 
+        }
+        // -----------------------------------------
 
         // 2. Сначала пробуем добавить в существующий стак
         for (let i = 0; i < this.mainSlots.length; i++) {
@@ -38,7 +56,7 @@ export class Inventory {
         }
 
         // 3. Если стака нет или он полон, ищем пустой слот
-const emptyIndex = this.mainSlots.indexOf(null);
+        const emptyIndex = this.mainSlots.indexOf(null);
         if (emptyIndex !== -1) {
             const toAdd = Math.min(amountToAdd, this.maxStack);
             this.mainSlots[emptyIndex] = { ...item, count: toAdd };
@@ -63,11 +81,13 @@ const emptyIndex = this.mainSlots.indexOf(null);
         }
         return total;
     }
-     hasHook() {
-    // Проверяем основные слоты и аксессуары (на случай, если крюк там)
-    const allSlots = [...this.mainSlots, ...this.accessorySlots, ...this.bubbleSlots];
-    return allSlots.some(item => item && (item.id === 'hook' || item.type === 'hook'));
-}
+
+    hasHook() {
+        // Проверяем основные слоты и аксессуары (на случай, если крюк там)
+        const allSlots = [...this.mainSlots, ...this.accessorySlots, ...this.bubbleSlots];
+        return allSlots.some(item => item && (item.id === 'hook' || item.type === 'hook'));
+    }
+
     // Трата кристаллов
     spendCrystals(amount) {
         if (this.getCrystalCount() < amount) return false;
@@ -93,24 +113,44 @@ const emptyIndex = this.mainSlots.indexOf(null);
         return this.mainSlots.findIndex(item => item && item.id === id);
     }
 
-    consumeItem(index) {
-        if (this.mainSlots[index]) {
-            this.mainSlots[index].count--;
-            if (this.mainSlots[index].count <= 0) {
-                this.mainSlots[index] = null;
-            }
-            return true;
+    // ИСПРАВЛЕНИЕ: Теперь можно удалять предметы из любого массива, по умолчанию — mainSlots
+consumeItem(index, targetArray = this.mainSlots) {
+    if (targetArray[index]) {
+        targetArray[index].count--;
+        
+        // Гарантируем, что если предмет кончился, слот становится СТРОГО null
+        if (targetArray[index].count <= 0) {
+            targetArray[index] = null;
+            return null; // Возвращаем null как сигнал, что стак пуст
         }
-        return false;
+        return targetArray[index]; // Возвращаем остаток стака
     }
+    return false;
+}
 
     // Метод для добавления кристаллов в спец. слоты
     addCrystal(amount = 1) {
+        // --- ЗАЩИТА ОТ ДЮПА КРИСТАЛЛОВ ---
+        let availableSpace = 0;
+        for (let slot of this.currencySlots) {
+            if (slot === null) {
+                availableSpace += this.maxStack;
+            } else if (slot.type === 'crystal' || slot.id === 'crystal') {
+                availableSpace += this.maxStack - slot.count;
+            }
+        }
+
+        if (availableSpace < amount) {
+            console.log("💎 Нет места для кристаллов!");
+            return false;
+        }
+        // ----------------------------------
+
         // Сначала заполняем существующие стаки в currencySlots
         for (let i = 0; i < this.currencySlots.length; i++) {
             if (amount <= 0) break;
             let slot = this.currencySlots[i];
-            if (slot && slot.type === 'crystal' && slot.count < this.maxStack) {
+            if (slot && (slot.type === 'crystal' || slot.id === 'crystal') && slot.count < this.maxStack) {
                 const space = this.maxStack - slot.count;
                 const toAdd = Math.min(amount, space);
                 slot.count += toAdd;
