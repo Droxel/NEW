@@ -103,6 +103,7 @@ C:.
     |       input.js
     |       lootConfig.js
     |       main.js
+    |       SaveManager.js
     |       spawnConfig.js
     |       time.js
     |       

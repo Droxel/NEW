@@ -4,10 +4,27 @@ import { player } from "../entities/player.js";
 export const gameOver = {
     isShown: false,
 
+    // Инициализация (вызови это один раз при старте или прямо в файле)
+    init() {
+        const respawnBtn = document.getElementById("btn-respawn");
+        const menuBtn = document.getElementById("btn-to-menu");
+
+        if (respawnBtn) {
+            respawnBtn.onclick = () => {
+                console.log("Нажата кнопка возрождения");
+                this.restart();
+            };
+        }
+
+        if (menuBtn) {
+            menuBtn.onclick = () => {
+                location.reload(); // Самый простой способ вернуться в меню
+            };
+        }
+    },
+
     update() {
-        // Если хп 0 и экран еще не показан
         if (player.hp <= 0 && !this.isShown) {
-            console.log("Критическое состояние! HP:", player.hp);
             this.show();
         }
     },
@@ -17,26 +34,25 @@ export const gameOver = {
         const overlay = document.getElementById("game-over-screen");
         if (overlay) {
             overlay.style.display = "flex";
-            console.log("Экран смерти отображен");
-        } else {
-            // Если ты забыл добавить ID в index.html, ты увидишь это в консоли
-            console.error("ОШИБКА: Элемент 'game-over-screen' не найден в index.html!");
+            // Инициализируем кнопки, если еще не сделали этого
+            this.init(); 
         }
     },
 
     restart() {
-        player.hp = player.maxHp;
-        player.invulnerableTimer = 60;
-        player.x = 100;
-        player.y = 100; // Немного поднимем при спавне
+        // Восстанавливаем игрока
+        player.hp = player.maxHp || 100;
+        player.x = 100; // Координаты спавна
+        player.y = 100;
         player.velocityX = 0;
         player.velocityY = 0;
+        player.invulnerableTimer = 120; // 2 секунды неуязвимости
 
         this.isShown = false;
         const overlay = document.getElementById("game-over-screen");
         if (overlay) overlay.style.display = "none";
         
-        console.log("Игра перезапущена!");
+        console.log("Игрок возрожден!");
     }
 };
 

@@ -1,5 +1,9 @@
-//seed.js 
-export const WORLD_SEED = 123456789;
+// src/world/seed.js
+export let WORLD_SEED = 123456789; // Теперь это let
+
+export function setWorldSeed(newSeed) {
+    WORLD_SEED = newSeed;
+}
 
 export function hash(n) {
     n = Math.imul(n ^ 0x27d4eb2d, 0x165667b1);

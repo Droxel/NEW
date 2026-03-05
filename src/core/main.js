@@ -135,7 +135,11 @@ let lastTime = performance.now();
 function gameLoop(now) {
     const dt = (now - lastTime) / 1000;
     lastTime = now;
-
+if (gameOver.isShown) { 
+        // Если игрок мертв, только рисуем экран смерти, но не считаем физику
+        requestAnimationFrame(gameLoop);
+        return; 
+    }
     gameOver.update(); 
 
     if (!gameOver.isShown) {
@@ -256,4 +260,3 @@ window.startGame = () => {
     lastTime = performance.now(); // Сбрасываем время перед стартом
     requestAnimationFrame(gameLoop);
 };
-requestAnimationFrame(gameLoop);
