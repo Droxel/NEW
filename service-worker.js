@@ -1,4 +1,3 @@
-
 const CACHE_NAME = 'game-cache-v1';
 
 const ASSETS_TO_CACHE = [
@@ -150,13 +149,26 @@ const ASSETS_TO_CACHE = [
   './src/world/terrain/height.js'
 ];
 
-
-
-// Установка: кешируем всё
+// Установка: кешируем файлы по одному (отказоустойчиво!)
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      console.log('Начинаем кеширование ресурсов...');
+      return Promise.all(
+        ASSETS_TO_CACHE.map((url) => {
+          return fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                console.warn(`[SW] Ошибка скачивания файла: ${url}`);
+                return; // Игнорируем ошибку, продолжаем кешировать другие
+              }
+              return cache.put(url, response);
+            })
+            .catch((err) => {
+              console.warn(`[SW] Файл не найден (опечатка?): ${url}`);
+            });
+        })
+      );
     })
   );
   self.skipWaiting();
@@ -174,11 +186,15 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Стратегия: Cache-First (сначала ищем в кеше, если нет — идем в сеть)
+// Стратегия: Cache-First + защита от крашей без интернета
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+      // Если файл есть в кеше, отдаем его. Если нет — пытаемся скачать
+      return response || fetch(event.request).catch(() => {
+        console.warn(`[SW] Оффлайн. Файл не найден в кеше: ${event.request.url}`);
+        // Здесь мы просто глушим ошибку, чтобы игра не вылетала с белым экраном
+      });
     })
   );
 });

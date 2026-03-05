@@ -4,8 +4,10 @@ C:.
 |   cordova.js
 |   cordova_plugins.js
 |   index.html
+|   service-worker.js
 |   structure.txt
 |   style.css
+|   version.json
 |   
 +---.vscode
 |       settings.json
