@@ -1,0 +1,201 @@
+Структура папок тома Windows 10
+Серийный номер тома: D6BE-FD12
+C:.
+|   cordova.js
+|   cordova_plugins.js
+|   index.html
+|   structure.txt
+|   style.css
+|   
++---.vscode
+|       settings.json
+|       
++---assets
+|   +---audio
+|   |   \---music
+|   |           ambient.mp3
+|   |           boss_theme.mp3
+|   |           CHudesenka_-_Ladoshki_76625190.mp3
+|   |           danjunglei.mp3
+|   |           
+|   +---background
+|   |       desert.png
+|   |       forest.png
+|   |       jungles.png
+|   |       Mountains.png
+|   |       winter.png
+|   |       
+|   +---chest
+|   |   |   bubble.svg
+|   |   |   bush of life.svg
+|   |   |   chestopen.svg
+|   |   |   chestunopened.svg
+|   |   |   fruit of life.svg
+|   |   |   
+|   |   \---items
+|   |       |   Amulet of regeneration.svg
+|   |       |   book.svg
+|   |       |   broken sword.svg
+|   |       |   bubble_pitomets.svg
+|   |       |   essence.svg
+|   |       |   hand_staff.svg
+|   |       |   hook.svg
+|   |       |   mace.svg
+|   |       |   poo.svg
+|   |       |   ring.svg
+|   |       |   rope.svg
+|   |       |   stone.svg
+|   |       |   threads.svg
+|   |       |   
+|   |       \---sundukjunglei
+|   |               jungle_chest_closed.svg
+|   |               jungle_chest_locked.svg
+|   |               jungle_chest_open.svg
+|   |               
+|   +---pets
+|   |   \---ghost
+|   |           ghost.png
+|   |           
+|   +---png
+|   |       crystal.png
+|   |       skeletjungey.png
+|   |       
+|   +---statue
+|   |       idol_desert.svg
+|   |       idol_ice.svg
+|   |       idol_jungle.svg
+|   |       idol_pillar.svg
+|   |       
+|   +---svg
+|   |       cam.svg
+|   |       cube.svg
+|   |       tree1.svg
+|   |       tree2.svg
+|   |       tree3.svg
+|   |       tree4.svg
+|   |       tree5.svg
+|   |       tree6.svg
+|   |       xp.svg
+|   |       
+|   \---village
+|           consoles.svg
+|           fire.svg
+|           flowerbed.svg
+|           flower_pots.svg
+|           fountain.svg
+|           house.svg
+|           house_2.svg
+|           house_3.svg
+|           house_4.svg
+|           kuznya.svg
+|           tower.svg
+|           trading_tent.svg
+|           
+\---src
+    +---core
+    |       AssetLoader.js
+    |       audioManager.js
+    |       braw.js
+    |       config.js
+    |       input.js
+    |       lootConfig.js
+    |       main.js
+    |       spawnConfig.js
+    |       time.js
+    |       
+    +---entities
+    |   |   Bubble.js
+    |   |   GrapplingHook.js
+    |   |   player.js
+    |   |   
+    |   +---bosses
+    |   |   |   Boss.js
+    |   |   |   BossManager.js
+    |   |   |   
+    |   |   +---cubeBoss
+    |   |   |       CubeBoss.js
+    |   |   |       
+    |   |   +---desertBoss
+    |   |   |   |   DesertBoss.js
+    |   |   |   |   
+    |   |   |   \---desertpng
+    |   |   |           Desertt.png
+    |   |   |           
+    |   |   +---iceBoss
+    |   |   |   \---icepng
+    |   |   |           ice.png
+    |   |   |           
+    |   |   +---junglesBoss
+    |   |   |   |   JungleBoss.js
+    |   |   |   |   JungleMinion.js
+    |   |   |   |   
+    |   |   |   \---junglespng
+    |   |   |           jungles.png
+    |   |   |           kyk.png
+    |   |   |           
+    |   |   \---states
+    |   +---mobs
+    |   |       JungleSkeleton.js
+    |   |       Mob.js
+    |   |       MobManager.js
+    |   |       SlimeMob.js
+    |   |       
+    |   +---npcs
+    |   |       GlassesMerchant.js
+    |   |       merchant.js
+    |   |       NPC.js
+    |   |       
+    |   \---pets
+    |           GhostPet.js
+    |           PetEquipment.js
+    |           PetManager.js
+    |           
+    +---ui
+    |       ChestUI.js
+    |       gameOver.js
+    |       inventory.js
+    |       InventoryUI.js
+    |       merchant_ui.js
+    |       ui.js
+    |       
+    \---world
+        |   seed.js
+        |   water.js
+        |   world.js
+        |   
+        +---chunk
+        |       Chunk.js
+        |       ChunkManager.js
+        |       
+        +---objects
+        |       Chest.js
+        |       ChestManager.js
+        |       DroppedItem.js
+        |       JungleChest.js
+        |       LifeBush.js
+        |       LifeBushManager.js
+        |       Statue.js
+        |       statueConfigs.js
+        |       
+        +---sky
+        |       BackgroundManager.js
+        |       Cloud.js
+        |       Sky.js
+        |       Weather.js
+        |       
+        +---structures
+        |   |   DungeonGenerator.js
+        |   |   structureBlueprints.js
+        |   |   StructureManager.js
+        |   |   VillageGenerator.js
+        |   |   
+        |   \---village
+        |           StructureManager.js
+        |           VillageAssembler.js
+        |           villageBlueprints.js
+        |           VillageGenerator.js
+        |           
+        \---terrain
+                biomeMap.js
+                height.js
+                

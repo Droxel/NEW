@@ -5,45 +5,48 @@
   <title>Игра</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Стили загрузочного экрана */
+    #loading-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #1a1a1a; color: white;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 10000; font-family: sans-serif;
+    }
+    .loader-bar-container {
+      width: 250px; height: 10px; background: #333;
+      border-radius: 5px; margin-top: 20px; overflow: hidden;
+    }
+    #loader-fill {
+      width: 0%; height: 100%; background: #4CAF50;
+      transition: width 0.3s;
+    }
+    .status-text { margin-top: 10px; font-size: 14px; color: #aaa; }
+  </style>
 </head>
 <body>
-<div id="hook-joystick-container" style="
-    display: none; /* Скрыт по умолчанию */
-    position: fixed; 
-    bottom: 160px;
-    right: 30px; 
-    width: 120px; 
-    height: 120px; 
-    background: rgba(0,0,0,0.3); 
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 50%; 
-    touch-action: none;
-    z-index: 1000; 
-    display: block;
-">
-    <div id="hook-joystick-stick" style="
-        position: absolute; 
-        top: 35px; 
-        left: 35px; 
-        width: 50px; 
-        height: 50px; 
-        background: #5c3a21; 
-        border: 2px solid #fff; 
-        border-radius: 50%;
-        pointer-events: none;
-    "></div>
-</div>
+
+  <div id="loading-screen">
+    <h2 id="loader-title">Загрузка игры...</h2>
+    <div class="loader-bar-container">
+      <div id="loader-fill"></div>
+    </div>
+    <div id="status-message" class="status-text">Проверка ресурсов...</div>
+  </div>
+
+  <div id="hook-joystick-container" style="position: fixed; bottom: 160px; right: 30px; width: 120px; height: 120px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; touch-action: none; z-index: 1000; display: block;">
+      <div id="hook-joystick-stick" style="position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; background: #5c3a21; border: 2px solid #fff; border-radius: 50%; pointer-events: none;"></div>
+  </div>
+
   <div class="game-wrapper">
     <div class="game-box" id="game-box">
       <div id="health-ui"></div> 
-
       <div id="game-over-screen">
         <div class="over-content">
           <h1>ТЫ ПОГИБ</h1>
           <button onclick="location.reload()">ВОЗРОДИТЬСЯ</button>
         </div>
       </div>
-
       <canvas id="game" width="600" height="300"></canvas>
     </div>
   </div>
@@ -53,16 +56,77 @@
       <button id="left">◀</button>
       <button id="right">▶</button>
     </div>
-
-<div class="actions" style="display: flex; gap: 15px; align-items: flex-end;">
-    <button id="heal-btn" style="width: 50px; height: 50px; background-color: #444; color: white;">H</button>
-    
-
-    
-    <button id="jump" style="width: 70px; height: 70px; z-index: 101;">▲</button>
-</div>
+    <div class="actions" style="display: flex; gap: 15px; align-items: flex-end;">
+        <button id="heal-btn" style="width: 50px; height: 50px; background-color: #444; color: white;">H</button>
+        <button id="jump" style="width: 70px; height: 70px; z-index: 101;">▲</button>
+    </div>
   </div>
 
-  <script type="module" src="src/core/main.js"></script>
+  <script>
+    const VERSION_CHECK_URL = 'https://new-omega-ashen.vercel.app/version.json';
+    const fill = document.getElementById('loader-fill');
+    const status = document.getElementById('status-message');
+
+    async function initGame() {
+      if ('serviceWorker' in navigator) {
+        try {
+          // 1. Проверяем интернет и версию
+          status.innerText = "Проверка обновлений...";
+          fill.style.width = "20%";
+          
+          const response = await fetch(VERSION_CHECK_URL, { cache: "no-store" });
+          const data = await response.json();
+          const serverVersion = data.version;
+          const localVersion = localStorage.getItem('game_v');
+
+          if (serverVersion !== localVersion) {
+            status.innerText = "Скачивание новой версии (25MB)...";
+            fill.style.width = "50%";
+            
+            // Чистим кеш для новой версии
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+            
+            localStorage.setItem('game_v', serverVersion);
+            
+            // Регистрируем SW и ждем установки
+            const reg = await navigator.serviceWorker.register('./service-worker.js');
+            status.innerText = "Установка ресурсов...";
+            fill.style.width = "80%";
+            
+            // Если SW новый, ждем пока он установится полностью
+            if (reg.installing) {
+                reg.installing.addEventListener('statechange', (e) => {
+                    if (e.target.state === 'activated') location.reload();
+                });
+            } else {
+                location.reload();
+            }
+            return;
+          }
+        } catch (e) {
+          status.innerText = "Работаем в оффлайн режиме";
+          console.log("Offline mode");
+        }
+
+        // Регистрируем SW
+        await navigator.serviceWorker.register('./service-worker.js');
+      }
+
+      // Завершение загрузки
+      fill.style.width = "100%";
+      status.innerText = "Запуск...";
+      setTimeout(() => {
+        document.getElementById('loading-screen').style.display = 'none';
+        // Загружаем основной код игры
+        const gameScript = document.createElement('script');
+        gameScript.type = 'module';
+        gameScript.src = 'src/core/main.js';
+        document.body.appendChild(gameScript);
+      }, 500);
+    }
+
+    initGame();
+  </script>
 </body>
 </html>
