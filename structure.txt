@@ -60,6 +60,7 @@ C:.
 |   |           
 |   +---png
 |   |       crystal.png
+|   |       fon_menu.png
 |   |       skeletjungey.png
 |   |       
 |   +---statue
@@ -157,6 +158,7 @@ C:.
     |       gameOver.js
     |       inventory.js
     |       InventoryUI.js
+    |       MainMenu.js
     |       merchant_ui.js
     |       ui.js
     |       

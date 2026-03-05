@@ -6,22 +6,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Стили загрузочного экрана */
+    /* 1. СТИЛИ ЗАГРУЗОЧНОГО ЭКРАНА */
     #loading-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #1a1a1a; color: white;
+      background: url('assets/background/forest.png') no-repeat center center;
+      background-size: cover;
+      color: white;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       z-index: 10000; font-family: sans-serif;
+    }
+    /* Затемнение для читаемости текста загрузки */
+    #loading-screen::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6); z-index: -1;
     }
     .loader-bar-container {
       width: 250px; height: 10px; background: #333;
       border-radius: 5px; margin-top: 20px; overflow: hidden;
     }
-    #loader-fill {
-      width: 0%; height: 100%; background: #4CAF50;
-      transition: width 0.3s;
+    #loader-fill { width: 0%; height: 100%; background: #4CAF50; transition: width 0.3s; }
+    .status-text { margin-top: 10px; font-size: 14px; color: #ccc; }
+
+    /* 2. СТИЛИ ГЛАВНОГО МЕНЮ */
+    #main-menu {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: url('assets/png/fon_menu.png') no-repeat center center;
+      background-size: cover;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9000;
     }
-    .status-text { margin-top: 10px; font-size: 14px; color: #aaa; }
+    .menu-content {
+      display: flex; flex-direction: column; gap: 15px;
+      background: rgba(0,0,0,0.7); padding: 50px; border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    .menu-btn {
+      padding: 15px 60px; font-size: 22px; cursor: pointer;
+      background: #4CAF50; color: white; border: none; border-radius: 8px;
+      transition: 0.2s; font-weight: bold;
+      text-transform: uppercase;
+    }
+    .menu-btn:hover { transform: scale(1.05); background: #45a049; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
+    .menu-btn:active { transform: scale(0.95); }
+    
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -34,7 +63,16 @@
     <div id="status-message" class="status-text">Проверка ресурсов...</div>
   </div>
 
-  <div id="hook-joystick-container" style="position: fixed; bottom: 160px; right: 30px; width: 120px; height: 120px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; touch-action: none; z-index: 1000; display: block;">
+  <div id="main-menu" class="hidden">
+    <div class="menu-content">
+        <h1 style="color: white; margin-bottom: 30px; letter-spacing: 2px;">Пока работает 1 кнопка :3</h1>
+        <button id="btn-play" class="menu-btn">ИГРАТЬ</button>
+        <button id="btn-create" class="menu-btn" style="opacity: 0.5; cursor: default;">СОЗДАТЬ МИР</button>
+        <button id="btn-settings" class="menu-btn" style="opacity: 0.5; cursor: default;">НАСТРОЙКИ</button>
+    </div>
+  </div>
+
+  <div id="hook-joystick-container" style="position: fixed; bottom: 160px; right: 30px; width: 120px; height: 120px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; touch-action: none; z-index: 1000; display: none;">
       <div id="hook-joystick-stick" style="position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; background: #5c3a21; border: 2px solid #fff; border-radius: 50%; pointer-events: none;"></div>
   </div>
 
@@ -51,7 +89,7 @@
     </div>
   </div>
 
-  <div class="controls">
+  <div class="controls" id="game-controls" style="display: none;">
     <div class="move">
       <button id="left">◀</button>
       <button id="right">▶</button>
@@ -62,15 +100,17 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { MainMenu } from './src/ui/MainMenu.js';
+
     const VERSION_CHECK_URL = 'https://new-omega-ashen.vercel.app/version.json';
     const fill = document.getElementById('loader-fill');
     const status = document.getElementById('status-message');
 
     async function initGame() {
+      // 1. ЛОГИКА ОБНОВЛЕНИЯ И SERVICE WORKER
       if ('serviceWorker' in navigator) {
         try {
-          // 1. Проверяем интернет и версию
           status.innerText = "Проверка обновлений...";
           fill.style.width = "20%";
           
@@ -80,50 +120,53 @@
           const localVersion = localStorage.getItem('game_v');
 
           if (serverVersion !== localVersion) {
-            status.innerText = "Скачивание новой версии (25MB)...";
+            status.innerText = "Загрузка новой версии...";
             fill.style.width = "50%";
-            
-            // Чистим кеш для новой версии
             const keys = await caches.keys();
             await Promise.all(keys.map(k => caches.delete(k)));
-            
             localStorage.setItem('game_v', serverVersion);
-            
-            // Регистрируем SW и ждем установки
             const reg = await navigator.serviceWorker.register('./service-worker.js');
-            status.innerText = "Установка ресурсов...";
-            fill.style.width = "80%";
             
-            // Если SW новый, ждем пока он установится полностью
             if (reg.installing) {
                 reg.installing.addEventListener('statechange', (e) => {
                     if (e.target.state === 'activated') location.reload();
                 });
-            } else {
-                location.reload();
+                return; 
             }
-            return;
           }
         } catch (e) {
-          status.innerText = "Работаем в оффлайн режиме";
-          console.log("Offline mode");
+          status.innerText = "Оффлайн режим";
         }
-
-        // Регистрируем SW
         await navigator.serviceWorker.register('./service-worker.js');
       }
 
-      // Завершение загрузки
+      // 2. ЗАВЕРШЕНИЕ ЗАГРУЗКИ
       fill.style.width = "100%";
       status.innerText = "Запуск...";
+
       setTimeout(() => {
-        document.getElementById('loading-screen').style.display = 'none';
-        // Загружаем основной код игры
-        const gameScript = document.createElement('script');
-        gameScript.type = 'module';
-        gameScript.src = './src/core/main.js';
-        document.body.appendChild(gameScript);
-      }, 500);
+        // Прячем экран загрузки
+        document.getElementById('loading-screen').classList.add('hidden');
+        
+        // Инициализируем меню
+        const menu = new MainMenu(() => {
+          // ЭТО СРАБОТАЕТ ПРИ НАЖАТИИ "ИГРАТЬ"
+          console.log("Старт игры!");
+          
+          // Показываем управление и джойстик
+          document.getElementById('game-controls').style.display = 'flex';
+          document.getElementById('hook-joystick-container').style.display = 'block';
+
+          // Загружаем ядро игры
+          const gameScript = document.createElement('script');
+          gameScript.type = 'module';
+          gameScript.src = './src/core/main.js';
+          document.body.appendChild(gameScript);
+        });
+
+        // Показываем меню
+        menu.show();
+      }, 800);
     }
 
     initGame();

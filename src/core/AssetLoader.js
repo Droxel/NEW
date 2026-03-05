@@ -53,6 +53,8 @@ export const assets = {
     hand_staff: new Image(),
     bubble_pitomets: new Image(),
     ghost: new Image(),
+
+    menu_bg: new Image(),
 };
 
 // Пути к деревьям
@@ -110,3 +112,5 @@ assets.jungle_chest_open.src = "./assets/chest/items/sundukjunglei/jungle_chest_
 assets.hand_staff.src = "./assets/chest/items/hand_staff.svg";
 assets.bubble_pitomets.src = "./assets/chest/items/bubble_pitomets.svg";
 assets.ghost.src = "./assets/pets/ghost/ghost.png";
+
+assets.menu_bg.src = "./assets/png/fon_menu.png";

@@ -1,27 +1,31 @@
-/* main.js */
-import { CONFIG } from "./config.js";
+/* src/core/main.js */
+import { CONFIG } from "./config.js";          // Оставляем так (они в одной папке core)
 import { setupInput, moveLeft, moveRight } from "./input.js";
 import { time } from "./time.js";
 import { draw, assets, cameraX, cameraY } from "./braw.js"; 
 import { audioManager } from "./audioManager.js";
+
+// Для этих нужно выйти на уровень вверх (../)
 import { player } from "../entities/player.js"; 
 import { world } from "../world/world.js";
 import { merchant } from "../entities/npcs/merchant.js";
-import { merchantUI } from "../ui/merchant_ui.js";
+import { GlassesMerchant } from "../entities/npcs/GlassesMerchant.js";
 import { bossManager } from "../entities/bosses/BossManager.js";
+import { mobManager } from "../entities/mobs/MobManager.js";
+import { petManager } from "../entities/pets/PetManager.js";
+
+// UI лежат в ../ui/
 import { ui } from "../ui/ui.js"; 
+import { merchantUI } from "../ui/merchant_ui.js";
 import { ChestUI } from "../ui/ChestUI.js";
 import { gameOver } from "../ui/gameOver.js";
 import { Inventory } from "../ui/inventory.js";
 import { InventoryUI } from "../ui/InventoryUI.js"; 
-import { GlassesMerchant } from "../entities/npcs/GlassesMerchant.js";
-import { mobManager } from "../entities/mobs/MobManager.js";
+
+// World объекты
 import { Sky } from "../world/sky/Sky.js";
 import { BackgroundManager } from "../world/sky/BackgroundManager.js";
-import { petManager } from "../entities/pets/PetManager.js";
-// Исправленный путь импорта согласно твоей структуре
 import { DroppedItem } from "../world/objects/DroppedItem.js";
-
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -246,4 +250,10 @@ function gameLoop(now) {
     requestAnimationFrame(gameLoop);
 }
 
+// Создаем функцию старта, которую вызовет меню
+window.startGame = () => {
+    console.log("🎮 Движок игры запущен!");
+    lastTime = performance.now(); // Сбрасываем время перед стартом
+    requestAnimationFrame(gameLoop);
+};
 requestAnimationFrame(gameLoop);
