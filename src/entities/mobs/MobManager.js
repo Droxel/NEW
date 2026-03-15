@@ -1,9 +1,9 @@
 // src/entities/mobs/MobManager.js
-import { world } from "../../world/world.js";
-import { CONFIG } from "../../core/config.js";
-import { cameraX, cameraY, assets } from "../../core/braw.js";
-import { time } from "../../core/time.js"; 
-import { SPAWN_CONFIG } from "../../core/spawnConfig.js"; 
+import { world } from "../../world/World.js"; // В структуре World.js с большой буквы
+import { CONFIG } from "../../data/config.js";
+import { cameraX, cameraY, assets } from "../../core/Braw.js"; // Braw.js с большой буквы
+import { time } from "../../core/Time.js"; 
+import { SPAWN_CONFIG } from "../../data/spawnConfig.js"; 
 import { JungleSkeleton } from "./JungleSkeleton.js";
 
 export const mobManager = {

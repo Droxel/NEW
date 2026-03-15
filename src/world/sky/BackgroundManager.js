@@ -1,7 +1,7 @@
 /* src/world/sky/BackgroundManager.js */
-import { CONFIG } from "../../core/config.js";
-import { getBiomeMix } from "../terrain/biomeMap.js";
-
+import { CONFIG } from "../../data/config.js"; 
+// Исправлено: добавлено ../ чтобы выйти из папки sky в папку world
+import { getBiomeMix } from "../terrain/BiomeMap.js";
 export class BackgroundManager {
     constructor() {
         // Конфигурация слоев

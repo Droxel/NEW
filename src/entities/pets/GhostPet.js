@@ -1,6 +1,7 @@
-import { world } from "../../world/world.js";
-import { cameraX, cameraY, assets } from "../../core/braw.js";
-import { CONFIG } from "../../core/config.js";
+//GhostPet.js
+import { world } from "../../world/World.js";
+import { cameraX, cameraY, assets } from "../../core/Braw.js";
+import { CONFIG } from "../../data/config.js";
 
 export class GhostPet {
     constructor(x, y) {

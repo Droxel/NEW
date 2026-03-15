@@ -1,5 +1,5 @@
-// src/world/seed.js
-export let WORLD_SEED = 123456789; // Теперь это let
+// src/world/Seed.js
+export let WORLD_SEED = 123456789;
 
 export function setWorldSeed(newSeed) {
     WORLD_SEED = newSeed;
@@ -44,10 +44,6 @@ export function fbm(x, options = {}) {
     return (value / max) * 2 - 1;
 }
 
-// --- НОВАЯ ФУНКЦИЯ: ЕДИНАЯ ЛОГИКА ОЗЕР ---
-// Возвращает число от 0 до 1.
-// 0 - нет озера.
-// 1 - самый центр глубокого озера.
 export function getLakeIntensity(x) {
     const BASIN_THRESHOLD = 0.55;
 
@@ -57,15 +53,13 @@ export function getLakeIntensity(x) {
         seed: WORLD_SEED + 5555
     });
     
-    // Нормализуем v от 0 до 1
     const normalized = (v + 1) / 2;
     const inverted = 1 - normalized;
 
     if (inverted > BASIN_THRESHOLD) {
-        // Вычисляем силу озера (кривую)
         const t = (inverted - BASIN_THRESHOLD) / (1 - BASIN_THRESHOLD);
-        return Math.pow(t, 2); // Парабола для плавного дна
+        return Math.pow(t, 2); 
     }
     
-    return 0; // Нет озера
+    return 0; 
 }

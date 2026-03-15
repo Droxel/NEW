@@ -1,9 +1,9 @@
 // src/world/world.js
-import { getHeight as calculateTerrainHeight } from "./terrain/height.js";
-import { getBiome, getBiomeMix, isLargeBiome } from "./terrain/biomeMap.js"; 
+import { getHeight as calculateTerrainHeight } from "./terrain/Height.js";
+// Исправлено: добавлена точка перед /terrain
+import { getBiome, getBiomeMix, isLargeBiome } from "./terrain/BiomeMap.js"; 
 import { ChunkManager } from "./chunk/ChunkManager.js";
-import { isWater, getWaterLevel, getWaterData } from "./water.js";
-// 1. ИМПОРТИРУЕМ ГЕНЕРАТОР
+import { isWater, getWaterLevel, getWaterData } from "./Water.js";
 import { DungeonGenerator } from "./structures/DungeonGenerator.js";
 
 const DUNGEON_SPACING = 15000; 
@@ -11,6 +11,7 @@ const DUNGEON_OFFSET = 5500;
 
 function getHeight(x, returnOriginal = false) {
     const terrainHeight = calculateTerrainHeight(x);
+    // Если нам нужна "чистая" земля без дырок для данжа (для спавна или мобов)
     if (returnOriginal) return terrainHeight;
 
     const dungeonCenter = Math.round((x - DUNGEON_OFFSET) / DUNGEON_SPACING) * DUNGEON_SPACING + DUNGEON_OFFSET;

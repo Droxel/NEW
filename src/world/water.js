@@ -1,7 +1,6 @@
-//water.js
-import { getLakeIntensity } from "./seed.js";
-import { getHeight } from "./terrain/height.js"; 
-
+// src/world/Water.js
+import { getLakeIntensity } from "./Seed.js"; 
+import { getHeight } from "./terrain/Height.js";
 // Уровень воды фиксируем.
 // Важно: он должен совпадать с логикой в height.js, где мы копаем яму.
 const WATER_SURFACE_LEVEL = 450; 

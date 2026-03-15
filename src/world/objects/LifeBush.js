@@ -1,7 +1,6 @@
 /* src/world/objects/LifeBush.js */
-/* src/world/objects/LifeBush.js */
-import { assets } from "../../core/braw.js"; 
-import { LIFE_FRUIT_ITEM } from "../../core/lootConfig.js"; // Импортируем наш конфиг
+import { assets } from "../../core/Braw.js"; 
+import { LIFE_FRUIT_ITEM } from "../../data/lootConfig.js"; // Ведет в data, а не core
 
 export class LifeBush {
     constructor(x, y) {

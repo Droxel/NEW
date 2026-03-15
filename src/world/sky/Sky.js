@@ -1,5 +1,5 @@
 /* src/world/sky/Sky.js */
-import { CONFIG } from "../../core/config.js";
+import { CONFIG } from "../../data/config.js";
 import { Cloud } from "./Cloud.js";
 
 export class Sky {

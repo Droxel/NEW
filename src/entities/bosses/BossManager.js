@@ -1,8 +1,8 @@
 // BossManager.js
-import { CubeBoss } from "./cubeBoss/CubeBoss.js";
-import { DesertBoss } from "./desertBoss/DesertBoss.js"; // <--- ДОБАВИТЬ ЭТО
-import { audioManager } from "../../core/audioManager.js";
-import { JungleBoss } from "./junglesBoss/JungleBoss.js";
+import { CubeBoss } from "./CubeBoss.js";     // Лежат в той же папке
+import { DesertBoss } from "./DesertBoss.js"; 
+import { JungleBoss } from "./JungleBoss.js";
+import { audioManager } from "../../core/AudioManager.js"; // Выходим из entities/bosses/ в src/
 export const bossManager = {
     boss: null,
     

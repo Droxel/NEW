@@ -1,5 +1,5 @@
 //DungeonGenerator.js
-import { isLargeBiome } from "../terrain/biomeMap.js";
+import { isLargeBiome } from "../terrain/BiomeMap.js";
 import { mobManager } from "../../entities/mobs/MobManager.js";
 const BLOCK_SIZE = 40;
 const DUNGEON_SPACING = 15000;

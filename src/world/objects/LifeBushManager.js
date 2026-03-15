@@ -1,6 +1,5 @@
 /* src/world/objects/LifeBushManager.js */
-/* src/world/objects/LifeBushManager.js */
-import { hash, WORLD_SEED } from "../seed.js";
+import { hash, WORLD_SEED } from "../Seed.js"; 
 import { LifeBush } from "./LifeBush.js";
 
 export class LifeBushManager {

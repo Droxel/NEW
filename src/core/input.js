@@ -1,11 +1,11 @@
 /* src/core/input.js */
-import { merchant } from "../entities/npcs/merchant.js";
-import { merchantUI } from "../ui/merchant_ui.js";
-import { cameraX, cameraY } from "./braw.js";
-import { allNPCs } from "./main.js";
-import { world } from "../world/world.js"; 
+import { merchant } from "../entities/npcs/Merchant.js";
+import { MerchantUI } from "../ui/screens/MerchantUI.js"; // путь в папку screens
+import { cameraX, cameraY } from "./Braw.js";              // Большая буква B
+import { allNPCs } from "../main.js";                      // main на уровень выше
+import { world } from "../world/World.js";                 // Большая буква W
 import { bossManager } from "../entities/bosses/BossManager.js"; 
-import { GrapplingHook } from "../entities/GrapplingHook.js";
+import { GrapplingHook } from "../entities/player/tools/GrapplingHook.js"; // Уточненный путь
 
 export let moveLeft = false;
 export let moveRight = false;
@@ -71,9 +71,9 @@ if (e.code === "KeyR") {
     const my = y + cameraY;
 
     // --- 1. ПРОВЕРКА ИНТЕРФЕЙСА МАГАЗИНА (Блокировка кликов) ---
-    if (merchantUI.open && merchantUI.currentNPC) {
-       // Рассчитываем размеры окна магазина так же, как в merchantUI.draw
-       const goods = merchantUI.currentNPC.goods;
+    if (MerchantUI.open && MerchantUI.currentNPC) {
+       // Рассчитываем размеры окна магазина так же, как в MerchantUI.draw
+       const goods = MerchantUI.currentNPC.goods;
        const uiX = 40;
        const uiY = 40;
        const itemSize = 40;
@@ -84,7 +84,7 @@ if (e.code === "KeyR") {
 
        // Если клик попал в область окна магазина
        if (x > uiX && x < uiX + width && y > uiY && y < uiY + height) {
-           merchantUI.click(x, y);
+           MerchantUI.click(x, y);
            return; // <--- ВАЖНО: Прекращаем выполнение, чтобы не призвать босса
        }
     }
@@ -94,10 +94,10 @@ if (e.code === "KeyR") {
     if (merchant.active && merchant.isPlayerNear) {
       if (mx > merchant.x && mx < merchant.x + merchant.size &&
           my > merchant.y - merchant.size && my < merchant.y) {
-        if (merchantUI.open && merchantUI.currentNPC === merchant) {
-             merchantUI.open = false;
+        if (MerchantUI.open && MerchantUI.currentNPC === merchant) {
+             MerchantUI.open = false;
         } else {
-             merchantUI.startTrade(merchant);
+             MerchantUI.startTrade(merchant);
         }
         return;
       }
@@ -109,10 +109,10 @@ if (e.code === "KeyR") {
             if (mx > npc.x - npc.size && mx < npc.x + npc.size &&
                 my > npc.y - npc.size * 2 && my < npc.y) {
                 
-                if (merchantUI.open && merchantUI.currentNPC === npc) {
-                    merchantUI.open = false;
+                if (MerchantUI.open && MerchantUI.currentNPC === npc) {
+                    MerchantUI.open = false;
                 } else {
-                    merchantUI.startTrade(npc);
+                    MerchantUI.startTrade(npc);
                 }
                 npcClicked = true;
             }

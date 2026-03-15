@@ -17,7 +17,7 @@
 
   <div id="main-menu" class="hidden">
     <div class="menu-content" id="menu-main">
-        <h1 style="color: white; margin-bottom: 30px; letter-spacing: 2px;">Kubaria</h1>
+        <h1 style="color: white; margin-bottom: 30px; letter-spacing: 2px;">Kyb</h1>
         <button id="btn-play" class="menu-btn">ВЫБРАТЬ МИР</button>
         <button id="btn-create-menu" class="menu-btn">СОЗДАТЬ МИР</button>
         <button id="btn-settings" class="menu-btn" style="opacity: 0.5; cursor: default;">НАСТРОЙКИ</button>
@@ -34,7 +34,7 @@
         <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 15px;">
              <input type="text" id="input-world-name" placeholder="Название мира" class="menu-input">
         </div>
-        <input type="number" id="input-world-seed" placeholder="Сид (рандом, если пусто)" class="menu-input" style="margin-bottom: 20px;">
+        <input type="number" id="input-world-seed" placeholder="Сид" class="menu-input" style="margin-bottom: 20px;">
         <div style="display: flex; gap: 10px;">
             <button id="btn-create-confirm" class="menu-btn">СОЗДАТЬ</button>
             <button id="btn-back-from-create" class="menu-btn" style="background: #e74c3c;">ОТМЕНА</button>
@@ -82,7 +82,7 @@
   </div>
 
   <script type="module">
-      import { MainMenu } from './src/ui/MainMenu.js';
+      import { MainMenu } from './src/ui/screens/MainMenu.js';
 
       const fill = document.getElementById('loader-fill');
       const status = document.getElementById('status-message');
@@ -108,7 +108,7 @@ const menu = new MainMenu(() => {
         window.startGame();;
                   } else {
                       // Если main.js еще не загружен (модуль)
-                      import('./src/core/main.js').then(m => {
+                      import('./src/main.js').then(m => {
                           if(window.startGame) window.startGame();
                       });
                   }

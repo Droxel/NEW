@@ -1,5 +1,5 @@
 // src/world/objects/ChestManager.js
-import { hash, WORLD_SEED } from "../seed.js";
+import { hash, WORLD_SEED } from "../Seed.js";
 import { Chest } from "./Chest.js";
 import { JungleChest } from "./JungleChest.js"; // <-- ИМПОРТИРУЕМ НАШ НОВЫЙ СУНДУК
 import { LifeBushManager } from "./LifeBushManager.js";

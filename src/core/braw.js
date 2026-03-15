@@ -1,16 +1,13 @@
-import { CONFIG } from "./config.js";
-import { merchant } from "../entities/npcs/merchant.js";
+//Braw.js
+import { CONFIG } from "../data/config.js";
+import { MerchantUI } from "../ui/screens/MerchantUI.js"; // Проверь название переменной
 import { bossManager } from "../entities/bosses/BossManager.js";
-
-// --- ВАЖНО: Импортируем assets из твоего нового AssetLoader.js ---
-// Убедись, что файл AssetLoader.js лежит в той же папке, что и braw.js,
-// или поправь путь (например, "../core/AssetLoader.js").
 import { assets } from "./AssetLoader.js"; 
-
+import { merchant } from "../entities/npcs/Merchant.js";
 // Переэкспортируем assets, чтобы main.js мог их видеть через этот файл
 export { assets };
 
-//  КАМЕРА
+//  КАМЕРА
 export let cameraX = 0;
 export let cameraY = 0;
 
@@ -33,7 +30,7 @@ function roundRect(ctx, x, y, w, h, r) {
 let hasLoggedTrees = false;
 let hasLoggedDungeon = false; // Флаг, чтобы не спамить
 // --- ОСНОВНАЯ ФУНКЦИЯ ОТРИСОВКИ ---
-export function draw(ctx, player, world, time, boss, sky, bgManager, petManager, mobManager) {
+export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager, mobManager) {
     // 1. ПЛАВНОЕ ДВИЖЕНИЕ КАМЕРЫ (LERP)
     const targetCameraX = player.x - CONFIG.width / 2;
     const targetCameraY = player.y - CONFIG.height / 2;

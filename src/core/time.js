@@ -1,5 +1,5 @@
-/* src/core/time.js */
-import { CONFIG } from "./config.js";
+/* src/core/Time.js */
+import { CONFIG } from "../data/config.js";
 
 export const time = {
     elapsed: 0,

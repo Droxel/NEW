@@ -1,5 +1,5 @@
 /*NPC.js */
-import { world } from "../../world/world.js";
+import { world } from "../../world/World.js";
 
 export class NPC {
   constructor(x, y) {

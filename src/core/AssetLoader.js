@@ -55,62 +55,62 @@ export const assets = {
     ghost: new Image(),
 
     menu_bg: new Image(),
+
+    boss_desert: new Image(),
+    boss_ice: new Image(),
+    boss_jungle: new Image(),
+    boss_kyk: new Image(),
 };
 
-// Пути к деревьям
-assets.tree1.src = "./assets/svg/tree1.svg";
-assets.tree2.src = "./assets/svg/tree2.svg";
-assets.tree3.src = "./assets/svg/tree3.svg";
-assets.tree4.src = "./assets/svg/tree4.svg";
-assets.tree5.src = "./assets/svg/tree5.svg";
-assets.tree6.src = "./assets/svg/tree6.svg";
+// Деревья (world/trees/)
+assets.tree1.src = "../../assets/images/world/trees/tree1.svg";
+assets.tree2.src = "../../assets/images/world/trees/tree2.svg";
+assets.tree3.src = "../../assets/images/world/trees/tree3.svg";
+assets.tree4.src = "../../assets/images/world/trees/tree4.svg";
+assets.tree5.src = "../../assets/images/world/trees/tree5.svg";
+assets.tree6.src = "../../assets/images/world/trees/tree6.svg";
 
-// Пути к статуям 
-assets.idol_desert.src = "./assets/statue/idol_desert.svg";
-assets.idol_ice.src    = "./assets/statue/idol_ice.svg";
-assets.idol_jungle.src = "./assets/statue/idol_jungle.svg";
-assets.idol_pillar.src = "./assets/statue/idol_pillar.svg";
+// Статуи (world/statue/)
+assets.idol_desert.src = "../../assets/images/world/statue/idol_desert.svg";
+assets.idol_ice.src    = "../../assets/images/world/statue/idol_ice.svg";
+assets.idol_jungle.src = "../../assets/images/world/statue/idol_jungle.svg";
+assets.idol_pillar.src = "../../assets/images/world/statue/idol_pillar.svg";
 
-//  Путь к кристаллу
-assets.crystal.src = "./assets/png/crystal.png";
+// Предметы (ВНИМАНИЕ: исправлены пробелы в названиях файлов)
+assets.crystal.src             = "../../assets/images/items/crystal.png";
+assets.mace.src                = "../../assets/images/items/mace.svg";
+assets.book.src                = "../../assets/images/items/book.svg";
+assets.broken_sword.src        = "../../assets/images/items/broken sword.svg"; // Пробел важен
+assets.ring.src                = "../../assets/images/items/ring.svg";
+assets.amulet_regeneration.src = "../../assets/images/items/Amulet of regeneration.svg"; // Пробел и регистр
+assets.essence.src             = "../../assets/images/items/essence.svg";
+assets.fruit_life.src          = "../../assets/images/items/fruit of life.svg"; 
+assets.life_fruit.src          = "../../assets/images/items/fruit of life.svg"; 
+assets.bubble.src              = "../../assets/images/items/bubble.svg";
+assets.hook.src                = "../../assets/images/items/hook.svg";
+assets.hand_staff.src          = "../../assets/images/items/hand_staff.svg";
+assets.bubble_pitomets.src     = "../../assets/images/items/bubble_pitomets.svg";
 
-// Пути к сундукам
-assets.chestopen.src = "./assets/chest/chestopen.svg";
-assets.chestunopened.src = "./assets/chest/chestunopened.svg";
+// Мир и сундуки (world/...)
+assets.bush_life.src           = "../../assets/images/world/bush of life.svg"; // Пробелы
+assets.chestopen.src           = "../../assets/images/world/chests/chestopen.svg";
+assets.chestunopened.src       = "../../assets/images/world/chests/chestunopened.svg";
+assets.jungle_chest_locked.src = "../../assets/images/world/chests/jungle_chest_locked.svg";
+assets.jungle_chest_closed.src = "../../assets/images/world/chests/jungle_chest_closed.svg";
+assets.jungle_chest_open.src   = "../../assets/images/world/chests/jungle_chest_open.svg";
 
-// кусты жизни 
-// Важно: проверь, чтобы имя файла совпадало с тем, что на диске!
-assets.bush_life.src = "./assets/chest/bush of life.svg"; 
-assets.fruit_life.src = "./assets/chest/fruit of life.svg";
+// Фоны (biomes/)
+assets.bg_desert.src    = "../../assets/images/biomes/desert.png";
+assets.bg_forest.src    = "../../assets/images/biomes/forest.png";
+assets.bg_jungles.src   = "../../assets/images/biomes/jungles.png";
+assets.bg_mountains.src = "../../assets/images/biomes/Mountains.png"; // Большая M
+assets.bg_winter.src    = "../../assets/images/biomes/winter.png";
 
-assets.bubble.src = "./assets/chest/bubble.svg";
+// Сущности и UI
+assets.ghost.src   = "../../assets/images/entities/pets/ghost.png";
+assets.menu_bg.src = "../../assets/images/ui/fon_menu.png";
 
-// Пути к оружию и артефактам
-assets.mace.src = "./assets/chest/items/mace.svg";
-assets.book.src = "./assets/chest/items/book.svg";
-assets.broken_sword.src = "./assets/chest/items/broken sword.svg";
-assets.ring.src = "./assets/chest/items/ring.svg";
-assets.amulet_regeneration.src = "./assets/chest/items/Amulet of regeneration.svg";
-assets.essence.src = "./assets/chest/items/essence.svg";
-
-// Для фрукта жизни путь из твоего конфига:
-assets.life_fruit.src = "./assets/chest/fruit of life.svg"; 
-
-assets.bg_desert.src = "./assets/background/desert.png";
-assets.bg_forest.src = "./assets/background/forest.png";
-assets.bg_jungles.src = "./assets/background/jungles.png";
-assets.bg_mountains.src = "./assets/background/Mountains.png"; // У тебя Mountains с большой буквы
-assets.bg_winter.src = "./assets/background/winter.png";
-
-assets.hook.src = "./assets/chest/items/hook.svg";
-
-// Пути (убедись, что переименовал файлы!)
-assets.jungle_chest_locked.src = "./assets/chest/items/sundukjunglei/jungle_chest_locked.svg";
-assets.jungle_chest_closed.src = "./assets/chest/items/sundukjunglei/jungle_chest_closed.svg";
-assets.jungle_chest_open.src = "./assets/chest/items/sundukjunglei/jungle_chest_open.svg";
-
-assets.hand_staff.src = "./assets/chest/items/hand_staff.svg";
-assets.bubble_pitomets.src = "./assets/chest/items/bubble_pitomets.svg";
-assets.ghost.src = "./assets/pets/ghost/ghost.png";
-
-assets.menu_bg.src = "./assets/png/fon_menu.png";
+assets.boss_desert.src = "../../assets/images/entities/bosses/Desertt.png";
+assets.boss_ice.src    = "../../assets/images/entities/bosses/ice.png";
+assets.boss_jungle.src = "../../assets/images/entities/bosses/jungles.png";
+assets.boss_kyk.src    = "../../assets/images/entities/bosses/kyk.png";

@@ -1,6 +1,6 @@
 // src/entities/mobs/SlimeMob.js
 import { Mob } from "./Mob.js";
-import { cameraX, cameraY } from "../../core/braw.js";
+import { cameraX, cameraY } from "../../core/Braw.js";
 
 export class CubeSlime extends Mob {
   constructor(x, y, isNightMob = false) {

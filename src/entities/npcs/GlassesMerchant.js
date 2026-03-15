@@ -1,6 +1,6 @@
 /* /GlassesMerchant.js */
 import { NPC } from "./NPC.js";
-import { cameraX, cameraY } from "../../core/braw.js"; 
+import { cameraX, cameraY } from "../../core/Braw.js";
 
 export class GlassesMerchant extends NPC {
   constructor() {

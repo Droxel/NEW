@@ -1,6 +1,6 @@
 /* src/world/objects/DroppedItem.js */
-import { world } from "../world.js";
-import { CONFIG } from "../../core/config.js";
+import { world } from "../World.js";        // Одна точка, так как World.js уровнем выше
+import { CONFIG } from "../../data/config.js"; // Две точки и папка data
 
 export class DroppedItem {
     constructor(x, y, itemData) {

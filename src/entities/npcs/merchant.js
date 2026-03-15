@@ -1,5 +1,5 @@
 // merchant.js
-import { world } from "../../world/world.js";
+import { world } from "../../world/World.js";
 
 export const merchant = {
   active: false,
@@ -35,7 +35,7 @@ export const merchant = {
       id: "potion_hp",
       name: "Зелье HP", 
       price: 5, // Цена в кристаллах
-      icon: "assets/svg/xp.svg", // Текстура
+      icon: "assets/images/items/xp.svg", // Текстура
       description: "+5 HP"
     }
   ],

@@ -1,5 +1,5 @@
 import { Mob } from "./Mob.js";
-import { cameraX, cameraY } from "../../core/braw.js";
+import { cameraX, cameraY } from "../../core/Braw.js";
 
 // src/entities/mobs/JungleSkeleton.js
 
@@ -16,7 +16,7 @@ export class JungleSkeleton extends Mob {
         this.jumpProbability = 0.02 + Math.random() * 0.03; // Шанс прыгнуть просто так
         
         this.image = new Image();
-        this.image.src = "assets/png/skeletjungey.png"; 
+        this.image.src = "assets/images/entities/mobs/skeletjungey.png"; 
 
         this.jumpCooldown = 0;
         this.aggroRange = 600;

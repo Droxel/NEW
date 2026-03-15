@@ -1,7 +1,7 @@
 // height.js
-import { CONFIG } from "../../core/config.js";
-import { fbm, WORLD_SEED, getLakeIntensity } from "../seed.js"; // Импортируем новую функцию
-import { getBiomeMix } from "./biomeMap.js";
+import { CONFIG } from "../../data/config.js";
+import { fbm, WORLD_SEED, getLakeIntensity } from "../Seed.js"; // Импортируем новую функцию
+import { getBiomeMix } from "./BiomeMap.js";
 
 export function getHeight(x){
     const base = CONFIG.groundY; 

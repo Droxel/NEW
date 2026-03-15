@@ -1,4 +1,5 @@
-import { world } from "../../world/world.js";
+//PetManager.js
+import { world } from "../../world/World.js";
 import { GhostPet } from "./GhostPet.js";
 import { PetEquipment } from "./PetEquipment.js";
 export const petManager = {

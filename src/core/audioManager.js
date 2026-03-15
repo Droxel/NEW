@@ -2,10 +2,10 @@
 export const audioManager = {
     currentMusic: null,
     unlocked: false,
+    isPausedBySystem: false, // Флаг, чтобы знать, что мы сами поставили на паузу
 
     playMusic(key) {
         if (!this.unlocked) {
-
             this.pendingMusic = key; 
             return;
         }
@@ -35,18 +35,34 @@ export const audioManager = {
         this.currentMusic = null;
     },
 
+    // --- НОВЫЕ МЕТОДЫ ДЛЯ ВЫХОДА ИЗ ПРИЛОЖЕНИЯ ---
+    pauseAll() {
+        if (this.currentMusic && !this.currentMusic.paused) {
+            this.currentMusic.pause();
+            this.isPausedBySystem = true;
+            console.log("⏸ Музыка на паузе (приложение свернуто)");
+        }
+    },
+
+    resumeAll() {
+        if (this.isPausedBySystem && this.currentMusic) {
+            this.currentMusic.play().catch(e => console.error(e));
+            this.isPausedBySystem = false;
+            console.log("▶️ Музыка возобновлена (вернулись в игру)");
+        }
+    },
+    // --------------------------------------------
+
     unlockAudio() {
         if (this.unlocked) return;
 
         this.unlocked = true;
         console.log("🔊 Аудио разблокировано");
-        
 
         if (this.pendingMusic) {
             this.playMusic(this.pendingMusic);
             this.pendingMusic = null;
         } else {
-
             this.playMusic("ambient");
         }
     },
@@ -54,7 +70,6 @@ export const audioManager = {
     initUnlock() {
         const unlock = () => {
             this.unlockAudio();
-
             ["click", "touchstart", "keydown"].forEach(type => 
                 document.removeEventListener(type, unlock)
             );
@@ -63,5 +78,18 @@ export const audioManager = {
         document.addEventListener("click", unlock);
         document.addEventListener("touchstart", unlock);
         document.addEventListener("keydown", unlock);
+
+        // --- ДОБАВЛЯЕМ СЛЕЖКУ ЗА ВИДИМОСТЬЮ ---
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                this.pauseAll();
+            } else {
+                this.resumeAll();
+            }
+        });
+
+        // Для Cordova (мобилки)
+        document.addEventListener("pause", () => this.pauseAll(), false);
+        document.addEventListener("resume", () => this.resumeAll(), false);
     }
 };

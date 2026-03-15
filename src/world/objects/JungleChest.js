@@ -1,5 +1,5 @@
 /* JungleChest.js */
-import { generateChestLoot } from "../../core/lootConfig.js";
+import { generateChestLoot } from "../../data/lootConfig.js";
 
 export class JungleChest {
     constructor(x, y, chestIndex) {

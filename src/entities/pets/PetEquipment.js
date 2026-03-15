@@ -1,5 +1,5 @@
 /* src/entities/pets/PetEquipment.js */
-import { player } from "../player.js";
+import { player } from "../player/Player.js";
 
 export const PetEquipment = {
     // Константы ID предметов для удобства

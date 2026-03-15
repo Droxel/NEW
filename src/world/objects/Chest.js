@@ -1,7 +1,7 @@
 //Chest.js
 /* Chest.js */
-import { hash, WORLD_SEED } from "../seed.js";
-import { generateChestLoot } from "../../core/lootConfig.js";
+import { hash, WORLD_SEED } from "../Seed.js";
+import { generateChestLoot } from "../../data/lootConfig.js";
 
 export class Chest {
     // Добавили chestIndex в конструктор

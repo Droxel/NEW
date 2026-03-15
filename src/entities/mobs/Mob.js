@@ -1,7 +1,7 @@
 // src/entities/mobs/Mob.js
-import { CONFIG } from "../../core/config.js";
-import { world } from "../../world/world.js";
-import { cameraX, cameraY } from "../../core/braw.js";
+import { CONFIG } from "../../data/config.js";
+import { world } from "../../world/World.js";
+import { cameraX, cameraY } from "../../core/Braw.js";
 import { mobManager } from "./MobManager.js";
 
 export class Mob {

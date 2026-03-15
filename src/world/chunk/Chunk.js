@@ -1,9 +1,12 @@
 // src/world/chunk/Chunk.js
-import { fbm, WORLD_SEED } from "../seed.js"; 
+import { fbm, WORLD_SEED } from "../Seed.js"; 
 import { Statue } from "../objects/Statue.js";
 import { ChestManager } from "../objects/ChestManager.js";
 import { LifeBushManager } from "../objects/LifeBushManager.js";
-import { desertConfig, iceConfig, jungleConfig, pillarConfig } from "../objects/statueConfigs.js";
+
+// Вот тут главная правка: идем в папку data
+import { desertConfig, iceConfig, jungleConfig, pillarConfig } from "../../data/statueConfigs.js";
+
 // Импорт Менеджера Структур
 import { StructureManager } from "../structures/StructureManager.js";
 
