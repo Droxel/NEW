@@ -81,13 +81,63 @@
       </div>
   </div>
 
-  <script type="module">
+<script type="module">
       import { MainMenu } from './src/ui/screens/MainMenu.js';
 
       const fill = document.getElementById('loader-fill');
       const status = document.getElementById('status-message');
 
+      // --- СИСТЕМА ОБНОВЛЕНИЙ И ОФФЛАЙНА ---
+      async function checkUpdateAndRegisterSW() {
+          if ('serviceWorker' in navigator) {
+              try {
+                  // 1. Проверяем новую версию на сервере (добавляем ?t=..., чтобы обойти кэш браузера)
+                  const response = await fetch('./version.json?t=' + new Date().getTime());
+                  const serverData = await response.json();
+                  const localVersion = localStorage.getItem('game_version');
+
+                  // 2. Если версия обновилась
+                  if (localVersion && localVersion !== serverData.version) {
+                      console.log(`🚀 Доступно обновление: ${localVersion} -> ${serverData.version}`);
+                      
+                      // Чистим старые кэши
+                      const cacheNames = await caches.keys();
+                      await Promise.all(cacheNames.map(name => caches.delete(name)));
+                      
+                      // Удаляем старый Service Worker
+                      const registrations = await navigator.serviceWorker.getRegistrations();
+                      for (let reg of registrations) {
+                          await reg.unregister();
+                      }
+
+                      // Сохраняем новую версию и перезагружаем страницу
+                      localStorage.setItem('game_version', serverData.version);
+                      window.location.reload(true);
+                      return; // Прерываем текущий запуск, ждем перезагрузки
+                  }
+
+                  // Если это первый заход - просто сохраняем версию
+                  if (!localVersion) {
+                      localStorage.setItem('game_version', serverData.version);
+                  }
+
+                  // 3. Регистрируем Service Worker для оффлайна
+                  await navigator.serviceWorker.register('./service-worker.js');
+                  console.log('✅ Оффлайн-режим активирован');
+
+              } catch (error) {
+                  console.log('📶 Нет интернета. Запускаем оффлайн версию.');
+              }
+          }
+      }
+
+      // --- ЗАПУСК ИГРЫ ---
       async function initGame() {
+          if(status) status.innerText = "Проверка обновлений...";
+          
+          // Сначала проверяем обновления и подрубаем оффлайн
+          await checkUpdateAndRegisterSW();
+
           if(fill) fill.style.width = "100%";
           if(status) status.innerText = "Запуск...";
 
@@ -95,19 +145,18 @@
               const loadingScreen = document.getElementById('loading-screen');
               if(loadingScreen) loadingScreen.classList.add('hidden');
               
-const menu = new MainMenu(() => {
-    console.log("🚀 Старт движка!");
-    
-    const controls = document.getElementById('game-controls');
-    const joystick = document.getElementById('hook-joystick-container'); // Находим джойстик
-    
-    if (controls) controls.style.display = 'flex';
-    if (joystick) joystick.style.display = 'block'; // ВКЛЮЧАЕМ ЕГО ПРИ СТАРТЕ
+              const menu = new MainMenu(() => {
+                  console.log("🚀 Старт движка!");
+                  
+                  const controls = document.getElementById('game-controls');
+                  const joystick = document.getElementById('hook-joystick-container'); 
+                  
+                  if (controls) controls.style.display = 'flex';
+                  if (joystick) joystick.style.display = 'block'; 
 
-    if (window.startGame) {
-        window.startGame();;
+                  if (window.startGame) {
+                      window.startGame();
                   } else {
-                      // Если main.js еще не загружен (модуль)
                       import('./src/main.js').then(m => {
                           if(window.startGame) window.startGame();
                       });
@@ -116,6 +165,7 @@ const menu = new MainMenu(() => {
               menu.show();
           }, 800);
       }
+      
       initGame();
   </script>
 </body>
