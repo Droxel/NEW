@@ -88,20 +88,29 @@ export class GrapplingHook {
 }
 
 checkCollision(x, y) {
-    const margin = 10; // "Радиус" крюка, чтобы он цеплял углы блоков
+    const margin = 10; 
 
     // 1. ПРОВЕРКА ЗЕМЛИ
     const groundY = world.getHeight(x);
-    if (groundY < 10000) { // Только если это не бездна данжа
+    if (groundY < 10000) { 
         if (y >= groundY - 5 && y <= groundY + 20) return true;
     }
 
-    // 2. ПРОВЕРКА БЛОКОВ (с учетом хитбокса крюка)
+    // 2. ПРОВЕРКА БЛОКОВ
     const chunkId = world.chunkManager.getChunkId(x);
     const chunk = world.chunkManager.chunks.get(chunkId);
+    
     if (chunk && chunk.objects) {
         for (let obj of chunk.objects) {
-            if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth" || obj.type === "blue_block") {
+            // ДОБАВЛЯЕМ ТИПЫ ДЕРЕВНИ: village_wall, village_house, village_decor
+            if (
+                obj.type === "dungeon_wall" || 
+                obj.type === "dungeon_wall_smooth" || 
+                obj.type === "blue_block" ||
+                obj.type === "village_wall" ||  // Это ваши колонны
+                obj.type === "village_house" || // Чтобы цепляться за крыши домов
+                obj.type === "village_decor"    // Чтобы цепляться за колодцы/заборы
+            ) {
                 // Проверяем столкновение точки крюка с запасом (margin)
                 if (x + margin > obj.x && x - margin < obj.x + obj.width &&
                     y + margin > obj.y && y - margin < obj.y + obj.height) {

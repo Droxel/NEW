@@ -128,29 +128,31 @@ export function generateChestLoot(chestIndex, type = "common") {
         }
     });
 
-    // --- 100% ГАРАНТИРОВАННЫЕ ПРЕДМЕТЫ (ВНУТРИ ФУНКЦИИ!) ---
+// --- 100% ГАРАНТИРОВАННЫЕ ПРЕДМЕТЫ ---
     
-    // Функция-помощник, чтобы не дублировать код
     const addItemToSlot = (item) => {
         const slotIndex = slots.findIndex(s => s === null);
         if (slotIndex !== -1) slots[slotIndex] = { ...item, count: item.count || 1 };
     };
 
-    // Если это джунглевый сундук — кладем предметы призрака
+    // 1. Если это джунглевый сундук
     if (type === "jungle") {
         addItemToSlot(TAMING_STAFF_ITEM);
         addItemToSlot(PET_BUBBLE_ITEM);
-        
-        // Также добавим Крюк и обычный Пузырь (как у тебя было)
-        addItemToSlot({ 
-            id: 'hook', 
-            name: 'Крюк-кошка', 
-            icon: 'assets/images/items/hook.svg',
-            type: 'hook'
-        });
     }
 
-    // --- НОВОЕ: 100% шанс Пузыря для тестов ---
+    // 2. ДОБАВЛЯЕМ КРЮК-КОШКУ ВО ВСЕ СУНДУКИ (и обычные, и джунглевые)
+    // Если хочешь ТОЛЬКО в обычные, напиши: if (type === "common")
+    const hookItem = { 
+        id: 'hook', 
+        name: 'Крюк-кошка', 
+        icon: 'assets/images/items/hook.svg',
+        type: 'hook',
+        count: 1
+    };
+    addItemToSlot(hookItem);
+
+    // 3. Твой тестовый пузырь (тоже во всех сундуках сейчас)
     const bubbleItem = { 
         id: 'magic_bubble', 
         name: 'Волшебный пузырь', 
@@ -159,12 +161,7 @@ export function generateChestLoot(chestIndex, type = "common") {
         type: 'bubble',
         count: 1 
     };
-    
-    // Ищем первый пустой слот и кладем туда пузырь
-    const emptyBubbleSlot = slots.findIndex(s => s === null);
-    if (emptyBubbleSlot !== -1) {
-        slots[emptyBubbleSlot] = bubbleItem;
-    }
+    addItemToSlot(bubbleItem);
 
     return slots;
 }
