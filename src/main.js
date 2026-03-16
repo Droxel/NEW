@@ -31,20 +31,52 @@ import { Sky } from "./world/sky/Sky.js";
 import { BackgroundManager } from "./world/sky/BackgroundManager.js";
 import { DroppedItem } from "./world/objects/DroppedItem.js";
 
+import { SaveManager } from "./core/SaveManager.js";
+import { Settings } from "./ui/screens/Settings.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 // --- ФИКС ДЛЯ МОБИЛОК ---
 function resize() {
-    // Устанавливаем размер канваса равным размеру экрана
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const settings = SaveManager.getSettings();
+    let scale = settings.resolution || 1.0;
+
+    // 1. Округляем размеры до целых чисел, чтобы не было дробных пикселей
+    const targetWidth = Math.floor(window.innerWidth * scale);
+    const targetHeight = Math.floor(window.innerHeight * scale);
+
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
     
-    // Обновляем конфиг, чтобы другие скрипты знали новые границы
-    CONFIG.width = canvas.width;
-    CONFIG.height = canvas.height;
-    CONFIG.groundY = canvas.height - 50;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+
+    CONFIG.width = window.innerWidth;
+    CONFIG.height = window.innerHeight;
+    CONFIG.groundY = CONFIG.height - 50;
+
+    // 2. Рассчитываем точный коэффициент масштабирования
+    // (потому что после Math.floor он может чуть-чуть отличаться от 0.8)
+    const realScaleX = canvas.width / CONFIG.width;
+    const realScaleY = canvas.height / CONFIG.height;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(realScaleX, realScaleY);
+
+    // 3. Отключаем сглаживание, чтобы пиксели были четкими
+    ctx.imageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.msImageSmoothingEnabled = false;
+    
+    console.log(`Рендер: ${canvas.width}x${canvas.height}, Scale: ${realScaleX.toFixed(2)}`);
 }
+// Инициализируем экран настроек в main.js (где-нибудь перед запуском меню)
+const settingsUI = new Settings(
+    () => mainMenu.showMain(), // Коллбэк для кнопки Назад
+    () => resize()             // Коллбэк для применения разрешения
+);
 
 // Вызываем при запуске
 resize();
@@ -247,9 +279,18 @@ if (gameOver.isShown) {
     }
     
     // --- ОТРИСОВКА ---
+// --- ОТРИСОВКА ---
     ui.update(); 
     MerchantUI.update();
     
+    // ВАЖНО: Применяем масштаб перед отрисовкой всего мира
+    const scale = SaveManager.getSettings().resolution || 1.0;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); 
+    ctx.scale(scale, scale); 
+
+    // Очистка экрана (теперь в виртуальных координатах)
+    ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
+
     // Рисуем основной мир
     draw(ctx, player, world, time, bossManager.boss, sky, bgManager, petManager, mobManager, droppedItems);
 

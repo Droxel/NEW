@@ -112,6 +112,11 @@ canvas {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
+image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
 }
 
 /* Кнопки управления ПОВЕРХ игры */

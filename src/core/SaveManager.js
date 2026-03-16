@@ -38,4 +38,12 @@ export class SaveManager {
     static getCurrentWorldId() {
         return localStorage.getItem('current_world_id');
     }
+static getSettings() {
+    const data = localStorage.getItem('game_settings');
+    return data ? JSON.parse(data) : { resolution: 1.0 }; // По умолчанию 1.0 (Обычное)
+}
+
+static saveSettings(settings) {
+    localStorage.setItem('game_settings', JSON.stringify(settings));
+}
 }

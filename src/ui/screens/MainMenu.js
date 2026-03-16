@@ -18,6 +18,8 @@ export class MainMenu {
         this.inputSeed = document.getElementById('input-world-seed');
 
         this.initEventListeners();
+
+        this.menuSettings = document.getElementById('menu-settings');
     }
 
     initEventListeners() {
@@ -31,14 +33,19 @@ export class MainMenu {
         // --- ЭКРАН СОЗДАНИЯ ---
         document.getElementById('btn-back-from-create').onclick = () => this.showMain();
         document.getElementById('btn-create-confirm').onclick = () => this.handleCreateWorld();
+        
+        document.getElementById('btn-settings').onclick = () => this.showSettings();
     }
-
-    showMain() {
-        this.menuMain.classList.remove('hidden');
-        this.menuSelect.classList.add('hidden');
-        this.menuCreate.classList.add('hidden');
-    }
-
+showSettings() {
+    this.menuMain.classList.add('hidden');
+    this.menuSettings.classList.remove('hidden');
+}
+showMain() {
+    this.menuMain.classList.remove('hidden');
+    this.menuSelect.classList.add('hidden');
+    this.menuCreate.classList.add('hidden');
+    this.menuSettings.classList.add('hidden'); // Добавили эту строку
+}
     showCreateWorld() {
         this.menuMain.classList.add('hidden');
         this.menuSelect.classList.add('hidden');

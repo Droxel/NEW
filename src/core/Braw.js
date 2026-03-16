@@ -88,7 +88,7 @@ export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager,
         if (isEntrance && biome === 'jungle') {
             ctx.fillStyle = "#1a1a1a"; // Фон шахты
             // ВОТ ТУТ МЕНЯЕМ 5000 на 30000
-            ctx.fillRect(x, groundY + player.size, step, 30000); 
+            ctx.fillRect(x, groundY + player.size, step + 0.5, 30000);
             continue; // Не рисуем землю там, где вход
         }
 
@@ -100,7 +100,7 @@ export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager,
 
         ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
         // И ВОТ ТУТ МЕНЯЕМ 5000 на 30000
-        ctx.fillRect(x, groundY + player.size, step, 30000); 
+        ctx.fillRect(x, groundY + player.size, step + 0.5, 30000);
 
         if (waterData.isWater) {
             const wLevel = waterData.level + player.size;
@@ -128,7 +128,7 @@ if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
             
             // 1. Цвет: сверху сухой песчано-серый, снизу - темный мшистый
             ctx.fillStyle = isTop ? "#636353" : "#4a4f3d"; 
-            ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+            ctx.fillRect(obj.x, obj.y, obj.width + 1, obj.height + 1);
 
             // 2. Блик (чтобы блок не казался совсем плоским)
             ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
@@ -163,7 +163,7 @@ if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
             
             // Фон: спокойный, темный (верхний светлее нижнего)
             ctx.fillStyle = isTop ? "#2a2a24" : "#1a1e15"; 
-            ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+            ctx.fillRect(obj.x, obj.y, obj.width + 1, obj.height + 1);
             
             // Очень крупные, едва заметные контуры плит, чтобы глаз отдыхал
             ctx.strokeStyle = isTop ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.2)";
