@@ -65,26 +65,22 @@ jump() {
         }
     },
     // ПРОВЕРКА СТОЛКНОВЕНИЙ СО СТЕНАМИ (Блоки данжа)
-    checkWallCollisions(axis) {
+checkWallCollisions(axis) {
         if (!world.chunkManager) return;
 
         const chunkId = world.chunkManager.getChunkId(this.x);
         const chunk = world.chunkManager.chunks.get(chunkId);
         if (!chunk || !chunk.objects) return;
 
-        // Сбрасываем флаг земли перед проверкой Y, если мы падаем
-        // Но если мы уже нашли землю в этом кадре, не сбрасываем
-        // if (axis === 'y' && this.velocityY > 0) this.onGround = false; 
-
         for (let obj of chunk.objects) {
-            // Проверяем только стены данжа
-            if (obj.type !== "dungeon_wall") continue;
+            // ЖЕЛЕЗОБЕТОННОЕ ПРАВИЛО: врезаемся и в данжи, и в колонны деревни!
+            if (obj.type !== "dungeon_wall" && obj.type !== "village_wall") continue;
 
             // AABB Коллизия
             if (
                 this.x < obj.x + obj.width &&
                 this.x + this.size > obj.x &&
-                this.y < obj.y + obj.height && // this.y - это ВЕРХ игрока (обычно), но у тебя логика отрисовки может отличаться
+                this.y < obj.y + obj.height && 
                 this.y + this.size > obj.y 
             ) {
                 if (axis === 'x') {
@@ -97,7 +93,7 @@ jump() {
                 }
                 
                 if (axis === 'y') {
-                    if (this.velocityY > 0) { // Падаем вниз -> встаем на пол
+                    if (this.velocityY > 0) { // Падаем вниз -> встаем на пол/колонну
                         this.y = obj.y - this.size; 
                         this.velocityY = 0;
                         this.onGround = true; // МЫ НА БЛОКЕ!

@@ -34,8 +34,8 @@ export class Mob {
     if (!chunk || !chunk.objects) return;
 
     for (let obj of chunk.objects) {
-        if (obj.type !== "dungeon_wall" && obj.type !== "dungeon_block") continue;
-
+        const solidTypes = ["dungeon_wall", "dungeon_block", "village_wall", "wall", "stone"];
+if (!solidTypes.includes(obj.type)) continue;
         if (
             this.x < obj.x + obj.width &&
             this.x + this.width > obj.x &&

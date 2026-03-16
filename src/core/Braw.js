@@ -94,13 +94,12 @@ export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager,
 
         const mix = world.getBiomeMix(x);
         const waterData = world.getWaterData(x);
-        const r = Math.floor((255*mix.desert)+(92*mix.plains)+(63*mix.forest)+(47*mix.jungle)+(255*mix.snow));
-        const g = Math.floor((248*mix.desert)+(138*mix.plains)+(107*mix.forest)+(79*mix.jungle)+(255*mix.snow));
-        const b = Math.floor((109*mix.desert)+(58*mix.plains)+(42*mix.forest)+(47*mix.jungle)+(255*mix.snow));
+const r = Math.floor((255*mix.desert)+(92*mix.plains)+(63*mix.forest)+(47*mix.jungle)+(255*mix.snow) + (100 * mix.village));
+const g = Math.floor((248*mix.desert)+(138*mix.plains)+(107*mix.forest)+(79*mix.jungle)+(255*mix.snow) + (160 * mix.village));
+const b = Math.floor((109*mix.desert)+(58*mix.plains)+(42*mix.forest)+(47*mix.jungle)+(255*mix.snow) + (60 * mix.village));
 
-        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-        // И ВОТ ТУТ МЕНЯЕМ 5000 на 30000
-        ctx.fillRect(x, groundY + player.size, step + 0.5, 30000);
+ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+ctx.fillRect(x, groundY + player.size, step + 0.5, 30000);
 
         if (waterData.isWater) {
             const wLevel = waterData.level + player.size;
@@ -112,7 +111,6 @@ export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager,
         }
     }
 // --- СЛОЙ 3: ДАНЖ И ИНТЕРАКТИВ (Улучшенный визуал) ---
-// --- Улучшенный визуал ДАНЖА ---
 for (let i = startChunk; i <= endChunk; i++) {
     const chunk = world.chunkManager.getChunk(i * (CONFIG.chunkSize || 1024));
     if (!chunk?.objects) continue;
@@ -120,10 +118,10 @@ for (let i = startChunk; i <= endChunk; i++) {
     chunk.objects.forEach(obj => {
         if (obj.x + (obj.width || 0) < renderCamX || obj.x > renderCamX + CONFIG.width) return;
 
-        // Используем координаты для "стабильной" случайности
+        // Используем координаты для "стабильной" случайности (объявляем один раз)
         const seed = (obj.x * 3421 + obj.y * 1234);
 
-if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
+        if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
             const isTop = obj.type === "dungeon_wall_smooth";
             
             // 1. Цвет: сверху сухой песчано-серый, снизу - темный мшистый
@@ -133,8 +131,6 @@ if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
             // 2. Блик (чтобы блок не казался совсем плоским)
             ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
             ctx.fillRect(obj.x + 2, obj.y + 2, obj.width - 4, Math.floor(obj.height / 2));
-
-            const seed = (obj.x * 3421 + obj.y * 1234);
 
             // 3. Редкие и очень тусклые трещины
             if (seed % 7 === 0) {
@@ -161,18 +157,16 @@ if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
         else if (obj.type === "dungeon_bg" || obj.type === "dungeon_bg_smooth") {
             const isTop = obj.type === "dungeon_bg_smooth";
             
-            // Фон: спокойный, темный (верхний светлее нижнего)
+            // Фон: спокойный, темный
             ctx.fillStyle = isTop ? "#2a2a24" : "#1a1e15"; 
             ctx.fillRect(obj.x, obj.y, obj.width + 1, obj.height + 1);
             
-            // Очень крупные, едва заметные контуры плит, чтобы глаз отдыхал
             ctx.strokeStyle = isTop ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.2)";
             ctx.lineWidth = 2;
             
-            const step = 80; // Очень большие блоки (в два раза шире обычных)
+            const step = 80; 
             for (let bx = 0; bx < obj.width; bx += step) {
                 for (let by = 0; by < obj.height; by += step) {
-                    // Рисуем не везде, а случайно, просто как намек на стык плит
                     if ((bx + by) % 3 === 0) { 
                         ctx.beginPath();
                         ctx.moveTo(obj.x + bx, obj.y + by + step);
@@ -182,38 +176,40 @@ if (obj.type === "dungeon_wall" || obj.type === "dungeon_wall_smooth") {
                 }
             }
         }
-// НОВЫЙ ИСПРАВЛЕННЫЙ КОД
-else if (obj.type === "chest") {
-    const chest = obj.instance;
-    
-    // ПРОВЕРКА: Если у объекта есть метод getImageKey (как в JungleChest), 
-    // используем его. Если нет (как в старом Chest) — используем старую логику.
-    let imageKey;
-    if (typeof chest.getImageKey === 'function') {
-        imageKey = chest.getImageKey();
-    } else {
-        imageKey = chest.isOpen ? "chestopen" : "chestunopened";
-    }
+        else if (obj.type === "chest") {
+            const chest = obj.instance;
+            let imageKey;
+            if (typeof chest.getImageKey === 'function') {
+                imageKey = chest.getImageKey();
+            } else {
+                imageKey = chest.isOpen ? "chestopen" : "chestunopened";
+            }
 
-    const img = assets[imageKey];
-    if (img?.complete) {
-        ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
-    }
-}
+            const img = assets[imageKey];
+            if (img?.complete) {
+                ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
+            }
+        }
         else if (obj.type === "life_bush" && obj.instance?.draw) {
             obj.instance.draw(ctx, 0, 0);
         }
+        else if (obj.type.startsWith("village_")) {
+            const img = assets[obj.imgKey];
+            if (img?.complete && img.naturalHeight !== 0) {
+                ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
+            } // Было пропущено
+        } // Было пропущено
     });
 
     if (chunk.statues) {
         chunk.statues.forEach(s => s.draw(ctx, assets));
     }
 }
-// --- СЛОЙ 4: МОБЫ (после земли, перед игроком) ---
-    if (mobManager) {
-        mobManager.draw(ctx); 
-    }
-    
+
+// --- СЛОЙ 4: МОБЫ ---
+if (mobManager) {
+    mobManager.draw(ctx); 
+}
     // 7. ИГРОК
     ctx.save();
     // Перемещаемся в центр игрока

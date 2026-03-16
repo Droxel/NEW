@@ -108,23 +108,23 @@ update(dt, player) {
         );
     },
 
-    isPointInWall(x, y) {
+isPointInWall(x, y) {
         if (!world.chunkManager) return false;
         const chunkId = world.chunkManager.getChunkId(x);
         const chunk = world.chunkManager.chunks.get(chunkId);
         if (!chunk || !chunk.objects) return false;
 
-// Обычный цикл прерывается сразу, как только нашли совпадение (return true)
-const objs = chunk.objects;
-for (let i = 0; i < objs.length; i++) {
-    const obj = objs[i];
-    if ((obj.type === "dungeon_wall" || obj.type === "dungeon_block") &&
-        x >= obj.x && x <= obj.x + obj.width &&
-        y >= obj.y && y <= obj.y + obj.height) {
-        return true; 
-    }
-}
-return false;
+        const objs = chunk.objects;
+        for (let i = 0; i < objs.length; i++) {
+            const obj = objs[i];
+            // ЖЕЛЕЗОБЕТОННОЕ ПРАВИЛО: Мобы видят колонны деревни как стены
+            if ((obj.type === "dungeon_wall" || obj.type === "dungeon_block" || obj.type === "village_wall") &&
+                x >= obj.x && x <= obj.x + obj.width &&
+                y >= obj.y && y <= obj.y + obj.height) {
+                return true; 
+            }
+        }
+        return false;
     },
 
 handleSpawning(player) {

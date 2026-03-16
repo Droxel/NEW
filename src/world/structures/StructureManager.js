@@ -1,23 +1,24 @@
 //StructureManager.js
 import { DungeonGenerator } from "./DungeonGenerator.js";
-import { VillageGenerator } from "./VillageGenerator.js"; // Если есть, иначе можно убрать
+import { VillageGenerator } from "./VillageGenerator.js";
 
 export const StructureManager = {
     dungeonGenerator: new DungeonGenerator(),
-    villageGenerator: new VillageGenerator(), // Заглушка, если файл пустой
+    villageGenerator: new VillageGenerator(),
 
     generateStructuresForChunk(chunk, world) {
-        const chunkX = chunk.id * 1024; // CHUNK_SIZE из ChunkManager
+        const chunkX = chunk.id * 1024;
         const chunkWidth = 1024;
 
         // 1. Генерация Данжей
         const dungeonBlocks = this.dungeonGenerator.getDungeonBlocksForChunk(chunkX, chunkWidth, world);
-        
-        // Добавляем блоки данжа в объекты чанка
-        // Важно добавить их в НАЧАЛО массива objects, чтобы они рисовались ПОЗАДИ деревьев и игрока (если background)
-        // Или разделить на слои. Пока кидаем всё в objects.
-        
         dungeonBlocks.forEach(block => {
+            chunk.objects.push(block);
+        });
+
+        // 2. Генерация Деревень (НОВОЕ)
+        const villageBlocks = this.villageGenerator.getVillageBlocksForChunk(chunkX, chunkWidth, world);
+        villageBlocks.forEach(block => {
             chunk.objects.push(block);
         });
     }

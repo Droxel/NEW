@@ -43,17 +43,38 @@ getDungeonBlocksForChunk(chunkX, chunkWidth, world) {
     }
     return blocks;
 }
+// Новый метод для синхронизации с world.js
+shouldSpawnDungeon(centerX, world) {
+    // Если в кэше уже есть запись (null или данные), возвращаем результат
+    if (this.cache.has(centerX)) {
+        return this.cache.get(centerX) !== null;
+    }
 
-    getDungeonData(centerX, world) {
-        if (this.cache.has(centerX)) return this.cache.get(centerX);
+    // Все условия в одном месте
+    const isJungle = world.getBiome(centerX) === "jungle";
+    const isLarge = isLargeBiome(centerX, "jungle", 400);
+    const nearWater = world.isWater(centerX);
 
-        // Biome Checks
-        if (world.getBiome(centerX) !== "jungle" || !isLargeBiome(centerX, "jungle", 600) || world.isWater(centerX)) {
-            this.cache.set(centerX, null); 
-            return null;
-        }
+    const canSpawn = isJungle && isLarge && !nearWater;
 
-        console.log(`🧱 GENERATING STRUCTURED DUNGEON AT X: ${centerX}`);
+    if (!canSpawn) {
+        this.cache.set(centerX, null); // Помечаем в кэше, что здесь ничего не будет
+    }
+    return canSpawn;
+}
+getDungeonData(centerX, world) {
+    // 1. Сначала проверяем, должен ли он там быть
+    if (!this.shouldSpawnDungeon(centerX, world)) {
+        return null;
+    }
+
+    // 2. Если проверка прошла и данные уже в кэше — возвращаем их
+    if (this.cache.get(centerX) && this.cache.get(centerX).rects) {
+        return this.cache.get(centerX);
+    }
+
+    // Далее идет твой старый код генерации (console.log, rects, carvedTiles и т.д.)
+    console.log(`🧱 GENERATING STRUCTURED DUNGEON AT X: ${centerX}`);
 
         const rects = []; 
         const carvedTiles = new Set();

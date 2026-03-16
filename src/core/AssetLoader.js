@@ -60,7 +60,22 @@ export const assets = {
     boss_ice: new Image(),
     boss_jungle: new Image(),
     boss_kyk: new Image(),
+
+    // --- ДЕРЕВНЯ ---
+    village_tower: new Image(),
+    village_house1: new Image(),
+    village_house2: new Image(),
+    village_house3: new Image(),
+    village_house4: new Image(),
+    village_kuznya: new Image(),
+    village_fire: new Image(),
+    village_fountain: new Image(),
+    village_pots: new Image(),
+    village_tent: new Image(),
+    village_flowerbed: new Image(),
+    village_consoles: new Image()
 };
+
 
 // Деревья (world/trees/)
 assets.tree1.src = "../../assets/images/world/trees/tree1.svg";
@@ -114,3 +129,14 @@ assets.boss_desert.src = "../../assets/images/entities/bosses/Desertt.png";
 assets.boss_ice.src    = "../../assets/images/entities/bosses/ice.png";
 assets.boss_jungle.src = "../../assets/images/entities/bosses/jungles.png";
 assets.boss_kyk.src    = "../../assets/images/entities/bosses/kyk.png";
+
+assets.village_tower.src = "../../assets/images/world/village/tower.svg";
+assets.village_house1.src = "../../assets/images/world/village/house.svg";
+assets.village_house2.src = "../../assets/images/world/village/house_2.svg";
+assets.village_house3.src = "../../assets/images/world/village/house_3.svg";
+assets.village_house4.src = "../../assets/images/world/village/house_4.svg";
+assets.village_kuznya.src = "../../assets/images/world/village/kuznya.svg";
+assets.village_fire.src = "../../assets/images/world/village/fire.svg";
+assets.village_fountain.src = "../../assets/images/world/village/fountain.svg";
+assets.village_pots.src = "../../assets/images/world/village/flower_pots.svg";
+assets.village_tent.src = "../../assets/images/world/village/trading_tent.svg";
