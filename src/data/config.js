@@ -10,7 +10,7 @@ export const CONFIG = {
   waterLevel: window.innerHeight - 30,
   
   gravity: 0.6,
-  speed: 80, // Немного уменьшил, а то на большом экране будет летать
+  speed: 8, // Немного уменьшил, а то на большом экране будет летать
   jumpPower: 15,
   
   SKY: {
