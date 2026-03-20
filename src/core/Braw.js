@@ -4,6 +4,7 @@ import { MerchantUI } from "../ui/screens/MerchantUI.js"; // Проверь на
 import { bossManager } from "../entities/bosses/BossManager.js";
 import { assets } from "./AssetLoader.js"; 
 import { merchant } from "../entities/npcs/Merchant.js";
+import { residentManager } from "../entities/npcs/residents/ResidentManager.js";
 // Переэкспортируем assets, чтобы main.js мог их видеть через этот файл
 export { assets };
 
@@ -209,6 +210,11 @@ for (let i = startChunk; i <= endChunk; i++) {
 // --- СЛОЙ 4: МОБЫ ---
 if (mobManager) {
     mobManager.draw(ctx); 
+}
+// --- СЛОЙ 4.5: ЖИТЕЛИ ДЕРЕВНИ ---
+if (residentManager) {
+    // Передаем контекст, позицию камеры и ширину экрана (из CONFIG)
+    residentManager.draw(ctx, renderCamX, CONFIG.width);
 }
     // 7. ИГРОК
     ctx.save();

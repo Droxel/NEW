@@ -1,5 +1,6 @@
 // VillageGenerator.js
 import { VillageAssembler } from "./village/VillageAssembler.js";
+import { residentManager } from "../../entities/npcs/residents/ResidentManager.js"; // <--- ДОБАВИТЬ ЭТО
 
 export class VillageGenerator {
     constructor() {
@@ -51,17 +52,22 @@ export class VillageGenerator {
                     const yEnd = world.getHeight(endX, true);
                     const maxDiff = Math.max(Math.abs(yStart - yEnd), Math.abs(yStart - yMid), Math.abs(yMid - yEnd));
                     
-                    if (maxDiff > 150) {
+if (maxDiff > 150) {
                         continue; 
                     }
 
                     this.villages.set(villageId, { startX, data: layoutData.objects });
                     console.log(`🏠 Деревня создана строго в своем биоме на X: ${Math.round(startX)}`);
+                    
+                    // --- НОВОЕ: СПАВН ЖИТЕЛЕЙ ---
+                    // Передаем координаты стен (startX и endX) и массив объектов (чтобы посчитать дома)
+                    residentManager.spawnForVillage(startX, endX, layoutData.objects);
+                    // ----------------------------
                 }
             }
         }
 
-        // Рендеринг блоков (остается без изменений)
+// Рендеринг блоков
         this.villages.forEach((village) => {
             const chunkEndX = chunkX + chunkWidth;
             village.data.forEach(obj => {
@@ -73,6 +79,15 @@ export class VillageGenerator {
                     const groundY = Math.max(yLeft, yRight, yCenter); 
                     const offsetDown = obj.yOffset !== undefined ? obj.yOffset : 35;
 
+                    // --- НОВОЕ: ПРИНУДИТЕЛЬНАЯ КОЛЛИЗИЯ ДЛЯ КОЛОНН ---
+                    let isSolid = obj.hasCollision || false;
+                    
+                    // Если в названии картинки есть слово column, wall, stena и т.д.
+                    // (замени на свое название ключа картинки колонны, если оно другое)
+                    if (obj.imgKey && (obj.imgKey.includes("column") || obj.imgKey.includes("wall"))) {
+                        isSolid = true;
+                    }
+
                     blocks.push({
                         type: obj.type,
                         x: worldX,
@@ -80,7 +95,7 @@ export class VillageGenerator {
                         width: obj.width,
                         height: obj.height,
                         imgKey: obj.imgKey,
-                        hasCollision: obj.hasCollision || false
+                        hasCollision: isSolid // Передаем наш флажок
                     });
                 }
             });

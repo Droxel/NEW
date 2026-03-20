@@ -128,38 +128,49 @@ isPointInWall(x, y) {
     },
 
 handleSpawning(player) {
-        this.spawnTimer++;
-        if (this.spawnTimer < 90) return; 
-        this.spawnTimer = 0;
-        
-        if (this.mobs.length >= this.maxMobs) return;
+    this.spawnTimer++;
+    if (this.spawnTimer < 90) return; 
+    this.spawnTimer = 0;
+    
+    if (this.mobs.length >= this.maxMobs) return;
 
-        const dir = Math.random() > 0.5 ? 1 : -1;
-        const spawnX = player.x + dir * (600 + Math.random() * 600);
-        let spawnY = player.y + (Math.random() * 400 - 200);
+    // Выбираем сторону, где мобов МЕНЬШЕ, чтобы не копить армию с одного края
+    const mobsLeft = this.mobs.filter(m => m.x < player.x).length;
+    const mobsRight = this.mobs.length - mobsLeft;
+    const dir = mobsLeft > mobsRight ? 1 : -1;
 
-        const inDungeon = this.isPointInDungeon(spawnX, spawnY);
-        const biome = world.getBiome(spawnX);
-        const currentPool = inDungeon ? SPAWN_CONFIG.dungeon : SPAWN_CONFIG.surface;
+    const spawnX = player.x + dir * (700 + Math.random() * 500); // Чуть дальше от края экрана
+    let spawnY = player.y + (Math.random() * 400 - 200);
 
-        if (!currentPool) return;
+    // --- ПРОВЕРКА НА ПЛОТНОСТЬ (АНТИ-АРМИЯ) ---
+    const nearbyMobs = this.mobs.filter(m => Math.abs(m.x - spawnX) < 300).length;
+    if (nearbyMobs >= 2) {
+        // Если там уже есть двое, третьему там делать нечего
+        return; 
+    }
 
-        currentPool.forEach(cfg => {
-            if (Math.random() < cfg.chance && cfg.check(time, biome)) {
-                if (!inDungeon) {
-                    const groundY = world.getHeight(spawnX); 
-                    if (groundY < 5000) { 
-                        const mobH = (cfg.params && cfg.params[0] === true) ? 40 : 30; // Высота зависит от типа
-                        this.addMob(cfg.class, spawnX, groundY - mobH, cfg.params);
-                    }
-                } else {
-                    if (!this.isPointInWall(spawnX, spawnY)) {
-                        this.addMob(cfg.class, spawnX, spawnY, cfg.params);
-                    }
+    const inDungeon = this.isPointInDungeon(spawnX, spawnY);
+    const biome = world.getBiome(spawnX);
+    const currentPool = inDungeon ? SPAWN_CONFIG.dungeon : SPAWN_CONFIG.surface;
+
+    if (!currentPool) return;
+
+    currentPool.forEach(cfg => {
+        if (Math.random() < cfg.chance && cfg.check(time, biome)) {
+            if (!inDungeon) {
+                const groundY = world.getHeight(spawnX); 
+                if (groundY < 5000) { 
+                    const mobH = (cfg.params && cfg.params[0] === true) ? 40 : 30;
+                    this.addMob(cfg.class, spawnX, groundY - mobH, cfg.params);
+                }
+            } else {
+                if (!this.isPointInWall(spawnX, spawnY)) {
+                    this.addMob(cfg.class, spawnX, spawnY, cfg.params);
                 }
             }
-        });
-    },
+        }
+    });
+},
 
     addMob(MobClass, x, y, params = []) {
         const newMob = new MobClass(x, y, ...params);

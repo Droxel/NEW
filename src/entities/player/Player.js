@@ -20,7 +20,7 @@ export const player = {
     x: 100,
     y: CONFIG.groundY,
     size: 30, // Размер игрока (высота)
-    color: "#140858",
+    color: "#192774",
     velocityX: 0,
     velocityY: 0,
     onGround: true,

@@ -34,6 +34,7 @@ import { DroppedItem } from "./world/objects/DroppedItem.js";
 import { SaveManager } from "./core/SaveManager.js";
 import { Settings } from "./ui/screens/Settings.js";
 
+import { residentManager } from "./entities/npcs/residents/ResidentManager.js";
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -234,6 +235,11 @@ if (gameOver.isShown) {
         mobManager.updateDropsLogic(dt, player, playerInventory);
         petManager.update(dt, player, mobManager.mobs, droppedItems);
 
+        // --- ДОБАВЬ ЭТО ТУТ ---
+if (residentManager) {
+    // Добавляем player и dt (дельта времени)
+    residentManager.update(world, audioManager, player, dt); 
+}
         // КОЛЛИЗИИ С МОБАМИ
         mobManager.mobs.forEach(mob => {
             if (!mob.isDead && !player.isFlying &&

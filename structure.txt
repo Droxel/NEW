@@ -9,6 +9,9 @@ C:.
 |   style.css
 |   version.json
 |   
++---.vscode
+|       settings.json
+|       
 +---assets
 |   +---audio
 |   |   +---music
@@ -18,6 +21,11 @@ C:.
 |   |   |       danjunglei.mp3
 |   |   |       
 |   |   \---sfx
+|   |       \---residents
+|   |               no-3-v.mp3
+|   |               rozgovor1.mp3
+|   |               rozgovor2.mp3
+|   |               
 |   \---images
 |       +---biomes
 |       |       desert.png
@@ -107,6 +115,7 @@ C:.
     |       AssetLoader.js
     |       AudioManager.js
     |       Braw.js
+    |       DebugCommands.js
     |       GameState.js
     |       Input.js
     |       SaveManager.js
@@ -139,10 +148,14 @@ C:.
     |   |       SlimeMob.js
     |   |       
     |   +---npcs
-    |   |       GlassesMerchant.js
-    |   |       Merchant.js
-    |   |       NPC.js
-    |   |       
+    |   |   |   GlassesMerchant.js
+    |   |   |   Merchant.js
+    |   |   |   NPC.js
+    |   |   |   
+    |   |   \---residents
+    |   |           Resident.js
+    |   |           ResidentManager.js
+    |   |           
     |   +---pets
     |   |       GhostPet.js
     |   |       PetEquipment.js
@@ -166,6 +179,7 @@ C:.
     |           InventoryUI.js
     |           MainMenu.js
     |           MerchantUI.js
+    |           Settings.js
     |           
     \---world
         |   Seed.js

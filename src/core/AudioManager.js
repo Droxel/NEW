@@ -51,6 +51,16 @@ export const audioManager = {
             console.log("▶️ Музыка возобновлена (вернулись в игру)");
         }
     },
+    
+    // Метод для коротких звуков (эффекты, голоса)
+    playSFX(path, volume = 0.3) {
+        // Путь указываем относительно корня или папки sfx
+        const sound = new Audio(`./assets/audio/sfx/${path}.mp3`);
+        sound.volume = volume;
+        sound.play().catch(err => {
+            // Игнорируем ошибки, если звук не успел загрузиться
+        });
+    },
     // --------------------------------------------
 
     unlockAudio() {
