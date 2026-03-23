@@ -42,6 +42,10 @@ C:.
 |       |   |       kyk.png
 |       |   |       
 |       |   +---mobs
+|       |   |       arm_giant.png
+|       |   |       body_giant.png
+|       |   |       fist.png
+|       |   |       head_giant.png
 |       |   |       skeletjungey.png
 |       |   |       
 |       |   \---pets
@@ -142,6 +146,7 @@ C:.
     |   |   |   
     |   |   \---states
     |   +---mobs
+    |   |       GiantMob.js
     |   |       JungleSkeleton.js
     |   |       Mob.js
     |   |       MobManager.js

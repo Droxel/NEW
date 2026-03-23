@@ -73,7 +73,13 @@ export const assets = {
     village_pots: new Image(),
     village_tent: new Image(),
     village_flowerbed: new Image(),
-    village_consoles: new Image()
+    village_consoles: new Image(),
+
+    // --- ГИГАНТ ---
+    giant_head: new Image(),
+    giant_body: new Image(),
+    giant_arm: new Image(),
+    giant_fist: new Image(),
 };
 
 
@@ -140,3 +146,9 @@ assets.village_fire.src = "../../assets/images/world/village/fire.svg";
 assets.village_fountain.src = "../../assets/images/world/village/fountain.svg";
 assets.village_pots.src = "../../assets/images/world/village/flower_pots.svg";
 assets.village_tent.src = "../../assets/images/world/village/trading_tent.svg";
+
+// Гигант (entities/mobs/)
+assets.giant_head.src = "../../assets/images/entities/mobs/head_giant.png";
+assets.giant_body.src = "../../assets/images/entities/mobs/body_giant.png";
+assets.giant_arm.src  = "../../assets/images/entities/mobs/arm_giant.png";
+assets.giant_fist.src = "../../assets/images/entities/mobs/fist.png";

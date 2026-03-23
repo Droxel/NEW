@@ -15,6 +15,9 @@ export class GrapplingHook {
         this.speed = 25;          // Чуть быстрее полет
         this.pullSpeed = 16;      
         this.maxDistance = 600;   
+        this.hookedMob = null;   // Ссылка на моба, за которого зацепились
+this.mobOffsetX = 0;     // Локальное смещение по X
+this.mobOffsetY = 0;     // Локальное смещение по Y
     }
 
     shoot(angle) { // Теперь принимаем угол от джойстика
@@ -26,16 +29,24 @@ export class GrapplingHook {
         this.velocityX = Math.cos(angle) * this.speed;
         this.velocityY = Math.sin(angle) * this.speed;
     }
-
-    release() {
+release() {
         this.active = false;
         this.hooked = false;
+        this.hookedMob = null; // Очищаем
     }
 
- update() {
-    if (!this.active) return;
+update() {
+        if (!this.active) return;
 
-    if (!this.hooked) {
+        // --- НОВОЕ: Если зацепились за моба, подтягиваем точку крюка к нему ---
+        if (this.hooked && this.hookedMob) {
+            this.x = this.hookedMob.x + (this.mobOffsetX * this.hookedMob.facing);
+            this.y = this.hookedMob.y + this.mobOffsetY;
+            
+            if (this.hookedMob.isDead) this.release(); // Отцепляемся, если босс умер
+        }
+
+        if (!this.hooked) {
         // ПОЛЕТ КРЮКА: делаем 4 проверки за кадр вместо 2 (мини-рейкастинг)
         const subSteps = 4;
         for (let i = 0; i < subSteps; i++) {
@@ -77,41 +88,93 @@ export class GrapplingHook {
                 
                 this.player.y += stepY;
                 this.player.checkWallCollisions('y'); 
-            } else {
+} else {
                 // Мы в точке назначения, зануляем всё
                 this.player.x = targetX;
                 this.player.y = targetY;
                 this.player.velocityX = 0;
                 this.player.velocityY = 0;
+                
+                // --- НОВОЕ: Автоматический прыжок от головы босса ---
+                if (this.hookedMob) {
+                    this.release(); // Отцепляем крюк
+                    this.player.velocityY = -10; // Подбрасываем игрока вверх!
+                    this.player.onGround = false;
+                }
             }
         }
 }
 
 checkCollision(x, y) {
     const margin = 10; 
+    const hookRadius = 15; // Немного увеличим радиус для надежности
 
-    // 1. ПРОВЕРКА ЗЕМЛИ
+    const extractEntities = (collection) => {
+        if (!collection) return [];
+        // Если это Map или Set
+        if (collection instanceof Map || collection instanceof Set) return Array.from(collection.values());
+        // Если это массив
+        if (Array.isArray(collection)) return collection;
+        // Если это одиночный объект (например, world.bossManager.currentBoss)
+        if (typeof collection === 'object') {
+            if (collection.headHitbox) return [collection]; // Это сам моб
+            return Object.values(collection); // Это контейнер с мобами
+        }
+        return [];
+    };
+
+    // Собираем всех вообще: и обычных мобов, и боссов, и просто сущности
+    const mobs = extractEntities(world.mobManager?.mobs);
+    const bosses = extractEntities(world.bossManager?.bosses);
+    const activeBoss = world.bossManager?.boss ? [world.bossManager.boss] : []; // На случай если босс один
+    const entities = extractEntities(world.entities); 
+    
+    const allTargets = [...mobs, ...bosses, ...activeBoss, ...entities];
+
+    for (let mob of allTargets) {
+        if (!mob || mob.isDead || mob === this.player) continue;
+        
+        const hb = mob.headHitbox;
+        
+        // ФИКС: Проверяем и .width (из getPartHitbox) и .w (из конструктора)
+        const hbW = hb?.width || hb?.w || 0;
+        const hbH = hb?.height || hb?.h || 0;
+
+        if (hb && hbW > 0) {
+            // Простая и надежная проверка пересечения точки (x,y) с прямоугольником hb
+            if (x > hb.x && x < hb.x + hbW && 
+                y > hb.y && y < hb.y + hbH) {
+                
+                console.log("🎯 Попал в голову:", mob.constructor.name); 
+                this.hookedMob = mob;
+                // Запоминаем смещение относительно центра моба, учитывая поворот
+                this.mobOffsetX = (x - mob.x) / mob.facing; 
+                this.mobOffsetY = y - mob.y;
+                return true;
+            }
+        }
+    }
+
+    // 2. ПРОВЕРКА ЗЕМЛИ
     const groundY = world.getHeight(x);
     if (groundY < 10000) { 
         if (y >= groundY - 5 && y <= groundY + 20) return true;
     }
 
-    // 2. ПРОВЕРКА БЛОКОВ
+    // 3. ПРОВЕРКА БЛОКОВ
     const chunkId = world.chunkManager.getChunkId(x);
     const chunk = world.chunkManager.chunks.get(chunkId);
     
     if (chunk && chunk.objects) {
         for (let obj of chunk.objects) {
-            // ДОБАВЛЯЕМ ТИПЫ ДЕРЕВНИ: village_wall, village_house, village_decor
             if (
                 obj.type === "dungeon_wall" || 
                 obj.type === "dungeon_wall_smooth" || 
                 obj.type === "blue_block" ||
-                obj.type === "village_wall" ||  // Это ваши колонны
-                obj.type === "village_house" || // Чтобы цепляться за крыши домов
-                obj.type === "village_decor"    // Чтобы цепляться за колодцы/заборы
+                obj.type === "village_wall" ||  
+                obj.type === "village_house" || 
+                obj.type === "village_decor"    
             ) {
-                // Проверяем столкновение точки крюка с запасом (margin)
                 if (x + margin > obj.x && x - margin < obj.x + obj.width &&
                     y + margin > obj.y && y - margin < obj.y + obj.height) {
                     return true;

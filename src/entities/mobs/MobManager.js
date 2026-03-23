@@ -5,6 +5,7 @@ import { cameraX, cameraY, assets } from "../../core/Braw.js"; // Braw.js с б�
 import { time } from "../../core/Time.js"; 
 import { SPAWN_CONFIG } from "../../data/spawnConfig.js"; 
 import { JungleSkeleton } from "./JungleSkeleton.js";
+import { GiantMob } from "./GiantMob.js";
 
 export const mobManager = {
     mobs: [],
@@ -23,13 +24,18 @@ update(dt, player) {
         for (let i = 0; i < this.mobs.length; i++) {
             const mob = this.mobs[i];
 
-            // --- ЗАЩИТА ОТ МОБНОГО АПОКАЛИПСИСА (DESPAWN) ---
-            const distToPlayerX = Math.abs(player.x - mob.x);
-            // Если моб слишком далеко от игрока по горизонтали — помечаем на удаление
-            if (distToPlayerX > despawnDistance) {
-                mob.markedForDeletion = true;
-                continue; 
-            }
+// --- ЗАЩИТА ОТ МОБНОГО АПОКАЛИПСИСА (DESPAWN) ---
+const distToPlayerX = Math.abs(player.x - mob.x);
+
+if (distToPlayerX > despawnDistance) {
+    // Иммунитет для боссов!
+    if (mob instanceof GiantMob) {
+        continue; // Босса не удаляем, он ждет игрока
+    }
+    
+    mob.markedForDeletion = true;
+    continue; 
+}
             // ------------------------------------------------
 
             mob.update(dt, player, this.mobs);
@@ -67,7 +73,19 @@ update(dt, player) {
         this.updateDropsLogic(dt, player, player.inventory); 
         this.handleSpawning(player);
     },
-
+spawnBossAtStart() {
+    const spawnX = 1500; 
+    let groundY = world.getHeight(spawnX);
+    
+    // Если чанк еще не прогрузился, кидаем его высоко в небо
+    // Гравитация сама плавно опустит его на землю, когда игрок подойдет
+    if (isNaN(groundY) || groundY === undefined) {
+        groundY = -500; 
+    }
+    
+    const boss = new GiantMob(spawnX, groundY - 250); 
+    this.mobs.push(boss);
+},
     updateParticles() {
         // Оптимизированный цикл для частиц (убираем forEach для производительности)
         for (let i = this.particles.length - 1; i >= 0; i--) {
@@ -129,24 +147,29 @@ isPointInWall(x, y) {
 
 handleSpawning(player) {
     this.spawnTimer++;
-    if (this.spawnTimer < 90) return; 
+    
+    // --- НАСТРОЙКИ ЧАСТОТЫ ---
+    const spawnSpeed = 40; // Было 90. Чем меньше, тем чаще спавн.
+    if (this.spawnTimer < spawnSpeed) return; 
     this.spawnTimer = 0;
     
     if (this.mobs.length >= this.maxMobs) return;
 
-    // Выбираем сторону, где мобов МЕНЬШЕ, чтобы не копить армию с одного края
+    // Выбираем сторону
     const mobsLeft = this.mobs.filter(m => m.x < player.x).length;
     const mobsRight = this.mobs.length - mobsLeft;
     const dir = mobsLeft > mobsRight ? 1 : -1;
 
-    const spawnX = player.x + dir * (700 + Math.random() * 500); // Чуть дальше от края экрана
+    const spawnX = player.x + dir * (700 + Math.random() * 500); 
     let spawnY = player.y + (Math.random() * 400 - 200);
 
-    // --- ПРОВЕРКА НА ПЛОТНОСТЬ (АНТИ-АРМИЯ) ---
-    const nearbyMobs = this.mobs.filter(m => Math.abs(m.x - spawnX) < 300).length;
-    if (nearbyMobs >= 2) {
-        // Если там уже есть двое, третьему там делать нечего
-        return; 
+    // --- ТВОЯ ЗАЩИТА (АНТИ-АПОКАЛИПСИС) ---
+    // Если хочешь "толпы", увеличь 2 до 5-7
+    const maxDensity = 3; 
+    const nearbyMobs = this.mobs.filter(m => Math.abs(m.x - spawnX) < 400).length;
+    
+    if (nearbyMobs >= maxDensity) {
+        return; // Слишком тесно, не спавним
     }
 
     const inDungeon = this.isPointInDungeon(spawnX, spawnY);
@@ -156,6 +179,7 @@ handleSpawning(player) {
     if (!currentPool) return;
 
     currentPool.forEach(cfg => {
+        // Увеличь cfg.chance в своем SPAWN_CONFIG, если хочешь еще больше мобов
         if (Math.random() < cfg.chance && cfg.check(time, biome)) {
             if (!inDungeon) {
                 const groundY = world.getHeight(spawnX); 
@@ -171,16 +195,29 @@ handleSpawning(player) {
         }
     });
 },
+// --- НОВЫЙ МЕТОД ДЛЯ ДАНЖЕЙ ---
+    spawnDungeonMob(x, y) {
+        // Используем класс JungleSkeleton, который у тебя уже импортирован в начале файла
+        this.addMob(JungleSkeleton, x, y);
+    },
 
     addMob(MobClass, x, y, params = []) {
         const newMob = new MobClass(x, y, ...params);
         this.mobs.push(newMob);
     },
-
-    spawnDungeonMob(x, y) {
-        const skel = new JungleSkeleton(x, y);
-        this.mobs.push(skel);
-    },
+    // Добавь это после метода addMob
+spawnBossAtStart() {
+    // Поменяй 0 на 1500 или 2000, чтобы он стоял вдали
+    const spawnX = 1500; 
+    
+    // groundY сам посчитает высоту земли в этой точке
+    const groundY = world.getHeight(spawnX);
+    
+    // Спавним его чуть выше земли, чтобы он красиво "приземлился"
+    const boss = new GiantMob(spawnX, groundY - 250); 
+    
+    this.mobs.push(boss);
+},
 
     spawnDrop(x, y) {
         this.drops.push({

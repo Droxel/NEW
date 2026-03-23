@@ -32,7 +32,7 @@ function getHeight(x, returnOriginal = false) {
 
 // 2. ДОБАВЛЯЕМ dungeonGenerator В ОБЪЕКТ
 export const world = {
-    seed: WORLD_SEED, // ДОБАВИТЬ ЭТО
+    seed: WORLD_SEED,
     getHeight,
     getBiome,
     getBiomeMix,

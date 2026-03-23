@@ -313,6 +313,13 @@ if (residentManager) {
 // Создаем функцию старта, которую вызовет меню
 window.startGame = () => {
     console.log("🎮 Движок игры запущен!");
+    
+    // --- СПАВН ГИГАНТА НА СТАСТЕ ДЛЯ ТЕСТОВ ---
+    if (mobManager) {
+        mobManager.spawnBossAtStart(); 
+    }
+    // ------------------------------------------
+
     player.spawn(player.x);
     lastTime = performance.now(); // Сбрасываем время перед стартом
     requestAnimationFrame(gameLoop);
