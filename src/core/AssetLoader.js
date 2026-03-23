@@ -42,7 +42,8 @@ export const assets = {
     bg_jungles: new Image(),
     bg_mountains: new Image(),
     bg_winter: new Image(),
-    
+    bg_village: new Image(),
+
     hook: new Image(),
 
   // --- НОВЫЕ АССЕТЫ ДЖУНГЛЕВЫХ СУНДУКОВ ---
@@ -126,7 +127,7 @@ assets.bg_forest.src    = "../../assets/images/biomes/forest.png";
 assets.bg_jungles.src   = "../../assets/images/biomes/jungles.png";
 assets.bg_mountains.src = "../../assets/images/biomes/Mountains.png"; // Большая M
 assets.bg_winter.src    = "../../assets/images/biomes/winter.png";
-
+assets.bg_village.src = "../../assets/images/biomes/village.png";
 // Сущности и UI
 assets.ghost.src   = "../../assets/images/entities/pets/ghost.png";
 assets.menu_bg.src = "../../assets/images/ui/fon_menu.png";

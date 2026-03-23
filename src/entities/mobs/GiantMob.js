@@ -2,6 +2,7 @@ import { Mob } from './Mob.js';
 import { assets } from '../../core/Braw.js';
 import { CONFIG } from "../../data/config.js";
 import { world } from "../../world/World.js";
+import { audioManager } from '../../core/AudioManager.js';
 
 export class GiantMob extends Mob {
     constructor(x, y) {
@@ -33,7 +34,7 @@ export class GiantMob extends Mob {
         this.state = 'idle'; 
         this.facing = 1;       
         
-        this.detectionRange = 600;
+        this.detectionRange = 1600;
         this.attackRange = 150; 
         this.stompRange = 60;  
         
@@ -44,6 +45,7 @@ export class GiantMob extends Mob {
         this.stompTimer = 0; 
         this.attackTimer = 0; 
         this.liftLeg = false; 
+        this.lastStepPhase = 0;
 
         // Хранилище хитбоксов для боевки
 this.headHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Сразу используем width/height
@@ -128,7 +130,7 @@ this.headHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Сразу испол�
                      this.attackTimer = 0;
                  } else if (wideDist < this.detectionRange) {
                      this.state = 'chase';
-                     this.velocityX = this.facing * this.speed * 2.5;
+                     this.velocityX = this.facing * this.speed * 1.5;
                  } else {
                      // НОВОЕ: Игрока нет рядом — стоим на месте (убрали патруль)
                      this.state = 'idle';
@@ -178,6 +180,23 @@ this.headHitbox = { x: 0, y: 0, width: 0, height: 0 }; // Сразу испол�
         
         // НОВОЕ: Проверяем, задели ли мы игрока руками или ногами
         this.checkPlayerCollision(player); 
+    
+    // ЗВУК ШАГОВ (в блоке, где обновляется walkCycle)
+        if (this.onGround && this.state !== 'attack' && this.state !== 'stomp') {
+            const prevCycle = this.walkCycle;
+            this.walkCycle += Math.abs(actualDx) * 0.03; 
+
+            // Если синусоида цикла перешла через 0 — значит нога опустилась
+            if (Math.sin(prevCycle) > 0 && Math.sin(this.walkCycle) <= 0 || 
+                Math.sin(prevCycle) < 0 && Math.sin(this.walkCycle) >= 0) {
+                audioManager.playSFX("giants/step", 0.4); 
+            }
+        }
+
+        // ЗВУК АТАКИ (в момент смены состояния)
+        if (this.state === 'attack' && this.attackTimer === 1) {
+            audioManager.playSFX("giants/worth", 0.6); // Крик перед ударом
+        }
     }
     
     // НОВОЕ: Метод для расчета реальных хитбоксов в зависимости от поворота
@@ -246,7 +265,17 @@ updateHitboxes() {
         // Если попали - отнимаем ХП
         this.health -= amount;
         if (this.health <= 0) this.isDead = true;
+    // Если урон прошел:
+        audioManager.playSFX("giants/hit", 0.5);
+        this.health -= amount;
+        
+        if (this.health <= 0) {
+             this.isDead = true;
+             // audioManager.playSFX("giants/death", 0.7); // Если будет такой файл
+        }
     }
+
+    
 
     checkWallCollisions(axis, world) {
         if (!world || !world.chunkManager || !world.chunkManager.chunks) return;
@@ -500,24 +529,24 @@ updateHitboxes() {
         // --- ДЕБАГ ХИТБОКСА (Удали потом) ---
         // ctx.strokeStyle = "yellow";
         // ctx.strokeRect(this.headHitbox.x, this.headHitbox.y, this.headHitbox.width, this.headHitbox.height);
-    this.drawHealthBar(ctx);
+   // this.drawHealthBar(ctx);
         
         // --- ДЕБАГ ХИТБОКСА (Потом просто удали или закомментируй) ---
-        ctx.lineWidth = 2;
+       // ctx.lineWidth = 2;
         
         // Красный - Голова (Сюда бить)
-        ctx.strokeStyle = "red";
-        ctx.strokeRect(this.headHitbox.x, this.headHitbox.y, this.headHitbox.width, this.headHitbox.height);
+       // ctx.strokeStyle = "red";
+       // ctx.strokeRect(this.headHitbox.x, this.headHitbox.y, this.headHitbox.width, this.headHitbox.height);
         
         // Синий - Тело
-        ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.bodyHitbox.x, this.bodyHitbox.y, this.bodyHitbox.width, this.bodyHitbox.height);
+      //  ctx.strokeStyle = "blue";
+    //    ctx.strokeRect(this.bodyHitbox.x, this.bodyHitbox.y, this.bodyHitbox.width, this.bodyHitbox.height);
 
         // Желтый - Руки и Ноги (Они наносят урон)
-        ctx.strokeStyle = "yellow";
-        for (let hb of this.damageHitboxes) {
-            ctx.strokeRect(hb.x, hb.y, hb.width, hb.height);
-        }
+// ctx.strokeStyle = "yellow";
+  //      for (let hb of this.damageHitboxes) {
+    //        ctx.strokeRect(hb.x, hb.y, hb.width, hb.height);
+      //  }
     }
 
     drawHealthBar(ctx) {

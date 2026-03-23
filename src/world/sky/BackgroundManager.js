@@ -3,19 +3,20 @@ import { CONFIG } from "../../data/config.js";
 // Исправлено: добавлено ../ чтобы выйти из папки sky в папку world
 import { getBiomeMix } from "../terrain/BiomeMap.js";
 export class BackgroundManager {
-    constructor() {
-        // Конфигурация слоев
-        this.layers = [
-            { key: 'desert', imgKey: 'bg_desert', parallax: 0.1, scale: 0.8, offsetY: 40 }, 
-            { key: 'plains', imgKey: 'bg_mountains', parallax: 0.12, scale: 0.6, offsetY: 10 }, 
-            { key: 'forest', imgKey: 'bg_forest', parallax: 0.15, scale: 0.6, offsetY: 10 },
-            { key: 'jungle', imgKey: 'bg_jungles', parallax: 0.18, scale: 0.5, offsetY: 0 },
-            { key: 'snow', imgKey: 'bg_winter', parallax: 0.1, scale: 0.5, offsetY: 50 }
-        ];
+constructor() {
+    // Конфигурация слоев
+    this.layers = [
+        { key: 'desert', imgKey: 'bg_desert', parallax: 0.1, scale: 0.8, offsetY: 40 }, 
+        { key: 'plains', imgKey: 'bg_mountains', parallax: 0.12, scale: 0.6, offsetY: 10 }, 
+        { key: 'forest', imgKey: 'bg_forest', parallax: 0.15, scale: 0.6, offsetY: 10 },
+        { key: 'jungle', imgKey: 'bg_jungles', parallax: 0.18, scale: 0.5, offsetY: 0 },
+        { key: 'snow', imgKey: 'bg_winter', parallax: 0.1, scale: 0.5, offsetY: 50 },
+        // НОВОЕ: Добавляем деревню
+        { key: 'village', imgKey: 'bg_forest', parallax: 0.12, scale: 0.7, offsetY: 20 } 
+    ];
 
-        // Кэш для размеров, чтобы не пересчитывать математику каждый кадр
-        this._sizeCache = {};
-    }
+    this._sizeCache = {};
+}
 
     draw(ctx, assets, cameraX, cameraY) {
         const screenCenterX = cameraX + (CONFIG.width >> 1); // Используем битовый сдвиг вместо / 2 (быстрее)
