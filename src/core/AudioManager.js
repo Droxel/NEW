@@ -1,40 +1,75 @@
 // src/core/audioManager.js
 export const audioManager = {
     currentMusic: null,
+    nextMusic: null, // Для плавного перехода
+    fadeInterval: null,
     unlocked: false,
-    isPausedBySystem: false, // Флаг, чтобы знать, что мы сами поставили на паузу
+    isPausedBySystem: false,
 
-    playMusic(key) {
+playMusic(key, fadeTime = 2000) {
         if (!this.unlocked) {
             this.pendingMusic = key; 
             return;
         }
 
-        if (this.currentMusic && this.currentMusic.dataset.key === key) {
+        if (this.currentMusic && this.currentMusic.dataset.key === key) return;
+        if (this.nextMusic && this.nextMusic.dataset.key === key) return;
+
+        // --- МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ ---
+        if (fadeTime <= 0) {
+            this.stopMusic(); // Останавливаем всё сразу
+            const audio = new Audio(`./assets/audio/music/${key}.mp3`);
+            audio.loop = true;
+            audio.volume = (key === "ambient" || key === "evil") ? 0.15 : 0.35;
+            audio.dataset.key = key;
+            audio.play().catch(e => console.warn(e));
+            this.currentMusic = audio;
             return;
         }
 
-        this.stopMusic();
+        if (this.fadeInterval) clearInterval(this.fadeInterval);
 
         const audio = new Audio(`./assets/audio/music/${key}.mp3`);
         audio.loop = true;
-        audio.volume = key === "ambient" ? 0.15 : 0.35;
+        audio.volume = 0; // Начинаем с нуля
         audio.dataset.key = key;
+        this.nextMusic = audio;
 
-        audio.play().catch(err => {
-            console.warn("❌ Ошибка воспроизведения:", err);
-        });
+        audio.play().catch(e => console.warn(e));
 
-        this.currentMusic = audio;
+        const targetVolume = (key === "ambient" || key === "evil") ? 0.15 : 0.35;
+        const steps = 20;
+        let step = 0;
+
+        this.fadeInterval = setInterval(() => {
+            step++;
+            const progress = step / steps;
+
+            // Новая громкость вверх
+            this.nextMusic.volume = progress * targetVolume;
+
+            // Старая громкость вниз
+            if (this.currentMusic) {
+                this.currentMusic.volume = Math.max(0, this.currentMusic.volume * (1 - progress));
+            }
+
+            if (step >= steps) {
+                clearInterval(this.fadeInterval);
+                if (this.currentMusic) {
+                    this.currentMusic.pause();
+                    this.currentMusic.currentTime = 0;
+                }
+                this.currentMusic = this.nextMusic;
+                this.nextMusic = null;
+            }
+        }, fadeTime / steps);
     },
 
     stopMusic() {
-        if (!this.currentMusic) return;
-        this.currentMusic.pause();
-        this.currentMusic.currentTime = 0;
-        this.currentMusic = null;
+        if (this.fadeInterval) clearInterval(this.fadeInterval);
+        if (this.currentMusic) { this.currentMusic.pause(); this.currentMusic = null; }
+        if (this.nextMusic) { this.nextMusic.pause(); this.nextMusic = null; }
     },
-
     // --- НОВЫЕ МЕТОДЫ ДЛЯ ВЫХОДА ИЗ ПРИЛОЖЕНИЯ ---
     pauseAll() {
         if (this.currentMusic && !this.currentMusic.paused) {

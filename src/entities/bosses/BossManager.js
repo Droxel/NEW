@@ -3,6 +3,9 @@ import { CubeBoss } from "./CubeBoss.js";     // Лежат в той же па�
 import { DesertBoss } from "./DesertBoss.js"; 
 import { JungleBoss } from "./JungleBoss.js";
 import { audioManager } from "../../core/AudioManager.js"; // Выходим из entities/bosses/ в src/
+import { GameState } from "../../core/GameState.js";
+import { world } from "../../world/World.js";
+
 export const bossManager = {
     boss: null,
     
@@ -15,38 +18,35 @@ export const bossManager = {
         'forest_boss': CubeBoss  
     },
 
-    spawn(bossKey, x, y) {
-        if (this.boss) { // Убрал проверку isAlive, чтобы старый босс точно удалился
-             this.boss = null;
-        }
+spawn(bossKey, x, y) {
+        if (this.boss) this.boss = null;
 
-const BossClass = this.registry[bossKey];
-        if (!BossClass) {
-            console.error(`❌ Босс "${bossKey}" не найден в реестре!`);
-            return false;
-        }
+        const BossClass = this.registry[bossKey];
+        if (!BossClass) return false;
 
-        console.log(`💀 ПРИЗЫВ: ${bossKey} на ${x}`);
-        
-        this.boss = new BossClass(x); // <-- Передаем только X, Y он сам найдет по земле
-        
+        this.currentBossKey = bossKey; // <--- ЗАПОМИНАЕМ ТИП БОССА
+        this.boss = new BossClass(x); 
         audioManager.playMusic('boss_theme'); 
-
         return true;
     },
 
-    update(player) {
+update(player) {
         if (this.boss) {
-            // Обновляем босса всегда, даже если он умирает (чтобы проиграть анимацию)
             this.boss.update(player);
 
-            // Проверяем: если босс мертв И (опционально) анимация закончилась
-            // В CubeBoss.js анимация управляется таймером death
             if (!this.boss.isAlive && this.boss.timers.death > 100) {
-                console.log("🎉 Босс побежден и анимация прошла!");
+                console.log("🎉 Босс побежден!");
                 
+                // --- ЛОГИКА ПОРЧИ ---
+                if (!GameState.bossesDefeated[this.currentBossKey]) {
+                    GameState.bossesDefeated[this.currentBossKey] = true;
+                    world.corruptionManager.spreadCorruption(this.currentBossKey);
+                    world.replaceStatuesWithAltars(this.currentBossKey);
+                }
+                // --------------------
+
                 this.stopBossMusic();
-                this.boss = null; // Удаляем только после анимации
+                this.boss = null; 
             }
         }
     },

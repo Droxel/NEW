@@ -20,17 +20,7 @@ export const SPAWN_CONFIG = {
             check: (time, biome) => time.getNightFactor() === 1, 
             params: [true]
         },
-        // --- ГИГАНТЫ ---
-{
-    class: GiantMob,
-    name: "world_giant",
-    chance: 0.05, // Гиганты — это событие, лучше сделать шанс поменьше
-    check: (time, biome) => {
-        const isNight = time.getNightFactor() > 0.5; // Может, пусть только ночью ходят?
-        return progression.isGiantEra && biome !== 'village';
-    },
-    params: [] 
-}
+
     ],
     dungeon: [
         {

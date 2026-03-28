@@ -5,8 +5,8 @@ import { Bubble } from "./tools/Bubble.js";
 import { GrapplingHook } from "./tools/GrapplingHook.js";
 export const player = {
     // ХАРАКТЕРИСТИКИ
-    hp: 3,
-    maxHp: 3,
+    hp: 100,
+    maxHp: 100,
     invulnerableTimer: 0,
     timeSinceLastHit: 0,
     regenTimer: 0,

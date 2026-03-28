@@ -1,5 +1,6 @@
 // src/world/terrain/BiomeMap.js
 import { fbm, WORLD_SEED } from "../Seed.js";
+import { GameState } from "../../core/GameState.js";
 
 export function getBiomeValue(x) {
     // Основной шум биомов
@@ -30,18 +31,13 @@ export function getBiomeValue(x) {
 }
 
 export function getBiomeMix(x) {
-    const v = (getBiomeValue(x) + 1) / 2; // Приводим к 0..1
-
-    // Шум для деревни
-    const villageNoise = (fbm(x, {
-        scale: 0.0005, 
-        octaves: 2,
-        seed: WORLD_SEED + 12345
-    }) + 1) / 2;
-
-    let desert = 0, plains = 0, forest = 0, jungle = 0, snow = 0, village = 0;
-    const transition = 0.15; // Увеличили для большей плавности
-
+    const v = (getBiomeValue(x) + 1) / 2; 
+    const villageNoise = (fbm(x, { scale: 0.0005, octaves: 2, seed: WORLD_SEED + 12345 }) + 1) / 2;
+    
+    // ВОТ ТУТ ДОБАВИЛ corruption = 0
+    let desert = 0, plains = 0, forest = 0, jungle = 0, snow = 0, village = 0, corruption = 0; 
+    
+    const transition = 0.15;
     // Сначала рассчитываем обычные биомы
     if (v < 0.2) {
         desert = 1;
@@ -72,21 +68,43 @@ export function getBiomeMix(x) {
     }
 
     // Плавно вплавляем деревню, если шум высокий (например > 0.7)
-    if (villageNoise > 0.65) {
-        const vt = Math.min(1, (villageNoise - 0.65) / 0.1); // Плавный переход в 0.1 диапазона
+if (villageNoise > 0.65) {
+        const vt = Math.min(1, (villageNoise - 0.65) / 0.1); 
         village = vt;
         const invVt = 1 - vt;
-        // Уменьшаем влияние остальных биомов
         desert *= invVt; plains *= invVt; forest *= invVt; jungle *= invVt; snow *= invVt;
     }
 
-    return { desert, plains, forest, jungle, snow, village };
+// --- ВТОРЖЕНИЕ ПОРЧИ ---
+const level = GameState.corruptionLevel;
+
+if (level > 0) {
+    // Шум для порчи
+    const corruptionNoise = (fbm(x, { scale: 0.0003, octaves: 2, seed: WORLD_SEED + 666 }) + 1) / 2;
+    
+    // Порог появления порчи становится ниже с каждым боссом
+    // Level 1: только если шум > 0.9 (очень редко)
+    // Level 2: если шум > 0.8
+    // Level 3: если шум > 0.7
+    const threshold = 0.95 - (level * 0.08); 
+
+    if (corruptionNoise > threshold) {
+        const ct = Math.min(1, (corruptionNoise - threshold) / 0.1);
+        corruption = ct;
+        const invCt = 1 - ct;
+        // Подавляем остальные биомы
+        desert *= invCt; plains *= invCt; forest *= invCt; jungle *= invCt; snow *= invCt; village *= invCt;
+    }
+}
+
+    return { desert, plains, forest, jungle, snow, village, corruption };
 }
 
 export function getBiome(x) {
     const m = getBiomeMix(x);
-    // Берем биом с наибольшим весом
-    const maxWeight = Math.max(m.desert, m.plains, m.forest, m.jungle, m.snow, m.village);
+    const maxWeight = Math.max(m.desert, m.plains, m.forest, m.jungle, m.snow, m.village, m.corruption || 0);
+    
+    if (m.corruption === maxWeight) return "corruption"; // <--- НОВЫЙ БИОМ
     if (m.village === maxWeight) return "village";
     if (m.desert === maxWeight) return "desert";
     if (m.plains === maxWeight) return "plains";

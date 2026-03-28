@@ -1,0 +1,24 @@
+<svg width="192" height="192" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <desc>Jungle Altar - Terraria Style</desc>
+  <rect x="10" y="32" width="28" height="10" fill="#212121" />
+  <rect x="6" y="36" width="36" height="8" fill="#212121" />
+  <rect x="14" y="24" width="20" height="14" fill="#212121" />
+  <rect x="18" y="18" width="12" height="6" fill="#212121" />
+
+  <rect x="8" y="34" width="6" height="6" fill="#1B5E20" />
+  <rect x="34" y="34" width="6" height="6" fill="#1B5E20" />
+  <rect x="12" y="26" width="4" height="4" fill="#43A047" />
+  <rect x="32" y="26" width="4" height="4" fill="#43A047" />
+  <rect x="16" y="20" width="16" height="2" fill="#AEEA00" /> <rect x="22" y="22" width="4" height="18" fill="#1B5E20" opacity="0.7" /> <rect x="10" y="38" width="28" height="2" fill="#000000" opacity="0.3" />
+
+  <defs>
+    <radialGradient id="jungleCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#CCFF90" />
+      <stop offset="100%" stop-color="#64DD17" />
+    </radialGradient>
+  </defs>
+  <rect x="21" y="25" width="6" height="6" fill="url(#jungleCore)">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite" />
+  </rect>
+  <rect x="23" y="27" width="2" height="2" fill="#FFFFFF" opacity="0.8" />
+</svg>

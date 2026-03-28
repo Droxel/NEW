@@ -1,12 +1,16 @@
 //ChunkManager.js
 import { Chunk } from "./Chunk.js";
+import { GameState } from "../../core/GameState.js";
+import { cameraX } from "../../core/Braw.js"; // Нам нужна камера, чтобы не менять деревья прям на глазах
+import { CONFIG } from "../../data/config.js";
 
 const CHUNK_SIZE = 1024;
 
 export class ChunkManager {
     constructor(worldInstance){ 
         this.chunks = new Map();
-        this.world = worldInstance; // Сохраняем мир здесь
+        this.world = worldInstance; 
+        this.mutationTimer = 0; // Таймер для мутации
     }
 
     getChunkId(x){
@@ -27,6 +31,53 @@ export class ChunkManager {
 
         for (let i = startChunk; i <= endChunk; i++) {
             this.getChunk(i * CHUNK_SIZE);
+        }
+    }
+
+    // 👇 НОВЫЙ МЕТОД: Плавное заражение мира 👇
+    update(dt) {
+        const level = GameState.corruptionLevel;
+        if (level === 0) return; // Если все спокойно, не тратим ресурсы
+
+        this.mutationTimer++;
+        
+        // Чем больше убито боссов, тем быстрее мутируют деревья
+        const mutationRate = level === 1 ? 120 : (level === 2 ? 60 : 30);
+
+        if (this.mutationTimer >= mutationRate) {
+            this.mutationTimer = 0;
+            this.corruptRandomOffscreenTree();
+        }
+    }
+
+    corruptRandomOffscreenTree() {
+        const chunkIds = Array.from(this.chunks.keys());
+        if (chunkIds.length === 0) return;
+
+        // Выбираем случайный загруженный чанк
+        const randomId = chunkIds[Math.floor(Math.random() * chunkIds.length)];
+        const chunk = this.chunks.get(randomId);
+
+        // Границы экрана с небольшим запасом
+        const leftView = cameraX - 300;
+        const rightView = cameraX + CONFIG.width + 300;
+        const chunkStartX = randomId * CHUNK_SIZE;
+
+        // Если чанк сейчас на экране - отменяем! (Игрок не должен видеть магию)
+        if (chunkStartX + CHUNK_SIZE > leftView && chunkStartX < rightView) {
+            return; 
+        }
+
+        // Ищем в этом чанке обычные деревья
+        const normalTrees = chunk.objects.filter(obj => obj.type === "tree" && obj.imgKey !== "distorted_tree");
+        
+        if (normalTrees.length > 0) {
+            // Берем случайное дерево и превращаем его в искаженное
+            const treeToCorrupt = normalTrees[Math.floor(Math.random() * normalTrees.length)];
+            treeToCorrupt.imgKey = "distorted_tree";
+            // Можем чуть увеличить его для устрашения
+            treeToCorrupt.width *= 1.1; 
+            treeToCorrupt.height *= 1.1;
         }
     }
 }

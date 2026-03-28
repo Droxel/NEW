@@ -5,6 +5,7 @@ import { bossManager } from "../entities/bosses/BossManager.js";
 import { assets } from "./AssetLoader.js"; 
 import { merchant } from "../entities/npcs/Merchant.js";
 import { residentManager } from "../entities/npcs/residents/ResidentManager.js";
+import { GameState } from "../core/GameState.js";
 // Переэкспортируем assets, чтобы main.js мог их видеть через этот файл
 export { assets };
 
@@ -75,9 +76,9 @@ export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager,
 // --- СЛОЙ 2: ЗЕМЛЯ И ВОДЫ ---
     const startX = renderCamX;
     const endX = renderCamX + CONFIG.width + 1;
-    const step = 2;
+    const step = 8; 
     const DUNGEON_SPACING = 15000;
-    const entranceWidth = 60;
+    const entranceWidth = 60; // <--- ВОТ ЭТО ВЕРНУЛИ
 
     for (let x = startX; x < endX; x += step) {
         // Оставляем true, чтобы поверхность рисовалась ровной!
@@ -93,24 +94,37 @@ export function Braw(ctx, player, world, time, boss, sky, bgManager, petManager,
             continue; // Не рисуем землю там, где вход
         }
 
-        const mix = world.getBiomeMix(x);
-        const waterData = world.getWaterData(x);
-const r = Math.floor((255*mix.desert)+(92*mix.plains)+(63*mix.forest)+(47*mix.jungle)+(255*mix.snow) + (100 * mix.village));
-const g = Math.floor((248*mix.desert)+(138*mix.plains)+(107*mix.forest)+(79*mix.jungle)+(255*mix.snow) + (160 * mix.village));
-const b = Math.floor((109*mix.desert)+(58*mix.plains)+(42*mix.forest)+(47*mix.jungle)+(255*mix.snow) + (60 * mix.village));
+const mix = world.getBiomeMix(x);
+const waterData = world.getWaterData(x);
+
+// 👇 ДОБАВЛЯЕМ ЦВЕТ ПОРЧИ (Темно-фиолетовый: RGB 74, 0, 130)
+const r = Math.floor((255*mix.desert)+(92*mix.plains)+(63*mix.forest)+(47*mix.jungle)+(255*mix.snow) + (100 * mix.village) + (74 * mix.corruption));
+const g = Math.floor((248*mix.desert)+(138*mix.plains)+(107*mix.forest)+(79*mix.jungle)+(255*mix.snow) + (160 * mix.village) + (0 * mix.corruption));
+const b = Math.floor((109*mix.desert)+(58*mix.plains)+(42*mix.forest)+(47*mix.jungle)+(255*mix.snow) + (60 * mix.village) + (130 * mix.corruption));
 
 ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 ctx.fillRect(x, groundY + player.size, step + 0.5, 30000);
 
-        if (waterData.isWater) {
+if (waterData.isWater) {
             const wLevel = waterData.level + player.size;
-            const gLevel = groundY + player.size;
-            if (gLevel > wLevel) {
+            
+            // ВАЖНО: берем высоту дна БЕЗ бездны данжа (передаем true)
+            // Иначе вода будет литься колонной вниз на 20000 пикселей!
+            const realTerrainBottom = world.getHeight(x, true) + player.size; 
+            
+            if (realTerrainBottom > wLevel) {
                 ctx.fillStyle = "rgba(0, 120, 255, 0.5)";
-                ctx.fillRect(x, wLevel, step, gLevel - wLevel);
+                // Рисуем воду от гладкой поверхности (wLevel) до дна (realTerrainBottom)
+                ctx.fillRect(x, wLevel, step, realTerrainBottom - wLevel);
             }
         }
     }
+    // 👇 ДОБАВЛЯЕМ ЭТОТ БЛОК 👇
+    // --- СЛОЙ 2.5: ПЯТНА ПОРЧИ ---
+if (world.corruptionManager) {
+    // Передаем world, чтобы менеджер знал высоту земли
+    world.corruptionManager.draw(ctx, renderCamX, renderCamX + CONFIG.width, world); 
+}
 // --- СЛОЙ 3: ДАНЖ И ИНТЕРАКТИВ (Улучшенный визуал) ---
 for (let i = startChunk; i <= endChunk; i++) {
     const chunk = world.chunkManager.getChunk(i * (CONFIG.chunkSize || 1024));
@@ -165,17 +179,17 @@ for (let i = startChunk; i <= endChunk; i++) {
             ctx.strokeStyle = isTop ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.2)";
             ctx.lineWidth = 2;
             
-            const step = 80; 
+const step = 80; 
+            ctx.beginPath(); // Открываем путь ОДИН РАЗ до цикла
             for (let bx = 0; bx < obj.width; bx += step) {
                 for (let by = 0; by < obj.height; by += step) {
                     if ((bx + by) % 3 === 0) { 
-                        ctx.beginPath();
                         ctx.moveTo(obj.x + bx, obj.y + by + step);
                         ctx.lineTo(obj.x + bx + step / 2, obj.y + by + step);
-                        ctx.stroke();
                     }
                 }
             }
+            ctx.stroke(); // Рисуем все линии за ОДИН вызов
         }
         else if (obj.type === "chest") {
             const chest = obj.instance;
@@ -315,4 +329,55 @@ if (residentManager) {
     }
 
     ctx.restore(); // ВОЗВРАЩАЕМ КОНТЕКСТ КАМЕРЫ В НАЧАЛО
+
+
+}
+export class CorruptionManager {
+    // Нам больше не нужен constructor и массив spots!
+    
+draw(ctx, leftView, rightView, world) { 
+    const level = GameState.corruptionLevel;
+        if (level === 0) return; // Нет порчи - нет проблем
+
+        ctx.save();
+        
+        // --- 1. ПЯТНА ПОРЧИ НА ЗЕМЛЕ ---
+        // Шаг генерации: чем выше уровень, тем плотнее пятна
+        const step = level === 1 ? 800 : (level === 2 ? 400 : 200); 
+        const startX = Math.floor(leftView / step) * step;
+
+        for (let x = startX; x < rightView; x += step) {
+            // Создаем псевдослучайность на основе координаты X, чтобы пятна не прыгали
+            const seed = Math.sin(x * 0.01) * 10000;
+            const random = seed - Math.floor(seed); 
+
+            // Вероятность появления
+            const chance = level === 1 ? 0.3 : (level === 2 ? 0.6 : 0.9);
+            
+            if (random < chance) {
+                const groundY = world.getHeight(x);
+                // Размер пятна растет с уровнем
+                const radius = (level * 8) + (random * 20); 
+                
+                ctx.beginPath();
+                ctx.arc(x, groundY + 15, radius, 0, Math.PI * 2);
+                ctx.fillStyle = level >= 3 ? "#4a004a" : "#2d002d";
+                ctx.globalAlpha = 0.8;
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+
+        // --- 2. ЗЛОВЕЩИЙ ТУМАН ---
+        if (level >= 2) {
+            ctx.save();
+            if (level === 2) {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.2)"; // Легкая тьма
+            } else {
+                ctx.fillStyle = "rgba(74, 0, 74, 0.35)"; // Густая фиолетовая дымка
+            }
+            ctx.fillRect(leftView, -5000, rightView - leftView, 10000);
+            ctx.restore();
+        }
+    }
 }

@@ -7,7 +7,8 @@ export const assets = {
     tree4: new Image(),
     tree5: new Image(),
     tree6: new Image(),
-    
+    distorted_tree: new Image(),
+
     //  СТАТУИ 
     idol_desert: new Image(),
     idol_ice: new Image(),
@@ -81,6 +82,11 @@ export const assets = {
     giant_body: new Image(),
     giant_arm: new Image(),
     giant_fist: new Image(),
+
+    a_desert: new Image(),
+    a_forest: new Image(),
+    a_glazed: new Image(),
+    a_jungli: new Image(),
 };
 
 
@@ -91,6 +97,7 @@ assets.tree3.src = "../../assets/images/world/trees/tree3.svg";
 assets.tree4.src = "../../assets/images/world/trees/tree4.svg";
 assets.tree5.src = "../../assets/images/world/trees/tree5.svg";
 assets.tree6.src = "../../assets/images/world/trees/tree6.svg";
+assets.distorted_tree.src = "../../assets/images/world/trees/distorted_tree.svg";
 
 // Статуи (world/statue/)
 assets.idol_desert.src = "../../assets/images/world/statue/idol_desert.svg";
@@ -153,3 +160,8 @@ assets.giant_head.src = "../../assets/images/entities/mobs/head_giant.png";
 assets.giant_body.src = "../../assets/images/entities/mobs/body_giant.png";
 assets.giant_arm.src  = "../../assets/images/entities/mobs/arm_giant.png";
 assets.giant_fist.src = "../../assets/images/entities/mobs/fist.png";
+
+assets.a_desert.src = "../../assets/images/world/altars/a_desert.svg";
+assets.a_forest.src = "../../assets/images/world/altars/a_forest.svg";
+assets.a_glazed.src = "../../assets/images/world/altars/a_glazed.svg";
+assets.a_jungli.src = "../../assets/images/world/altars/a_jungli.svg";

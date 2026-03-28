@@ -1,0 +1,25 @@
+<svg width="192" height="192" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <desc>Ice Altar - Terraria Style</desc>
+  <rect x="10" y="32" width="28" height="12" fill="#0D47A1" />
+  <rect x="6" y="38" width="36" height="6" fill="#1565C0" />
+  <rect x="14" y="22" width="20" height="16" fill="#1976D2" />
+  
+  <rect x="14" y="22" width="20" height="2" fill="#E3F2FD" />
+  <rect x="10" y="32" width="6" height="2" fill="#E3F2FD" />
+  <rect x="32" y="32" width="6" height="2" fill="#E3F2FD" />
+
+  <rect x="18" y="24" width="2" height="12" fill="#00E5FF" opacity="0.6" />
+  <rect x="28" y="24" width="2" height="12" fill="#00E5FF" opacity="0.6" />
+  <rect x="20" y="34" width="8" height="2" fill="#00E5FF" opacity="0.8" />
+  <rect x="8" y="40" width="2" height="2" fill="#81D4FA" />
+  
+  <defs>
+    <linearGradient id="iceFire" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#00BCD4" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.5" />
+    </linearGradient>
+  </defs>
+  <path d="M24 10 L28 18 L24 22 L20 18 Z" fill="url(#iceFire)">
+    <animate attributeName="d" values="M24 10 L28 18 L24 22 L20 18 Z;M24 8 L29 17 L24 23 L19 17 Z;M24 10 L28 18 L24 22 L20 18 Z" dur="1.5s" repeatCount="indefinite" />
+  </path>
+</svg>

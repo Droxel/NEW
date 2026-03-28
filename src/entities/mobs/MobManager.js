@@ -6,6 +6,8 @@ import { time } from "../../core/Time.js";
 import { SPAWN_CONFIG } from "../../data/spawnConfig.js"; 
 import { JungleSkeleton } from "./JungleSkeleton.js";
 import { GiantMob } from "./GiantMob.js";
+import { GameState } from "../../core/GameState.js";
+import { bossManager } from "../bosses/BossManager.js";
 
 export const mobManager = {
     mobs: [],
@@ -24,17 +26,14 @@ update(dt, player) {
         for (let i = 0; i < this.mobs.length; i++) {
             const mob = this.mobs[i];
 
-// --- ЗАЩИТА ОТ МОБНОГО АПОКАЛИПСИСА (DESPAWN) ---
 const distToPlayerX = Math.abs(player.x - mob.x);
 
-if (distToPlayerX > despawnDistance) {
-    // Иммунитет для боссов!
-    if (mob instanceof GiantMob) {
-        continue; // Босса не удаляем, он ждет игрока
+// Если моб слишком далеко — удаляем сразу
+if (distToPlayerX > 1800) {
+    if (!(mob instanceof GiantMob)) {
+        mob.markedForDeletion = true;
+        continue;
     }
-    
-    mob.markedForDeletion = true;
-    continue; 
 }
             // ------------------------------------------------
 
@@ -144,34 +143,64 @@ isPointInWall(x, y) {
         }
         return false;
     },
-
 handleSpawning(player) {
     this.spawnTimer++;
     
-    // --- НАСТРОЙКИ ЧАСТОТЫ ---
-    const spawnSpeed = 40; // Было 90. Чем меньше, тем чаще спавн.
-    if (this.spawnTimer < spawnSpeed) return; 
+    // 1. АДАПТИВНЫЙ ТАЙМЕР: Если игрок стоит, спавним в 3 раза реже
+    const isStanding = Math.abs(player.velocityX || 0) < 0.1;
+    const currentSpawnRate = isStanding ? 120 : 45; // 120 кадров (~2 сек) если стоим
+
+    if (this.spawnTimer < currentSpawnRate) return; 
     this.spawnTimer = 0;
-    
+
+    // 2. ПРОВЕРКА ЛОКАЛЬНОЙ ПЛОТНОСТИ (Самое важное!)
+    // Считаем, сколько мобов уже находится в радиусе 1000 пикселей от игрока
+    const nearbyMobs = this.mobs.filter(m => {
+        const dist = Math.abs(m.x - player.x);
+        return dist < 1000 && !(m instanceof GiantMob); // Гигантов не считаем
+    }).length;
+
+    // Если рядом уже больше 6-8 мобов, не спавним новых
+    const localLimit = 8; 
+    if (nearbyMobs >= localLimit) return;
+
+    // Общий лимит тоже оставляем
     if (this.mobs.length >= this.maxMobs) return;
 
-    // Выбираем сторону
+    // 3. ВЫБОР СТОРОНЫ
+    // Чтобы мобы не копились с одной стороны, считаем баланс
     const mobsLeft = this.mobs.filter(m => m.x < player.x).length;
     const mobsRight = this.mobs.length - mobsLeft;
+    
+    // Спавним там, где меньше народу
     const dir = mobsLeft > mobsRight ? 1 : -1;
 
-    const spawnX = player.x + dir * (700 + Math.random() * 500); 
+    // 4. ДИСТАНЦИЯ СПАВНА
+    // Увеличим разброс, чтобы они не появлялись в одной точке
+    const spawnX = player.x + dir * (800 + Math.random() * 600); 
     let spawnY = player.y + (Math.random() * 400 - 200);
 
-    // --- ТВОЯ ЗАЩИТА (АНТИ-АПОКАЛИПСИС) ---
-    // Если хочешь "толпы", увеличь 2 до 5-7
-    const maxDensity = 3; 
-    const nearbyMobs = this.mobs.filter(m => Math.abs(m.x - spawnX) < 400).length;
-    
-    if (nearbyMobs >= maxDensity) {
-        return; // Слишком тесно, не спавним
-    }
+    // Логика Гигантов (оставляем твою, она хорошая)
+// 👇 ЛОГИКА ГИГАНТОВ: ТЕПЕРЬ ТОЛЬКО ПОСЛЕ БОССА ДЖУНГЛЕЙ 👇
+        if (GameState.bossesDefeated['jungle_boss'] && !bossManager.boss) { 
+            // Шанс спавна (можно сделать его фиксированным, раз это лейт-гейм)
+            const spawnChance = 0.05; 
+            const giantExists = this.mobs.some(m => m instanceof GiantMob);
 
+            if (Math.random() < spawnChance && !giantExists) {
+                const groundY = world.getHeight(spawnX);
+                if (!isNaN(groundY)) {
+                    console.log("⚠️ Вдалеке показался гигант...");
+                    this.addMob(GiantMob, spawnX, groundY - 300);
+                    return; 
+                }
+            }
+        }
+
+    // Если призван босс — жестко режем спавн мелочи (30% шанс)
+    if (bossManager.boss && Math.random() > 0.3) return;
+
+    // 5. СПАВН ОБЫЧНЫХ МОБОВ
     const inDungeon = this.isPointInDungeon(spawnX, spawnY);
     const biome = world.getBiome(spawnX);
     const currentPool = inDungeon ? SPAWN_CONFIG.dungeon : SPAWN_CONFIG.surface;
@@ -179,7 +208,6 @@ handleSpawning(player) {
     if (!currentPool) return;
 
     currentPool.forEach(cfg => {
-        // Увеличь cfg.chance в своем SPAWN_CONFIG, если хочешь еще больше мобов
         if (Math.random() < cfg.chance && cfg.check(time, biome)) {
             if (!inDungeon) {
                 const groundY = world.getHeight(spawnX); 
@@ -260,18 +288,19 @@ spawnBossAtStart() {
                 if (Math.abs(drop.vy) < 1) drop.vy = 0;
             }
             
-            const dx = (player.x + player.size/2) - (drop.x + drop.size/2);
+const dx = (player.x + player.size/2) - (drop.x + drop.size/2);
             const dy = (player.y + player.size/2) - (drop.y + drop.size/2);
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            const distSq = dx*dx + dy*dy; // Квадрат расстояния (очень быстро)
 
             if (currentTime - drop.createdAt < 700) return; 
 
-            if (dist < 150) { 
+            if (distSq < 22500) { // 150 * 150
+                const dist = Math.sqrt(distSq); // Корень нужен только тут для вектора тяги
                 drop.x += (dx / dist) * 8;
                 drop.y += (dy / dist) * 8;
             }
 
-            if (dist < 30) {
+            if (distSq < 900) { // 30 * 30
                 if (playerInventory) {
                     const success = playerInventory.addCrystal(1);
                     if (success) drop.pickedUp = true;

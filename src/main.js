@@ -185,23 +185,40 @@ if (gameOver.isShown) {
     gameOver.update(); 
 
     if (!gameOver.isShown) {
-        // --- МУЗЫКА ---
+// --- МУЗЫКА ---
         const boss = bossManager.boss;
         let targetTheme = "ambient";
+        let fadeTime = 4000; // По умолчанию плавно
+
         if (boss && boss.isAlive) {
             targetTheme = "boss_theme";
-        } else if (mobManager.isPointInDungeon(player.x + player.size / 2, player.y + player.size / 2)) {
+            fadeTime = 0; // Босс начался — музыка врубается резко!
+        } 
+        else if (mobManager.isPointInDungeon(player.x + player.size / 2, player.y + player.size / 2)) {
             targetTheme = "danjunglei"; 
+        } 
+        else if (world.corruptionManager && world.corruptionManager.visualAlpha > 0.3) {
+            targetTheme = "evil";
         }
 
-        if (!audioManager.currentMusic || audioManager.currentMusic.dataset.key !== targetTheme) {
-            audioManager.playMusic(targetTheme);
+        // Если мы переключаемся С темы босса на обычную — тоже делаем это резко (победа!)
+        if (audioManager.currentMusic && audioManager.currentMusic.dataset.key === "boss_theme") {
+            fadeTime = 0;
         }
 
+        audioManager.playMusic(targetTheme, fadeTime);
         bossManager.update(player);
         time.update(dt);
         sky.update(dt, time);
+        
+        if (world.chunkManager) {
+            world.chunkManager.update(dt);
+        }
 
+        // Обновляем порчу (для распространения биома и спавна спец-эффектов)
+        if (world.corruptionManager) {
+            world.corruptionManager.update(dt);
+        }
         // УПРАВЛЕНИЕ
         player.velocityX = 0;
         if (player.isFlying) player.velocityY = 0;
@@ -240,25 +257,7 @@ if (residentManager) {
     // Добавляем player и dt (дельта времени)
     residentManager.update(world, audioManager, player, dt); 
 }
-        // КОЛЛИЗИИ С МОБАМИ
-        mobManager.mobs.forEach(mob => {
-            if (!mob.isDead && !player.isFlying &&
-                player.x < mob.x + mob.width &&
-                player.x + player.size > mob.x &&
-                player.y < mob.y + mob.height &&
-                player.y + player.size > mob.y
-            ) {
-                if (player.velocityY > 0 && player.y + player.size < mob.y + mob.height * 0.5) {
-                    mob.takeDamage(1);
-                    player.velocityY = -8;
-                } else {
-                    player.takeDamage(mob.damage || 1); 
-                    const dir = Math.sign(player.x - mob.x);
-                    player.velocityX = dir * 10;
-                    player.velocityY = -5;
-                }
-            }
-        });
+
 
         // КУСТЫ ЖИЗНИ
         if (world.chunkManager) {

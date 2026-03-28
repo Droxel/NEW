@@ -20,6 +20,7 @@ C:.
 |   |   |       boss_theme.mp3
 |   |   |       CHudesenka_-_Ladoshki_76625190.mp3
 |   |   |       danjunglei.mp3
+|   |   |       evil.mp3
 |   |   |       
 |   |   \---sfx
 |   |       +---giants
@@ -85,6 +86,12 @@ C:.
 |       \---world
 |           |   bush of life.svg
 |           |   
+|           +---altars
+|           |       a_desert.svg
+|           |       a_forest.svg
+|           |       a_glazed.svg
+|           |       a_jungli.svg
+|           |       
 |           +---chests
 |           |       chestopen.svg
 |           |       chestunopened.svg
@@ -99,6 +106,7 @@ C:.
 |           |       idol_pillar.svg
 |           |       
 |           +---trees
+|           |       distorted_tree.svg
 |           |       tree1.svg
 |           |       tree2.svg
 |           |       tree3.svg
@@ -195,6 +203,7 @@ C:.
     |           Settings.js
     |           
     \---world
+        |   CorruptionManager.js
         |   Seed.js
         |   Water.js
         |   World.js
@@ -204,6 +213,7 @@ C:.
         |       ChunkManager.js
         |       
         +---objects
+        |       Altar.js
         |       Chest.js
         |       ChestManager.js
         |       DroppedItem.js
