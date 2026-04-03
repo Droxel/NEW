@@ -106,18 +106,44 @@ ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 ctx.fillRect(x, groundY + player.size, step + 0.5, 30000);
 
 if (waterData.isWater) {
-            const wLevel = waterData.level + player.size;
-            
-            // ВАЖНО: берем высоту дна БЕЗ бездны данжа (передаем true)
-            // Иначе вода будет литься колонной вниз на 20000 пикселей!
-            const realTerrainBottom = world.getHeight(x, true) + player.size; 
-            
-            if (realTerrainBottom > wLevel) {
-                ctx.fillStyle = "rgba(0, 120, 255, 0.5)";
-                // Рисуем воду от гладкой поверхности (wLevel) до дна (realTerrainBottom)
-                ctx.fillRect(x, wLevel, step, realTerrainBottom - wLevel);
-            }
-        }
+    const wLevel = waterData.level + player.size;
+    const realTerrainBottom = world.getHeight(x, true) + player.size; 
+    
+    if (realTerrainBottom > wLevel) {
+        // --- 1. ОПРЕДЕЛЯЕМ ЦВЕТА ВОДЫ ДЛЯ БИОМОВ ---
+        // Цвета в формате [R, G, B]
+        const c_desert     = [100, 200, 255]; // Бирюзовая
+        const c_plains     = [0, 120, 255];   // Обычная синяя
+        const c_forest     = [20, 100, 200];  // Глубокая синяя
+        const c_jungle     = [50, 180, 100];  // Грязновато-зеленая
+        const c_snow       = [180, 230, 255]; // Светло-ледяная
+        const c_village    = [0, 150, 255];   // Чистая голубая
+        const c_corruption = [80, 0, 120];    // Фиолетовая (порча)
+
+        // --- 2. СМЕШИВАЕМ ЦВЕТА (как у земли) ---
+        const wr = (c_desert[0] * mix.desert) + (c_plains[0] * mix.plains) + 
+                   (c_forest[0] * mix.forest) + (c_jungle[0] * mix.jungle) + 
+                   (c_snow[0] * mix.snow) + (c_village[0] * mix.village) + 
+                   (c_corruption[0] * mix.corruption);
+
+        const wg = (c_desert[1] * mix.desert) + (c_plains[1] * mix.plains) + 
+                   (c_forest[1] * mix.forest) + (c_jungle[1] * mix.jungle) + 
+                   (c_snow[1] * mix.snow) + (c_village[1] * mix.village) + 
+                   (c_corruption[1] * mix.corruption);
+
+        const wb = (c_desert[2] * mix.desert) + (c_plains[2] * mix.plains) + 
+                   (c_forest[2] * mix.forest) + (c_jungle[2] * mix.jungle) + 
+                   (c_snow[2] * mix.snow) + (c_village[2] * mix.village) + 
+                   (c_corruption[2] * mix.corruption);
+
+        // --- 3. ПРИМЕНЯЕМ ---
+        // 0.6 — это прозрачность (alpha). Можешь подкрутить под себя.
+        ctx.fillStyle = `rgba(${Math.floor(wr)}, ${Math.floor(wg)}, ${Math.floor(wb)}, 0.6)`;
+        
+        // Рисуем сам блок воды
+        ctx.fillRect(x, wLevel, step + 0.5, (realTerrainBottom - wLevel) + 0.5);
+    }
+}
     }
     // 👇 ДОБАВЛЯЕМ ЭТОТ БЛОК 👇
     // --- СЛОЙ 2.5: ПЯТНА ПОРЧИ ---

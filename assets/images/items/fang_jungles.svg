@@ -1,0 +1,29 @@
+<svg class="weapon-svg" width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <g transform="rotate(45 60 60)">
+        <!-- Деревянное основание рукояти -->
+        <path d="M 52 80 L 68 80 L 64 105 L 56 105 Z" fill="#3E2723"/>
+        
+        <!-- Лезвие из изогнутого клыка -->
+        <path d="M 45 80 Q 30 45 60 15 Q 70 45 70 80 Q 57 85 45 80 Z" fill="#F5F5DC"/>
+        <path d="M 60 15 Q 70 45 70 80 Q 57 85 57 80 Q 65 45 60 15 Z" fill="#E0D6B8"/> <!-- Тень для объема клыка -->
+
+        <!-- Трещины на кости -->
+        <path d="M 55 80 L 58 70 L 55 60" stroke="#D3C7A3" stroke-width="1" fill="none"/>
+        <path d="M 65 80 L 63 72 L 66 65" stroke="#D3C7A3" stroke-width="1" fill="none"/>
+
+        <!-- Яд на кончике -->
+        <path d="M 53 35 Q 60 40 65 33 Q 63 20 60 15 Q 55 20 53 35 Z" fill="#2ECC71"/>
+        
+        <!-- Стекающие капли яда -->
+        <path d="M 53 35 Q 53 45 56 45 Q 59 45 59 36 Z" fill="#2ECC71"/> 
+        <path d="M 62 33 Q 62 40 64 40 Q 66 40 65 33 Z" fill="#2ECC71"/> 
+        
+        <!-- Блик на яде, чтобы он казался жидким -->
+        <path d="M 57 25 Q 59 20 60 18" stroke="#A9DFBF" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+
+        <!-- Обмотка из лиан (держит клык на рукояти) -->
+        <path d="M 43 75 Q 60 85 72 75" stroke="#2E7D32" stroke-width="3" fill="none"/>
+        <path d="M 45 82 Q 60 92 69 82" stroke="#1B5E20" stroke-width="3" fill="none"/>
+        <path d="M 44 88 Q 60 98 67 88" stroke="#33691E" stroke-width="3" fill="none"/>
+    </g>
+</svg>

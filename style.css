@@ -62,7 +62,6 @@ body {
   transition: all 0.2s ease; font-weight: bold; text-transform: uppercase;
   text-shadow: 1px 1px 2px #000; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
 }
-/* Используем brightness, чтобы ховер работал и для красных кнопок */
 .menu-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.15); box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.4); }
 .menu-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: inset 0 2px 0 rgba(0,0,0,0.2); }
 .menu-btn:disabled { background-color: #555; border-color: #444; color: #888; cursor: not-allowed; box-shadow: none; }
@@ -76,7 +75,6 @@ body {
 .menu-input::placeholder { color: #888; }
 .menu-input:focus { border-color: #4CAF50; }
 
-/* Кастомный скроллбар для списка миров */
 #worlds-list::-webkit-scrollbar { width: 8px; }
 #worlds-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
 #worlds-list::-webkit-scrollbar-thumb { background: #5c3a21; border-radius: 4px; }
@@ -112,11 +110,10 @@ canvas {
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-image-rendering: -moz-crisp-edges;
+  image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-
 }
 
 /* Кнопки управления ПОВЕРХ игры */
@@ -162,32 +159,7 @@ image-rendering: -moz-crisp-edges;
 .controls button:active { background-color: #666; transform: scale(0.95); }
 
 /* =========================================
-   3. ЗДОРОВЬЕ (ХП)
-   ========================================= */
-#health-ui {
-  position: absolute;
-  top: 15px; right: 15px;
-  display: flex; flex-wrap: wrap; width: 260px; gap: 0 6px;
-  z-index: 10; padding-right: 10px;
-}
-
-.heart {
-  width: 20px; height: 20px; background-color: #ff3333;
-  transform: rotate(45deg); position: relative; transition: all 0.2s;
-  box-shadow: -1px 1px 2px rgba(0,0,0,0.5);
-  margin-bottom: -14px; margin-top: 10px;
-}
-
-.heart::before, .heart::after {
-  content: ""; width: 20px; height: 20px; background-color: #ff3333;
-  border-radius: 50%; position: absolute;
-}
-.heart::before { top: -10px; left: 0; }
-.heart::after { top: 0; left: -10px; }
-.heart.empty, .heart.empty::before, .heart.empty::after { background-color: #444; }
-
-/* =========================================
-   4. ЭФФЕКТЫ И ЭКРАН СМЕРТИ
+   3. ЭФФЕКТЫ И ЭКРАН СМЕРТИ
    ========================================= */
 .game-box.shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
 @keyframes shake {
@@ -213,7 +185,7 @@ image-rendering: -moz-crisp-edges;
 .over-content button:hover { transform: scale(1.1); background: #eee; }
 
 /* =========================================
-   5. ИНВЕНТАРЬ
+   4. ИНВЕНТАРЬ
    ========================================= */
 .inventory-toggle { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; cursor: pointer; z-index: 20; }
 .inventory-toggle img { width: 100%; height: 100%; display: block; pointer-events: none; }
@@ -274,3 +246,97 @@ image-rendering: -moz-crisp-edges;
 }
 .use-btn.active { opacity: 1; filter: none; background: #5cb85c; border-color: #fff; box-shadow: 0 0 10px rgba(92, 184, 92, 0.6); }
 .use-btn img { width: 80%; height: 80%; }
+
+/* =========================================
+   5. ПОКАЗАТЕЛИ ИГРОКА (ХП И ВОЗДУХ)
+   ========================================= */
+
+/* Общий контейнер */
+#player-stats-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column-reverse; /* Воздух будет сверху */
+    align-items: flex-end;
+    gap: 3px; /* Большой отступ, чтобы ХП не наезжали на пузырьки */
+    z-index: 100;
+    pointer-events: none;
+}
+
+#health-ui {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 260px;
+    /* 2px — расстояние между рядами (сделай меньше, если нужно еще плотнее) */
+    /* 6px — расстояние между сердечками в одном ряду */
+    gap: 2px 6px; 
+}
+
+/* Сами сердечки */
+.heart {
+    width: 20px; 
+    height: 20px; 
+    background-color: #ff3333;
+    transform: rotate(45deg); 
+    position: relative; 
+    transition: all 0.2s;
+    box-shadow: -1px 1px 2px rgba(0,0,0,0.5);
+
+    /* ОТРИЦАТЕЛЬНЫЙ ОТСТУП СВЕРХУ */
+    /* Чем больше это число, тем сильнее ряды будут накладываться друг на друга */
+    margin-top: -5px; 
+}
+.heart::before, .heart::after {
+    content: ""; width: 20px; height: 20px; background-color: #ff3333;
+    border-radius: 50%; position: absolute;
+}
+.heart::before { top: -10px; left: 0; }
+.heart::after { top: 0; left: -10px; }
+.heart.empty, .heart.empty::before, .heart.empty::after { background-color: #444; }
+
+/* Блок воздуха */
+#air-ui {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 260px;
+    gap: 4px 6px;
+    margin-right: 10px; /* Сдвигает пузырьки немного влево */
+}
+
+/* Стили самих пузырьков */
+/* Пузырьки: твои, но 20px и с бликом */
+.bubble-ui {
+    width: 20px;
+    height: 20px;
+    background: #3498db;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(52, 152, 219, 0.6);
+    position: relative;
+    margin-top: 5px;   /* Чтобы не слипались с нижним рядом сердец */
+    transition: opacity 0.3s ease;
+}
+
+/* Тот самый блик */
+.bubble-ui::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 5px;
+    height: 5px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+/* Анимация исчезновения */
+.bubble-ui.pop {
+    transform: scale(1.4);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+}

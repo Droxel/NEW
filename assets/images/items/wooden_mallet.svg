@@ -1,0 +1,35 @@
+<svg class="weapon-svg" width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Фильтр для свечения прожилок -->
+        <filter id="greenGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+    </defs>
+    <!-- Поворачиваем оружие по диагонали для динамики -->
+    <g transform="rotate(45 60 60)">
+        <!-- Рукоятка -->
+        <rect x="53" y="40" width="14" height="65" rx="3" fill="#3E2723"/>
+        <rect x="54" y="40" width="4" height="65" fill="#5D4037"/> <!-- Блик на рукояти -->
+        
+        <!-- Кожаная обмотка рукояти -->
+        <path d="M53 70 L67 75 M53 78 L67 83 M53 86 L67 91" stroke="#8D6E63" stroke-width="2"/>
+        
+        <!-- Деревянная голова молота -->
+        <rect x="25" y="20" width="70" height="30" rx="4" fill="#5D4037"/>
+        <rect x="25" y="20" width="70" height="12" rx="4" fill="#795548"/> <!-- Верхняя грань -->
+        <rect x="25" y="45" width="70" height="5" rx="2" fill="#3E2723"/> <!-- Тень снизу -->
+        
+        <!-- Текстура дерева (легкие линии) -->
+        <path d="M 30 25 Q 45 28 60 25 T 90 25" stroke="#4E342E" stroke-width="1" fill="none"/>
+        <path d="M 28 35 Q 50 32 65 35 T 85 35" stroke="#3E2723" stroke-width="1" fill="none"/>
+        
+        <!-- Светящиеся зеленые прожилки -->
+        <path d="M 35 20 Q 45 35 55 20" stroke="#00E676" stroke-width="2" fill="none" filter="url(#greenGlow)"/>
+        <path d="M 65 50 Q 75 35 85 50" stroke="#00E676" stroke-width="2" fill="none" filter="url(#greenGlow)"/>
+        <path d="M 45 35 L 75 35" stroke="#69F0AE" stroke-width="1.5" fill="none" filter="url(#greenGlow)"/>
+        <!-- Магические точки/узлы -->
+        <circle cx="45" cy="35" r="2" fill="#B9F6CA" filter="url(#greenGlow)"/>
+        <circle cx="75" cy="35" r="2" fill="#B9F6CA" filter="url(#greenGlow)"/>
+    </g>
+</svg>

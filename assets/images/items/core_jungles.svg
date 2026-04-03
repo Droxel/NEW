@@ -1,0 +1,22 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="flowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#16a085" stop-opacity="0.8" />
+      <stop offset="60%" stop-color="#117864" stop-opacity="1" />
+      <stop offset="100%" stop-color="#0b5345" stop-opacity="0.9" />
+    </radialGradient>
+    <filter id="flowGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <circle cx="50" cy="50" r="30" fill="url(#flowGradient)" filter="url(#flowGlow)" />
+  <circle cx="50" cy="50" r="20" fill="none" stroke="#0b5345" stroke-width="1.5" stroke-opacity="0.4" />
+  
+  <path d="M30 40 Q45 20 60 40 T90 40" stroke="#0b5345" stroke-width="2" fill="none" opacity="0.6" />
+  <path d="M10 60 Q30 80 50 60 T90 60" stroke="#0b5345" stroke-width="2" fill="none" opacity="0.6" />
+  
+  <path d="M35 55 Q50 35 65 55" stroke="#0b5345" stroke-width="2.5" fill="none" opacity="0.8" />
+  <path d="M35 45 Q50 65 65 45" stroke="#0b5345" stroke-width="2.5" fill="none" opacity="0.8" />
+</svg>
