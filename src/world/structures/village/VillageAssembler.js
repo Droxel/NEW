@@ -10,43 +10,58 @@ export class VillageAssembler {
         };
 
         const layout = [];
-        const buildingsCount = Math.floor(random() * 8) + 4; // От 4 до 11 построек внутри
         
+        // Проверка на наличие данных (чтобы не упасть сразу)
+        if (!VillageAssets || !VillageAssets.wall) {
+            console.error("❌ VillageAssets.wall не найден! Проверь импорт в VillageAssembler.");
+            return { objects: [], totalWidth: 0 };
+        }
+
+        const buildingsCount = Math.floor(random() * 8) + 4; 
         let cursorX = 0;
 
-        // 1. ЛЕВАЯ КОЛОННА (Замыкает слева)
+        // 1. ЛЕВАЯ КОЛОННА
         layout.push({
             ...VillageAssets.wall,
             offsetX: cursorX,
             type: 'village_wall'
         });
-        cursorX += VillageAssets.wall.width + 60; // Отступ от левой стены до первого дома
+        cursorX += (VillageAssets.wall.width || 250) + 60;
 
         // 2. ВНУТРЕННОСТИ ДЕРЕВНИ
         for (let i = 0; i < buildingsCount; i++) {
             const isHouse = random() > 0.4; 
             const pool = isHouse ? VillageAssets.houses : VillageAssets.decor;
+            
+            // Защита: если массив пуст или не найден
+            if (!pool || pool.length === 0) {
+                console.warn(`⚠️ Внимание: Массив ${isHouse ? 'houses' : 'decor'} пуст в villageBlueprints.js!`);
+                continue; // Пропускаем эту итерацию
+            }
+
             const blueprint = pool[Math.floor(random() * pool.length)];
             
+            // Финальная проверка самого объекта
+            if (!blueprint) continue;
+
             layout.push({
                 ...blueprint,
                 offsetX: cursorX,
                 type: isHouse ? 'village_house' : 'village_decor'
             });
             
-            // Динамический отступ между зданиями (от 30 до 80 пикселей)
-            cursorX += blueprint.width + 30 + (random() * 50); 
+            // Используем || 100 на случай, если width забыли прописать
+            cursorX += (blueprint.width || 100) + 30 + (random() * 50); 
         }
 
-        // 3. ПРАВАЯ КОЛОННА (Замыкает справа)
+        // 3. ПРАВАЯ КОЛОННА
         layout.push({
             ...VillageAssets.wall,
             offsetX: cursorX,
             type: 'village_wall'
         });
 
-        // Итоговая ширина всей конструкции (включая правую колонну)
-        const totalWidth = cursorX + VillageAssets.wall.width;
+        const totalWidth = cursorX + (VillageAssets.wall.width || 250);
 
         return {
             objects: layout,
