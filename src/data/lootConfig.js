@@ -1,6 +1,22 @@
 /* src/data/lootConfig.js */
 import { hash, WORLD_SEED } from "../world/Seed.js";
 
+
+export const BIOME_CORES = {
+    'desert_boss': { id: 'core_desert', name: 'Ядро Пустыни', icon: 'assets/images/items/core_desert.svg', type: 'core' },
+    'jungle_boss': { id: 'core_jungle', name: 'Ядро Джунглей', icon: 'assets/images/items/core_jungles.svg', type: 'core' },
+    // ЗАМЕНИ КЛЮЧ ТУТ:
+    'forest_boss': { id: 'core_forest', name: 'Ядро Леса', icon: 'assets/images/items/core_forest.svg', type: 'core' }, 
+    'ice_boss':    { id: 'core_ice', name: 'Ядро Льдов', icon: 'assets/images/items/core_ice.svg', type: 'core' }
+};
+
+export const BIOME_WEAPONS = {
+    'desert_boss': { id: 'wpn_desert', name: 'Песчаный Резак', icon: 'assets/images/items/desert_knife.svg', type: 'weapon', damage: 15 },
+    'jungle_boss': { id: 'wpn_jungle', name: 'Лоза Хранителя', icon: 'assets/images/items/fang_jungles.svg', type: 'weapon', damage: 18 },
+    // И ТУТ:
+    'forest_boss': { id: 'wpn_forest', name: 'Древесный Молот', icon: 'assets/images/items/wooden_mallet.svg', type: 'weapon', damage: 12 }, 
+    'ice_boss':    { id: 'wpn_ice', name: 'Ледяной Осколок', icon: 'assets/images/items/book.svg', type: 'weapon', damage: 20 }
+};
 // Добавляем определение Фрукта Жизни
 export const LIFE_FRUIT_ITEM = { 
     id: 'life_fruit', 

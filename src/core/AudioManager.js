@@ -88,9 +88,10 @@ playMusic(key, fadeTime = 2000) {
     },
     
     // Метод для коротких звуков (эффекты, голоса)
-    playSFX(path, volume = 0.3) {
-        // Путь указываем относительно корня или папки sfx
-        const sound = new Audio(`./assets/audio/sfx/${path}.mp3`);
+playSFX(path, volume = 0.3) {
+        // Проверяем, указали ли мы уже формат (например .wav). Если нет - ставим .mp3 по умолчанию
+        const extension = path.includes('.') ? '' : '.mp3';
+        const sound = new Audio(`./assets/audio/sfx/${path}${extension}`);
         sound.volume = volume;
         sound.play().catch(err => {
             // Игнорируем ошибки, если звук не успел загрузиться

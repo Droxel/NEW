@@ -17,10 +17,12 @@ C:.
 |   +---audio
 |   |   +---music
 |   |   |       ambient.mp3
-|   |   |       boss_theme.mp3
 |   |   |       CHudesenka_-_Ladoshki_76625190.mp3
 |   |   |       danjunglei.mp3
+|   |   |       desert_boss.mp3
 |   |   |       evil.mp3
+|   |   |       forest_boss.mp3
+|   |   |       junglm_boss.mp3
 |   |   |       
 |   |   \---sfx
 |   |       +---giants
@@ -29,10 +31,13 @@ C:.
 |   |       |       step.mp3
 |   |       |       worth.mp3
 |   |       |       
-|   |       \---residents
-|   |               no-3-v.mp3
-|   |               rozgovor1.mp3
-|   |               rozgovor2.mp3
+|   |       +---residents
+|   |       |       no-3-v.mp3
+|   |       |       rozgovor1.mp3
+|   |       |       rozgovor2.mp3
+|   |       |       
+|   |       \---world
+|   |               Earthquake.wav
 |   |               
 |   \---images
 |       +---biomes
@@ -66,8 +71,13 @@ C:.
 |       |       broken sword.svg
 |       |       bubble.svg
 |       |       bubble_pitomets.svg
+|       |       core_desert.svg
+|       |       core_forest.svg
+|       |       core_jungles.svg
 |       |       crystal.png
+|       |       desert_knife.svg
 |       |       essence.svg
+|       |       fang_jungles.svg
 |       |       fruit of life.svg
 |       |       hand_staff.svg
 |       |       hook.svg
@@ -77,6 +87,7 @@ C:.
 |       |       rope.svg
 |       |       stone.svg
 |       |       threads.svg
+|       |       wooden_mallet.svg
 |       |       xp.svg
 |       |       
 |       +---ui
@@ -138,6 +149,7 @@ C:.
     |       DebugCommands.js
     |       GameState.js
     |       Input.js
+    |       RitualManager.js
     |       SaveManager.js
     |       Time.js
     |       
@@ -182,14 +194,19 @@ C:.
     |   |       PetEquipment.js
     |   |       PetManager.js
     |   |       
-    |   \---player
-    |       |   Inventory.js
-    |       |   Player.js
-    |       |   
-    |       \---tools
-    |               Bubble.js
-    |               GrapplingHook.js
-    |               
+    |   +---player
+    |   |   |   Inventory.js
+    |   |   |   Player.js
+    |   |   |   
+    |   |   \---tools
+    |   |           Bubble.js
+    |   |           GrapplingHook.js
+    |   |           
+    |   \---weapons
+    |           BiomeWeapon.js
+    |           DesertWeapon.js
+    |           JungleWeapon.js
+    |           
     +---ui
     |   |   UIManager.js
     |   |   

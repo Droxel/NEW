@@ -234,7 +234,7 @@ const step = 80;
         else if (obj.type === "life_bush" && obj.instance?.draw) {
             obj.instance.draw(ctx, 0, 0);
         }
-        else if (obj.type.startsWith("village_")) {
+        else if (obj.type && obj.type.startsWith("village_")) {
             const img = assets[obj.imgKey];
             if (img?.complete && img.naturalHeight !== 0) {
                 ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);

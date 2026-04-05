@@ -35,6 +35,9 @@ import { SaveManager } from "./core/SaveManager.js";
 import { Settings } from "./ui/screens/Settings.js";
 
 import { residentManager } from "./entities/npcs/residents/ResidentManager.js";
+
+import { ritualManager } from "./core/RitualManager.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -190,10 +193,18 @@ if (gameOver.isShown) {
         let targetTheme = "ambient";
         let fadeTime = 4000; // По умолчанию плавно
 
-        if (boss && boss.isAlive) {
-            targetTheme = "boss_theme";
+if (boss && boss.isAlive) {
+            // Карта соответствия: ключ босса -> название файла музыки
+            const bossMusicMap = {
+                'desert_boss': 'desert_boss',
+                'forest_boss': 'forest_boss',
+                'jungle_boss': 'junglm_boss' // Точно как название твоего файла
+            };
+            
+            // Берем нужный трек или ставим 'evil' как запасной, если для босса нет музыки
+            targetTheme = bossMusicMap[bossManager.currentBossKey] || 'evil'; 
             fadeTime = 0; // Босс начался — музыка врубается резко!
-        } 
+        }
         else if (mobManager.isPointInDungeon(player.x + player.size / 2, player.y + player.size / 2)) {
             targetTheme = "danjunglei"; 
         } 
@@ -201,8 +212,9 @@ if (gameOver.isShown) {
             targetTheme = "evil";
         }
 
-        // Если мы переключаемся С темы босса на обычную — тоже делаем это резко (победа!)
-        if (audioManager.currentMusic && audioManager.currentMusic.dataset.key === "boss_theme") {
+// Если мы переключаемся С темы босса на обычную — тоже делаем это резко (победа!)
+        const bossTracks = ["desert_boss", "forest_boss", "junglm_boss"];
+        if (audioManager.currentMusic && bossTracks.includes(audioManager.currentMusic.dataset.key)) {
             fadeTime = 0;
         }
 
@@ -214,7 +226,7 @@ if (gameOver.isShown) {
         if (world.chunkManager) {
             world.chunkManager.update(dt);
         }
-
+        ritualManager.update(dt, world);
         // Обновляем порчу (для распространения биома и спавна спец-эффектов)
         if (world.corruptionManager) {
             world.corruptionManager.update(dt);
@@ -283,9 +295,7 @@ if (residentManager) {
     
     }
     
-    // --- ОТРИСОВКА ---
-// --- ОТРИСОВКА ---
-    ui.update(); 
+ui.update(); 
     MerchantUI.update();
     
     // ВАЖНО: Применяем масштаб перед отрисовкой всего мира
@@ -293,8 +303,17 @@ if (residentManager) {
     ctx.setTransform(1, 0, 0, 1, 0, 0); 
     ctx.scale(scale, scale); 
 
-    // Очистка экрана (теперь в виртуальных координатах)
+    // Очистка экрана
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
+
+    ctx.save(); // Сохраняем состояние канваса перед тряской
+
+    // --- ДОБАВЛЯЕМ ТРЯСКУ КАМЕРЫ ---
+    if (ritualManager.screenShake > 0) {
+        const shakeX = (Math.random() - 0.5) * ritualManager.screenShake;
+        const shakeY = (Math.random() - 0.5) * ritualManager.screenShake;
+        ctx.translate(shakeX, shakeY);
+    }
 
     // Рисуем основной мир
     draw(ctx, player, world, time, bossManager.boss, sky, bgManager, petManager, mobManager, droppedItems);
@@ -304,6 +323,8 @@ if (residentManager) {
     ctx.translate(-cameraX, -cameraY);
     droppedItems.forEach(drop => drop.draw(ctx));
     ctx.restore();
+
+    ctx.restore(); // Возвращаем канвас в норму после тряски (чтобы UI не трясся)
 
     MerchantUI.draw(ctx);
     requestAnimationFrame(gameLoop);

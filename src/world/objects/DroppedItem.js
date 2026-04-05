@@ -88,18 +88,25 @@ update(dt, player, inventory, inventoryUI) {
         }
     }
 
-    // ---------------------
-    // 3. ПОВЕРХНОСТЬ (ТОЛЬКО ЕСЛИ НЕ ПОД ЗЕМЛЁЙ)
-    // ---------------------
-    if (!this.onGround && !isBelowSurface) {
-
-        if (this.y + this.size >= surfaceY) {
-            this.y = surfaceY - this.size;
-            this.vy = 0;
-            this.vx = 0;
-            this.onGround = true;
-        }
+// ---------------------
+// 3. ПОВЕРХНОСТЬ (Умная проверка)
+// ---------------------
+// Предмет приземляется только если:
+// 1. Он не на земле
+// 2. Он летит ВНИЗ (this.vy > 0)
+// 3. Он не слишком глубоко под землей (чтобы не телепортироваться из данжа наверх)
+if (!this.onGround && this.vy > 0) {
+    const distToSurface = Math.abs((this.y + this.size) - surfaceY);
+    
+    // Если мы коснулись поверхности И находимся не глубже 20 пикселей от неё
+    // (Это позволит вещам в данжах падать на пол данжа, а не улетать на небо)
+    if (this.y + this.size >= surfaceY && distToSurface < 30) {
+        this.y = surfaceY - this.size;
+        this.vy = 0;
+        this.vx = 0;
+        this.onGround = true;
     }
+}
 
     // ---------------------
     // 4. ЛОГИКА ЖИЗНИ

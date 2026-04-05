@@ -87,6 +87,18 @@ export const assets = {
     a_forest: new Image(),
     a_glazed: new Image(),
     a_jungli: new Image(),
+
+    // Ядра (Cores)
+    core_desert: new Image(),
+    core_jungle: new Image(),
+    core_forest: new Image(),
+    core_ice:    new Image(),
+
+    // Оружие (Weapons)
+    wpn_desert: new Image(),
+    wpn_jungle: new Image(),
+    wpn_forest: new Image(),
+    wpn_ice:    new Image(),
 };
 
 
@@ -165,3 +177,15 @@ assets.a_desert.src = "../../assets/images/world/altars/a_desert.svg";
 assets.a_forest.src = "../../assets/images/world/altars/a_forest.svg";
 assets.a_glazed.src = "../../assets/images/world/altars/a_glazed.svg";
 assets.a_jungli.src = "../../assets/images/world/altars/a_jungli.svg";
+
+// Ядра (используем иконку эссенции или свои уникальные)
+assets.core_desert.src = "../../assets/images/items/essence_desert.svg";
+assets.core_jungle.src = "../../assets/images/items/essence_jungle.svg";
+assets.core_forest.src = "../../assets/images/items/essence_forest.svg";
+assets.core_ice.src    = "../../assets/images/items/essence_ice.svg";
+
+// Оружие
+assets.wpn_desert.src = "../../assets/images/items/sand_sword.svg";
+assets.wpn_jungle.src = "../../assets/images/items/jungle_staff.svg";
+assets.wpn_forest.src = "../../assets/images/items/forest_mace.svg";
+assets.wpn_ice.src    = "../../assets/images/items/ice_shard.svg";
