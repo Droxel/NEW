@@ -6,6 +6,7 @@ import { assets } from "./AssetLoader.js";
 import { merchant } from "../entities/npcs/Merchant.js";
 import { residentManager } from "../entities/npcs/residents/ResidentManager.js";
 import { GameState } from "../core/GameState.js";
+import { biomeWeaponManager } from "../entities/weapons/BiomeWeapon.js"; // ТЕПЕРЬ ПРАВИЛЬНО
 // Переэкспортируем assets, чтобы main.js мог их видеть через этот файл
 export { assets };
 
@@ -256,6 +257,7 @@ if (residentManager) {
     // Передаем контекст, позицию камеры и ширину экрана (из CONFIG)
     residentManager.draw(ctx, renderCamX, CONFIG.width);
 }
+
     // 7. ИГРОК
     ctx.save();
     // Перемещаемся в центр игрока
@@ -287,6 +289,8 @@ if (residentManager) {
     ctx.fill();
 
     ctx.restore(); // Возвращаем контекст (чтобы пузырь и оружие не вращались вместе с игроком при прыжке)
+    
+    biomeWeaponManager.draw(ctx, assets);
     // --- НОВОЕ: ОТРИСОВКА КРЮКА-КОШКИ ---
     // Рисуем его сразу после игрока, чтобы веревка была поверх всего
     if (player.hook && player.hook.active) {

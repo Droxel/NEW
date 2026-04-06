@@ -38,6 +38,8 @@ import { residentManager } from "./entities/npcs/residents/ResidentManager.js";
 
 import { ritualManager } from "./core/RitualManager.js";
 
+import { biomeWeaponManager } from "./entities/weapons/BiomeWeapon.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -257,6 +259,7 @@ if (boss && boss.isAlive) {
         allNPCs.forEach(npc => npc.update(player, dt));
         
         player.update();
+        biomeWeaponManager.update();
         
         if (window.inventoryUI) window.inventoryUI.update();
         

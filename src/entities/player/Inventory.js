@@ -4,7 +4,7 @@ export class Inventory {
         this.mainSlots = new Array(15).fill(null); 
         this.accessorySlots = new Array(9).fill(null);
         this.currencySlots = new Array(3).fill(null);
-        this.bubbleSlots = new Array(2).fill(null); // НОВОЕ: 0 - Пузырь, 1 - Оружие
+        this.bubbleSlots = new Array(3).fill(null); // НОВОЕ: 0 - Пузырь, 1 - Оружие
         this.maxStack = 99; 
     }
 

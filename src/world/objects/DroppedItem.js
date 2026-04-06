@@ -131,7 +131,7 @@ if (!this.onGround && this.vy > 0) {
 
 if (dist < 30) {
         if (inventory.addItem(this.itemData)) {
-            if (inventoryUI) inventoryUI.refresh();
+            if (inventoryUI && inventoryUI.renderer) inventoryUI.renderer.refresh();
             this.pickedUp = true; // Помечаем для удаления
             return true;
         }

@@ -1,5 +1,5 @@
 /* ChestUI.js */
-import { dragData } from "./InventoryUI.js";
+import { dragData } from "./inventory/InventoryEvents.js";
 
 export class ChestUI {
     constructor(inventoryUI) {
@@ -139,65 +139,66 @@ export class ChestUI {
         this.refresh();
     }
 
-    onSlotMouseDown(e, index) {
-        const item = this.currentChest.slots[index];
-        if (!item) return;
+onSlotMouseDown(e, index) {
+    const item = this.currentChest.slots[index];
+    if (!item) return;
 
-        this.selectSlot(index);
+    this.selectSlot(index);
 
-        dragData.isDragging = true;
-        dragData.item = item;
-        dragData.sourceArray = this.currentChest.slots;
-        dragData.sourceIndex = index;
-        dragData.uiRef = this.inventoryUI;
+    dragData.isDragging = true;
+    dragData.item = item;
+    dragData.sourceArray = this.currentChest.slots;
+    dragData.sourceIndex = index;
 
-        dragData.element = document.createElement('img');
-        dragData.element.src = item.icon || "assets/images/items/xp.svg";
-        dragData.element.style.cssText = `
-            position: fixed; width: 32px; height: 32px; 
-            z-index: 9999; pointer-events: none; opacity: 0.8;
-        `;
-        document.body.appendChild(dragData.element);
+    dragData.element = document.createElement('img');
+    dragData.element.src = item.icon || "assets/images/items/xp.svg";
+    dragData.element.style.cssText = `
+        position: fixed; width: 32px; height: 32px; 
+        z-index: 9999; pointer-events: none; opacity: 0.8;
+    `;
+    document.body.appendChild(dragData.element);
 
-        // Обновляем UI, чтобы предмет визуально "поднялся" (стал невидимым в слоте)
+    this.refresh();
+    // ИСПРАВЛЕНО: Обращаемся к классу событий
+    if (this.inventoryUI.events) {
+        this.inventoryUI.events.onMouseMove(e); 
+    }
+}
+takeSelected() {
+    if (this.selectedIndex === null || !this.currentChest) return;
+    const item = this.currentChest.slots[this.selectedIndex];
+    if (!item) return;
+
+    const added = this.inventoryUI.inventory.addItem(item);
+    if (added) {
+        this.currentChest.slots[this.selectedIndex] = null;
+        this.selectedIndex = null;
         this.refresh();
-        this.inventoryUI.onMouseMove(e); 
+        // ИСПРАВЛЕНО: вызываем refresh через renderer
+        this.inventoryUI.renderer.refresh();
     }
+}
 
-    takeSelected() {
-        if (this.selectedIndex === null || !this.currentChest) return;
-        const item = this.currentChest.slots[this.selectedIndex];
-        if (!item) return;
-
-        const added = this.inventoryUI.inventory.addItem(item);
-        if (added) {
-            this.currentChest.slots[this.selectedIndex] = null;
-            this.selectedIndex = null;
-            this.refresh();
-            this.inventoryUI.refresh();
+takeAll() {
+    if (!this.currentChest) return;
+    let changed = false;
+    for (let i = 0; i < this.currentChest.slots.length; i++) {
+        const item = this.currentChest.slots[i];
+        if (item) {
+            const added = this.inventoryUI.inventory.addItem(item);
+            if (added) {
+                this.currentChest.slots[i] = null;
+                changed = true;
+            } else break; 
         }
     }
-
-    takeAll() {
-        if (!this.currentChest) return;
-        let changed = false;
-        for (let i = 0; i < this.currentChest.slots.length; i++) {
-            const item = this.currentChest.slots[i];
-            if (item) {
-                const added = this.inventoryUI.inventory.addItem(item);
-                if (added) {
-                    this.currentChest.slots[i] = null;
-                    changed = true;
-                } else break; 
-            }
-        }
-        if (changed) {
-            this.selectedIndex = null;
-            this.refresh();
-            this.inventoryUI.refresh();
-        }
+    if (changed) {
+        this.selectedIndex = null;
+        this.refresh();
+        // ИСПРАВЛЕНО: вызываем refresh через renderer
+        this.inventoryUI.renderer.refresh();
     }
-
+}
     open(chest) {
         this.currentChest = chest;
         this.isOpen = true;
@@ -210,39 +211,39 @@ close() {
     this.isOpen = false;
     this.overlay.style.display = 'none';
     
-    // ИСПРАВЛЕНИЕ: Прячем подсказку при закрытии сундука
-    if (this.inventoryUI) {
-        this.inventoryUI.hideTooltip();
+    // ИСПРАВЛЕНО: Прячем подсказку через renderer
+    if (this.inventoryUI && this.inventoryUI.renderer) {
+        this.inventoryUI.renderer.hideTooltip();
     }
     
-    // Также сбрасываем индекс выбора, чтобы при следующем открытии 
-    // старый предмет не считался "выбранным"
     this.selectedIndex = null;
-
     if (this.currentChest) {
         this.currentChest.isOpen = false;
-        this.currentChest = null; // Очищаем ссылку на сундук
+        this.currentChest = null;
     }
 }
 
-    refresh() {
-        if (!this.currentChest) return;
-        const slots = this.gridElement.children;
+refresh() {
+    if (!this.currentChest) return;
+    const slots = this.gridElement.children;
 
-        for (let i = 0; i < 15; i++) {
-            const item = this.currentChest.slots[i];
-            const slotDiv = slots[i];
-            slotDiv.innerHTML = "";
+    for (let i = 0; i < 15; i++) {
+        const item = this.currentChest.slots[i];
+        const slotDiv = slots[i];
+        slotDiv.innerHTML = "";
 
+        const isDraggingThis = dragData.isDragging && dragData.sourceIndex === i && dragData.sourceArray === this.currentChest.slots;
+
+        // ИСПРАВЛЕНО: Тултипы теперь в renderer
         slotDiv.onmouseenter = (e) => {
-    if (item && !isDraggingThis) {
-        this.inventoryUI.showTooltip(item, e);
-    }
-};
+            if (item && !isDraggingThis && this.inventoryUI.renderer) {
+                this.inventoryUI.renderer.showTooltip(item, e);
+            }
+        };
 
-slotDiv.onmouseleave = () => {
-    this.inventoryUI.hideTooltip();
-};    
+        slotDiv.onmouseleave = () => {
+            if (this.inventoryUI.renderer) this.inventoryUI.renderer.hideTooltip();
+        }; 
 
             // Стилизация выделения
             const isSelected = (this.selectedIndex === i);
@@ -250,15 +251,13 @@ slotDiv.onmouseleave = () => {
             slotDiv.style.background = isSelected ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)";
             slotDiv.style.boxShadow = isSelected ? "0 0 8px rgba(255, 255, 255, 0.4)" : "none";
 
-            // Отрисовка предмета (только если мы его сейчас не перетаскиваем из этой ячейки)
-            const isDraggingThis = dragData.isDragging && dragData.sourceIndex === i && dragData.sourceArray === this.currentChest.slots;
-            
-            if (item && !isDraggingThis) {
-                this.inventoryUI.renderItemInSlot(slotDiv, item, false);
-                if (slotDiv.firstChild) {
-                    slotDiv.firstChild.style.pointerEvents = "none";
-                }
+ if (item && !isDraggingThis) {
+            // ИСПРАВЛЕНО: Отрисовка предмета через renderer
+            this.inventoryUI.renderer.renderItemInSlot(slotDiv, item, false);
+            if (slotDiv.firstChild) {
+                slotDiv.firstChild.style.pointerEvents = "none";
             }
         }
     }
+}
 }

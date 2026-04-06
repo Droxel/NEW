@@ -11,11 +11,10 @@ export const BIOME_CORES = {
 };
 
 export const BIOME_WEAPONS = {
-    'desert_boss': { id: 'wpn_desert', name: 'Песчаный Резак', icon: 'assets/images/items/desert_knife.svg', type: 'weapon', damage: 15 },
-    'jungle_boss': { id: 'wpn_jungle', name: 'Лоза Хранителя', icon: 'assets/images/items/fang_jungles.svg', type: 'weapon', damage: 18 },
-    // И ТУТ:
-    'forest_boss': { id: 'wpn_forest', name: 'Древесный Молот', icon: 'assets/images/items/wooden_mallet.svg', type: 'weapon', damage: 12 }, 
-    'ice_boss':    { id: 'wpn_ice', name: 'Ледяной Осколок', icon: 'assets/images/items/book.svg', type: 'weapon', damage: 20 }
+    'desert_boss': { id: 'wpn_desert', name: 'Песчаный Резак', icon: 'assets/images/items/desert_knife.svg', type: 'biome_weapon', damage: 15 },
+    'jungle_boss': { id: 'wpn_jungle', name: 'Лоза Хранителя', icon: 'assets/images/items/fang_jungles.svg', type: 'biome_weapon', damage: 18 },
+    'forest_boss': { id: 'wpn_forest', name: 'Древесный Молот', icon: 'assets/images/items/wooden_mallet.svg', type: 'biome_weapon', damage: 12 }, 
+    'ice_boss':    { id: 'wpn_ice', name: 'Ледяной Осколок', icon: 'assets/images/items/book.svg', type: 'biome_weapon', damage: 20 }
 };
 // Добавляем определение Фрукта Жизни
 export const LIFE_FRUIT_ITEM = { 

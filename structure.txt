@@ -36,6 +36,11 @@ C:.
 |   |       |       rozgovor1.mp3
 |   |       |       rozgovor2.mp3
 |   |       |       
+|   |       +---strikes
+|   |       |       hit.wav
+|   |       |       vortex.wav
+|   |       |       wave.wav
+|   |       |       
 |   |       \---world
 |   |               Earthquake.wav
 |   |               
@@ -199,12 +204,14 @@ C:.
     |   |   |   Player.js
     |   |   |   
     |   |   \---tools
+    |   |           BiomeWeaponItem.js
     |   |           Bubble.js
     |   |           GrapplingHook.js
     |   |           
     |   \---weapons
     |           BiomeWeapon.js
     |           DesertWeapon.js
+    |           ForestWeapon.js
     |           JungleWeapon.js
     |           
     +---ui
@@ -212,13 +219,17 @@ C:.
     |   |   
     |   +---components
     |   \---screens
-    |           ChestUI.js
-    |           GameOver.js
-    |           InventoryUI.js
-    |           MainMenu.js
-    |           MerchantUI.js
-    |           Settings.js
-    |           
+    |       |   ChestUI.js
+    |       |   GameOver.js
+    |       |   InventoryUI.js
+    |       |   MainMenu.js
+    |       |   MerchantUI.js
+    |       |   Settings.js
+    |       |   
+    |       \---inventory
+    |               InventoryEvents.js
+    |               InventoryRenderer.js
+    |               
     \---world
         |   CorruptionManager.js
         |   Seed.js

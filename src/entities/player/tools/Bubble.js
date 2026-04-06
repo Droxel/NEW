@@ -118,43 +118,48 @@ export class Bubble {
         this.targetEnemy = nearest;
     }
 
-    draw(ctx, assets, itemInBubble) {
-        ctx.save();
-        
-        // УДАЛЕНО: ctx.shadowBlur (главная причина лагов)
-        // Вместо тени можно использовать простую обводку или внешний круг
+draw(ctx, assets, itemInBubble) {
+    ctx.save();
+    
+    const pulse = this.state === 'LUNGE' ? 1.2 : 1.0;
+    const currentSize = this.size * pulse;
 
-        const pulse = this.state === 'LUNGE' ? 1.2 : 1.0;
-        const currentSize = this.size * pulse;
+    ctx.globalAlpha = 0.6;
 
-        ctx.globalAlpha = 0.6;
-        if (assets.bubble && assets.bubble.complete) {
-            ctx.drawImage(assets.bubble, this.x - currentSize/2, this.y - currentSize/2, currentSize, currentSize);
-        } else {
-            // ОПТИМИЗАЦИЯ: Рисуем простой градиент вместо тени, если нет спрайта
-            ctx.fillStyle = "rgba(0, 200, 255, 0.4)";
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, currentSize/2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-
-        if (itemInBubble && itemInBubble.id) {
-            const itemImg = assets[itemInBubble.id];
-            if (itemImg && itemImg.complete) {
-                ctx.globalAlpha = 1.0;
-                ctx.translate(this.x, this.y);
-                
-                const rotSpeed = this.state === 'LUNGE' ? 10 : 1;
-                ctx.rotate(Math.sin(this.floatTimer * rotSpeed) * 0.3);
-                
-                const itemSize = currentSize * 0.6;
-                ctx.drawImage(itemImg, -itemSize/2, -itemSize/2, itemSize, itemSize);
-            }
-        }
-
-        ctx.restore();
+    // Проверка самого пузыря: добавлена проверка на naturalWidth
+    if (assets.bubble && assets.bubble.complete && assets.bubble.naturalWidth > 0) {
+        ctx.drawImage(assets.bubble, this.x - currentSize/2, this.y - currentSize/2, currentSize, currentSize);
+    } else {
+        // Запасной вариант, если спрайт пузыря не прогрузился
+        ctx.fillStyle = "rgba(0, 200, 255, 0.4)";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, currentSize/2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
+
+    // Проверка предмета внутри
+    if (itemInBubble && itemInBubble.id) {
+        const itemImg = assets[itemInBubble.id];
+        
+        // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: добавляем проверку на naturalWidth > 0
+        if (itemImg && itemImg.complete && itemImg.naturalWidth > 0) {
+            ctx.globalAlpha = 1.0;
+            ctx.translate(this.x, this.y);
+            
+            const rotSpeed = this.state === 'LUNGE' ? 10 : 1;
+            ctx.rotate(Math.sin(this.floatTimer * rotSpeed) * 0.3);
+            
+            const itemSize = currentSize * 0.6;
+            ctx.drawImage(itemImg, -itemSize/2, -itemSize/2, itemSize, itemSize);
+        } else {
+            // Можно добавить лог, чтобы понять, какой именно предмет сломался
+            // console.warn(`Картинка для предмета ${itemInBubble.id} не загружена или битая`);
+        }
+    }
+
+    ctx.restore();
+}
 }
