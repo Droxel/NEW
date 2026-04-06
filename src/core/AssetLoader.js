@@ -186,6 +186,6 @@ assets.core_ice.src    = "../../assets/images/items/essence_ice.svg";
 
 // Оружие
 assets.wpn_desert.src = "assets/images/items/desert_knife.svg";
-assets.wpn_jungle.src = "../../assets/images/items/jungle_staff.svg";
+assets.wpn_jungle.src = "../../assets/images/items/fang_jungles.svg";
 assets.wpn_forest.src = "../../assets/images/items/wooden_mallet.svg";
 assets.wpn_ice.src    = "../../assets/images/items/ice_shard.svg";

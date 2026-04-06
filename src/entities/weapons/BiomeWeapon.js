@@ -2,8 +2,7 @@
 import { player } from "../player/Player.js";
 import { ForestWeapon } from "./ForestWeapon.js"; 
 import { DesertWeapon } from "./DesertWeapon.js";
-// В будущем добавишь сюда импорты:
-// import { DesertWeapon } from "./DesertWeapon.js";
+import { JungleWeapon } from "./JungleWeapon.js";
 
 export class BiomeWeaponManager {
     constructor() {
@@ -33,17 +32,19 @@ export class BiomeWeaponManager {
     }
 
 initWeaponLogic(id) {
-    // Проверяем ID, которые приходят из конфига BIOME_WEAPONS
     if (id === 'wooden_mallet' || id === 'wpn_forest') {
         this.currentWeapon = new ForestWeapon(player);
     } 
-    // Исправлено: заменяем 'desert_knife' на 'wpn_desert'
     else if (id === 'wpn_desert' || id === 'desert_knife') { 
         this.currentWeapon = new DesertWeapon(player); 
         console.log("🌵 Клинок пустыни инициализирован!");
     }
+    // <-- ДОБАВИТЬ ЭТОТ БЛОК
+    else if (id === 'wpn_jungle' || id === 'fang_jungles') {
+        this.currentWeapon = new JungleWeapon(player);
+        console.log("🌴 Отравленный клык инициализирован!");
+    }
 }
-
     // Добавил передачу assets, чтобы оружие могло себя нарисовать
     draw(ctx, assets) { 
         const weaponItem = player.inventory.bubbleSlots[2];

@@ -37,7 +37,10 @@ C:.
 |   |       |       rozgovor2.mp3
 |   |       |       
 |   |       +---strikes
+|   |       |       gas.wav
 |   |       |       hit.wav
+|   |       |       portal.wav
+|   |       |       shot.wav
 |   |       |       vortex.wav
 |   |       |       wave.wav
 |   |       |       
