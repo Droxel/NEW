@@ -1,6 +1,7 @@
 //DungeonGenerator.js
 import { isLargeBiome } from "../terrain/BiomeMap.js";
 import { mobManager } from "../../entities/mobs/MobManager.js";
+import { GameState } from "../../core/GameState.js";
 const BLOCK_SIZE = 40;
 const DUNGEON_SPACING = 15000;
 
@@ -13,32 +14,28 @@ getDungeonBlocksForChunk(chunkX, chunkWidth, world) {
     const blocks = [];
     const chunkEnd = chunkX + chunkWidth;
 
-    // Ищем центр по новой формуле с OFFSET
     const OFFSET = 5500;
     const SPACING = 15000;
-    const centerPoint = Math.round((chunkX - OFFSET) / SPACING) * SPACING + OFFSET;
+    
+    const regionX = Math.round((chunkX - OFFSET) / SPACING) * SPACING + OFFSET;
 
-    const regionsToCheck = [
-        centerPoint - SPACING,
-        centerPoint,
-        centerPoint + SPACING
-    ];
+    const dungeonData = this.getDungeonData(regionX, world);
+    if (!dungeonData) return blocks;
 
-    for (const regionX of regionsToCheck) {
-        const dungeonData = this.getDungeonData(regionX, world);
-        if (!dungeonData) continue;
+    for (const rect of dungeonData.rects) {
+        // 🛑 ВОТ ЭТА МАГИЯ: если это печать, а босс убит — просто игнорируем этот блок!
+        if (rect.type === "jungle_seal" && GameState.bossesDefeated['jungle_boss']) {
+            continue; 
+        }
 
-        for (const rect of dungeonData.rects) {
-            // Проверка пересечения прямоугольника с текущим чанком
-            if (rect.x + rect.w > chunkX && rect.x < chunkEnd) {
-                blocks.push({
-                    type: rect.type,
-                    x: rect.x,
-                    y: rect.y,
-                    width: rect.w,
-                    height: rect.h
-                });
-            }
+        if (rect.x + (rect.w || 40) > chunkX && rect.x < chunkEnd) {
+            blocks.push({
+                type: rect.type,
+                x: rect.x,
+                y: rect.y,
+                width: rect.w,
+                height: rect.h
+            });
         }
     }
     return blocks;
@@ -63,8 +60,9 @@ shouldSpawnDungeon(centerX, world) {
     return canSpawn;
 }
 getDungeonData(centerX, world) {
-    // 1. Сначала проверяем, должен ли он там быть
     if (!this.shouldSpawnDungeon(centerX, world)) {
+        // ДОБАВИТЬ ЭТОТ ЛОГ:
+        console.log(`[Dungeon] Отмена спавна на X: ${centerX}. (Это джунгли? ${world.getBiome(centerX) === "jungle"})`);
         return null;
     }
 
@@ -72,9 +70,7 @@ getDungeonData(centerX, world) {
     if (this.cache.get(centerX) && this.cache.get(centerX).rects) {
         return this.cache.get(centerX);
     }
-
-    // Далее идет твой старый код генерации (console.log, rects, carvedTiles и т.д.)
-    console.log(`🧱 GENERATING STRUCTURED DUNGEON AT X: ${centerX}`);
+console.log(`[Dungeon] 🧱 УСПЕХ! Генерируем данж на X: ${centerX}`);
 
         const rects = []; 
         const carvedTiles = new Set();
@@ -151,6 +147,38 @@ for (let i = 0; i < coneHeight; i++) {
 // Вырезаем дырку
 carveRect(startX - BLOCK_SIZE, topOfConeY, BLOCK_SIZE * 2, coneHeight * BLOCK_SIZE);
 
+// DungeonGenerator.js (внутри метода getDungeonData)
+
+// === ПЕЧАТЬ И СТРАЖИ ===
+// 1. Печать (оставляем как есть)
+rects.push({ 
+    type: "jungle_seal", 
+    x: startX - BLOCK_SIZE, 
+    y: topOfConeY, 
+    w: BLOCK_SIZE * 2, 
+    h: BLOCK_SIZE * 2 
+});
+
+// 2. Ставим стражей
+// Чтобы опустить их ниже: прибавляем к y больше BLOCK_SIZE (например, + 1.5 или + 2)
+// Чтобы раздвинуть шире: меняем множители 3.5 и 1.5 на бóльшие числа
+
+const guardsY = topOfConeY + (BLOCK_SIZE * 2); // Опускаем на 2 блока ниже верхушки печати
+const spread = 5.5; // Коэффициент разлета (было примерно 3.5 и 1.5)
+
+rects.push({ 
+    type: "jungle_guard_left", 
+    x: startX - BLOCK_SIZE * spread, // Уехал дальше влево
+    y: guardsY, 
+    w: BLOCK_SIZE, h: BLOCK_SIZE 
+});
+
+rects.push({ 
+    type: "jungle_guard_right", 
+    x: startX + BLOCK_SIZE * (spread - 1), // Уехал дальше вправо
+    y: guardsY, 
+    w: BLOCK_SIZE, h: BLOCK_SIZE 
+});
 // --- PHASE 2: DESCENT ---
 let currX = startX;
 // Начинаем спуск от конца конуса

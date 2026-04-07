@@ -85,24 +85,28 @@ jump() {
         }
     },
     // ПРОВЕРКА СТОЛКНОВЕНИЙ СО СТЕНАМИ (Блоки данжа)
-    checkWallCollisions(axis) {
-        if (!world.chunkManager) return;
+checkWallCollisions(axis) {
+    if (!world.chunkManager) return;
 
-        const chunkId = world.chunkManager.getChunkId(this.x);
-        const chunk = world.chunkManager.chunks.get(chunkId);
-        if (!chunk || !chunk.objects) return;
+    const chunkId = world.chunkManager.getChunkId(this.x);
+    const chunk = world.chunkManager.chunks.get(chunkId);
+    if (!chunk || !chunk.objects) return;
 
-        for (let obj of chunk.objects) {
-            // Врезаемся и в данжи, и в колонны деревни
-            if (obj.type !== "dungeon_wall" && obj.type !== "village_wall") continue;
+    for (let obj of chunk.objects) {
+        // ✅ ДОБАВЛЯЕМ "jungle_seal" в список твердых объектов
+        if (
+            obj.type !== "dungeon_wall" && 
+            obj.type !== "village_wall" && 
+            obj.type !== "jungle_seal" // Теперь игрок будет врезаться в печать
+        ) continue;
 
-            // AABB Коллизия
-            if (
-                this.x < obj.x + obj.width &&
-                this.x + this.size > obj.x &&
-                this.y < obj.y + obj.height && 
-                this.y + this.size > obj.y 
-            ) {
+        // AABB Коллизия (оставляем без изменений)
+        if (
+            this.x < obj.x + obj.width &&
+            this.x + this.size > obj.x &&
+            this.y < obj.y + obj.height && 
+            this.y + this.size > obj.y 
+        ) {
                 if (axis === 'x') {
                     if (this.velocityX > 0) { // Движемся вправо -> врезаемся левой стороной стены
                         this.x = obj.x - this.size;

@@ -35,20 +35,28 @@ export class ChunkManager {
     }
 
     // 👇 НОВЫЙ МЕТОД: Плавное заражение мира 👇
-    update(dt) {
-        const level = GameState.corruptionLevel;
-        if (level === 0) return; // Если все спокойно, не тратим ресурсы
-
+update(dt, player) {
+    // 1. Твоя логика мутации деревьев (оставляем)
+    const level = GameState.corruptionLevel;
+    if (level > 0) {
         this.mutationTimer++;
-        
-        // Чем больше убито боссов, тем быстрее мутируют деревья
         const mutationRate = level === 1 ? 120 : (level === 2 ? 60 : 30);
-
         if (this.mutationTimer >= mutationRate) {
             this.mutationTimer = 0;
             this.corruptRandomOffscreenTree();
         }
     }
+
+    // 2. НОВАЯ ЛОГИКА: Обновляем только те чанки, которые видит игрок
+    // Это заставит стражей в поле зрения проверять GameState
+const startId = this.getChunkId(cameraX - 1000);
+    const endId = this.getChunkId(cameraX + CONFIG.width + 1000);
+
+    for (let id = startId; id <= endId; id++) {
+        const chunk = this.chunks.get(id);
+        if (chunk) chunk.update(dt, player); // <-- Передаем player в чанк
+    }
+}
 
     corruptRandomOffscreenTree() {
         const chunkIds = Array.from(this.chunks.keys());

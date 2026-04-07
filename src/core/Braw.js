@@ -241,6 +241,13 @@ const step = 80;
                 ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
             } // Было пропущено
         } // Было пропущено
+    // --- ДОБАВЬ ЭТОТ БЛОК ---
+    if (typeof obj.draw === 'function') {
+        // Если у объекта есть свой метод draw (как у JungleGuard), вызываем его
+        // Передаем assets, чтобы страж мог нарисовать guard.png
+        obj.draw(ctx, assets); 
+        return; // Переходим к следующему объекту
+    }
     });
 
     if (chunk.statues) {

@@ -5,7 +5,8 @@ import { ChestManager } from "../objects/ChestManager.js";
 import { LifeBushManager } from "../objects/LifeBushManager.js";
 import { GameState } from "../../core/GameState.js"; // Проверь путь до GameState
 import { Altar } from "../objects/Altar.js";
-
+import { JungleGuard } from "../objects/JungleGuard.js";
+import { JungleSeal } from "../objects/JungleSeal.js"; // Импортируем новый класс
 // Вот тут главная правка: идем в папку data
 import { desertConfig, iceConfig, jungleConfig, pillarConfig } from "../../data/statueConfigs.js";
 
@@ -101,7 +102,53 @@ generate(world) {
         this.generateStatues(startX, endX, world);
         ChestManager.generateChestsForChunk(this, world);
         LifeBushManager.generateBushesForChunk(this, world);
+    
+        // --- 3. ГЕНЕРАЦИЯ ДАНЖЕВЫХ ОБЪЕКТОВ (Печать и Стражи) ---
+const dungeonData = world.dungeonGenerator.getDungeonBlocksForChunk(startX, 1024, world);
+
+// ДОБАВИТЬ ЭТОТ ЛОГ:
+console.log(`[Chunk ${this.id}] Получено блоков данжа: ${dungeonData.length}`);
+
+dungeonData.forEach(data => {
+    if (data.type === "jungle_guard_left" || data.type === "jungle_guard_right") {
+        const side = data.type === "jungle_guard_left" ? "left" : "right";
+        this.objects.push(new JungleGuard(data.x, data.y, side)); 
+    } 
+    else if (data.type === "jungle_seal") {
+        // ✅ ВМЕСТО обычного объекта создаем экземпляр класса
+        this.objects.push(new JungleSeal(data.x, data.y, data.width, data.height));
     }
+});
+    }
+
+update(dt, player) { // <-- Принимаем player
+    this.objects.forEach(obj => {
+        // Для объектов, добавленных напрямую (как JungleGuard)
+        if (obj.update) obj.update(dt, player);
+        
+        // Для объектов, обернутых в { instance: ... } (если у них появится update)
+        if (obj.instance && typeof obj.instance.update === 'function') {
+            obj.instance.update(dt, player);
+        }
+    });
+
+    // Динамическая очистка печати...
+    if (GameState.bossesDefeated['jungle_boss']) {
+        this.objects = this.objects.filter(obj => obj.type !== "jungle_seal");
+    }
+}
+
+draw(ctx) {
+    this.objects.forEach(obj => {
+        // Если у объекта есть свой метод отрисовки (как у JungleGuard) — используем его
+        if (obj.draw) {
+            obj.draw(ctx);
+        } else {
+            // Обычная отрисовка для простых объектов (деревья, печать)
+            // (Тут должен быть твой существующий код отрисовки через ctx.drawImage)
+        }
+    });
+}
 
     generateStatues(startX, endX, world) {
         // (Твой старый код статуй без изменений)

@@ -37,9 +37,11 @@ C:.
 |   |       |       rozgovor2.mp3
 |   |       |       
 |   |       +---strikes
+|   |       |       buzzing.wav
 |   |       |       gas.wav
 |   |       |       hit.wav
 |   |       |       portal.wav
+|   |       |       roar.wav
 |   |       |       shot.wav
 |   |       |       vortex.wav
 |   |       |       wave.wav
@@ -58,15 +60,19 @@ C:.
 |       |       
 |       +---entities
 |       |   +---bosses
+|       |   |       arm_skeleton.png
 |       |   |       Desertt.png
 |       |   |       ice.png
 |       |   |       jungles.png
 |       |   |       kyk.png
+|       |   |       skeleton.png
+|       |   |       skeleton_minion.png
 |       |   |       
 |       |   +---mobs
 |       |   |       arm_giant.png
 |       |   |       body_giant.png
 |       |   |       fist.png
+|       |   |       guard.png
 |       |   |       head_giant.png
 |       |   |       skeletjungey.png
 |       |   |       
@@ -235,6 +241,7 @@ C:.
     |               
     \---world
         |   CorruptionManager.js
+        |   LightingManager.js
         |   Seed.js
         |   Water.js
         |   World.js
@@ -249,6 +256,8 @@ C:.
         |       ChestManager.js
         |       DroppedItem.js
         |       JungleChest.js
+        |       JungleGuard.js
+        |       JungleSeal.js
         |       LifeBush.js
         |       LifeBushManager.js
         |       Statue.js

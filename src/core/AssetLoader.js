@@ -99,6 +99,9 @@ export const assets = {
     wpn_jungle: new Image(),
     wpn_forest: new Image(),
     wpn_ice:    new Image(),
+
+    jungle_guard: new Image(),
+
 };
 
 
@@ -189,3 +192,5 @@ assets.wpn_desert.src = "assets/images/items/desert_knife.svg";
 assets.wpn_jungle.src = "../../assets/images/items/fang_jungles.svg";
 assets.wpn_forest.src = "../../assets/images/items/wooden_mallet.svg";
 assets.wpn_ice.src    = "../../assets/images/items/ice_shard.svg";
+
+assets.jungle_guard.src = "../../assets/images/entities/mobs/guard.png";

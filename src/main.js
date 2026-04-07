@@ -40,6 +40,8 @@ import { ritualManager } from "./core/RitualManager.js";
 
 import { biomeWeaponManager } from "./entities/weapons/BiomeWeapon.js";
 
+import { lightingManager } from "./world/LightingManager.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -225,9 +227,9 @@ if (boss && boss.isAlive) {
         time.update(dt);
         sky.update(dt, time);
         
-        if (world.chunkManager) {
-            world.chunkManager.update(dt);
-        }
+if (world.chunkManager) {
+    world.chunkManager.update(dt, player); // <-- Добавляем player
+}
         ritualManager.update(dt, world);
         // Обновляем порчу (для распространения биома и спавна спец-эффектов)
         if (world.corruptionManager) {
@@ -259,6 +261,22 @@ if (boss && boss.isAlive) {
         allNPCs.forEach(npc => npc.update(player, dt));
         
         player.update();
+        lightingManager.update(player, world, dt);
+        // --- ОБНОВЛЕНИЕ ОБЪЕКТОВ МИРА (Стражи, сундуки и т.д.) ---
+if (world.chunkManager) {
+    const chunkId = world.chunkManager.getChunkId(player.x);
+    const chunk = world.chunkManager.chunks.get(chunkId);
+    
+    if (chunk && chunk.objects) {
+        chunk.objects.forEach(obj => {
+            // Если у объекта есть метод update (как у нашего Стража)
+            if (obj.instance && typeof obj.instance.update === 'function') {
+                // ПЕРЕДАЕМ ИГРОКА, чтобы страж его видел
+                obj.instance.update(player); 
+            }
+        });
+    }
+}
         biomeWeaponManager.update();
         
         if (window.inventoryUI) window.inventoryUI.update();
@@ -319,8 +337,9 @@ ui.update();
     }
 
     // Рисуем основной мир
-    draw(ctx, player, world, time, bossManager.boss, sky, bgManager, petManager, mobManager, droppedItems);
+draw(ctx, player, world, time, bossManager.boss, sky, bgManager, petManager, mobManager, droppedItems);
 
+lightingManager.draw(ctx, player, cameraX, cameraY, world, []);
     // Рисуем выпавшие предметы с учетом камеры
     ctx.save();
     ctx.translate(-cameraX, -cameraY);
