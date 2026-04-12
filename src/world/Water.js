@@ -1,5 +1,5 @@
 // src/world/Water.js
-import { getHeight } from "./terrain/Height.js";
+import { world } from "./World.js";
 
 // Кэшируем зоны (по 50px), чтобы не пересчитывать тяжелый радар каждый кадр
 const regionCache = new Map();
@@ -7,9 +7,10 @@ const regionCache = new Map();
 function calculateLake(x) {
     const STEP = 50;         // Шаг радара (перешагиваем мелкие кочки)
     const MAX_DIST = 4000;   // Максимальный размер озера в одну сторону
-    const BOWL_TOLERANCE = 80; // Насколько пикселей должна упасть земля за горой, чтобы мы признали её краем (бортиком)
+    const BOWL_TOLERANCE = 80; // Насколько пикселей должна упасть земля за горой, чтобы мы признали её краем
 
-    let startY = getHeight(x);
+    // ИСПОЛЬЗУЕМ БАЗОВУЮ ВЫСОТУ (БЕЗ ДАНЖЕЙ)
+    let startY = world.getBaseHeight(x);
 
     // 1. Ищем левый край (пик горы слева)
     let leftPeakY = startY;
@@ -17,7 +18,7 @@ function calculateLake(x) {
     let foundLeftRim = false;
 
     for (let scanX = x; scanX > x - MAX_DIST; scanX -= STEP) {
-        let y = getHeight(scanX);
+        let y = world.getBaseHeight(scanX);
         if (y < leftPeakY) { // Земля идет вверх (Y уменьшается)
             leftPeakY = y;
             leftPeakX = scanX;
@@ -34,7 +35,7 @@ function calculateLake(x) {
     let foundRightRim = false;
 
     for (let scanX = x; scanX < x + MAX_DIST; scanX += STEP) {
-        let y = getHeight(scanX);
+        let y = world.getBaseHeight(scanX);
         if (y < rightPeakY) {
             rightPeakY = y;
             rightPeakX = scanX;
@@ -53,17 +54,17 @@ function calculateLake(x) {
 
     // 4. Трассируем ТОЧНЫЕ границы берегов (чтобы вода идеально касалась земли)
     let exactLeftX = leftPeakX;
-    while(getHeight(exactLeftX) < waterLevelY && exactLeftX < x) exactLeftX += 5;
+    while(world.getBaseHeight(exactLeftX) < waterLevelY && exactLeftX < x) exactLeftX += 5;
 
     let exactRightX = rightPeakX;
-    while(getHeight(exactRightX) < waterLevelY && exactRightX > x) exactRightX -= 5;
+    while(world.getBaseHeight(exactRightX) < waterLevelY && exactRightX > x) exactRightX -= 5;
 
     // 5. Фильтрация луж (слишком узкие или мелкие игнорируем)
     if (exactRightX - exactLeftX < 150) return null;
     
     let lowestY = startY;
     for (let cx = exactLeftX; cx <= exactRightX; cx += 20) {
-        lowestY = Math.max(lowestY, getHeight(cx));
+        lowestY = Math.max(lowestY, world.getBaseHeight(cx));
     }
     if (lowestY - waterLevelY < 40) return null;
 
@@ -74,15 +75,14 @@ function calculateLake(x) {
     };
 }
 
-export function getWaterData(x) {
+export function getWaterData(x, y) {
     const REGION_SIZE = 50;
     const region = Math.floor(x / REGION_SIZE);
 
     if (!regionCache.has(region)) {
         let lake = calculateLake(x);
         regionCache.set(region, lake || false);
-        
-        // Если нашли озеро, кэшируем сразу ВСЕ его зоны, чтобы не считать заново
+
         if (lake) {
             let startR = Math.floor(lake.leftX / REGION_SIZE);
             let endR = Math.floor(lake.rightX / REGION_SIZE);
@@ -90,28 +90,38 @@ export function getWaterData(x) {
                 regionCache.set(r, lake);
             }
         }
-
-        // Очистка старого кэша для оптимизации памяти
         if (regionCache.size > 2000) regionCache.clear();
     }
 
-    let lakeData = regionCache.get(region);
+    const lakeData = regionCache.get(region);
 
-    if (lakeData && x >= lakeData.leftX && x <= lakeData.rightX) {
-        const groundY = getHeight(x);
-        // Рисуем воду только если реальная земля ниже уровня воды
-        if (groundY > lakeData.level) {
-            return { isWater: true, level: lakeData.level };
-        }
+    // 1. Если озера в этих координатах X нет — сразу выходим
+    if (!lakeData || x < lakeData.leftX || x > lakeData.rightX) {
+        return { isWater: false, level: null };
+    }
+
+    // 2. Получаем реальное дно (ИСПОЛЬЗУЕМ БАЗОВУЮ ВЫСОТУ, без учета бездны данжей)
+    const groundY = world.getBaseHeight(x);
+
+    // 3. ПРОВЕРКА ВЫСОТЫ
+    if (y === undefined || y === null) {
+        return { isWater: true, level: lakeData.level, bottom: groundY };
+    }
+
+    // Объект в воде ТОЛЬКО если его Y между поверхностью озера и реальным дном
+    if (y >= lakeData.level && y <= (groundY + 10)) {
+        return { isWater: true, level: lakeData.level, bottom: groundY };
     }
 
     return { isWater: false, level: null };
 }
 
-export function isWater(x) {
-    return getWaterData(x).isWater;
+export function isWater(x, y) {
+    if (y === undefined || y === null) return false; 
+    return getWaterData(x, y).isWater;
 }
 
 export function getWaterLevel(x) {
-    return getWaterData(x).level;
+    const data = getWaterData(x);
+    return data.isWater ? data.level : null;
 }

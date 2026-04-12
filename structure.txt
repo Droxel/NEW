@@ -23,6 +23,7 @@ C:.
 |   |   |       evil.mp3
 |   |   |       forest_boss.mp3
 |   |   |       junglm_boss.mp3
+|   |   |       skeleton_boss.mp3
 |   |   |       
 |   |   \---sfx
 |   |       +---giants
@@ -185,7 +186,14 @@ C:.
     |   |   |   IceBoss.js
     |   |   |   JungleBoss.js
     |   |   |   JungleMinion.js
+    |   |   |   SkeletonBoss.js
+    |   |   |   SkeletonMinion.js
     |   |   |   
+    |   |   +---skeleton
+    |   |   |       SkeletonAttacks.js
+    |   |   |       SkeletonProjectiles.js
+    |   |   |       SkeletonRenderer.js
+    |   |   |       
     |   |   \---states
     |   +---mobs
     |   |       GiantMob.js
@@ -252,6 +260,7 @@ C:.
         |       
         +---objects
         |       Altar.js
+        |       BossDecorations.js
         |       Chest.js
         |       ChestManager.js
         |       DroppedItem.js
@@ -273,6 +282,10 @@ C:.
         |   |   StructureManager.js
         |   |   VillageGenerator.js
         |   |   
+        |   +---dungeon
+        |   |       DungeonCarver.js
+        |   |       DungeonPieces.js
+        |   |       
         |   \---village
         |           VillageAssembler.js
         |           

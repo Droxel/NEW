@@ -102,6 +102,11 @@ export const assets = {
 
     jungle_guard: new Image(),
 
+    // --- СКЕЛЕТ БОСС ---
+    skeleton_boss: new Image(),
+    skeleton_arm: new Image(),
+    skeleton_minion: new Image(),
+
 };
 
 
@@ -194,3 +199,8 @@ assets.wpn_forest.src = "../../assets/images/items/wooden_mallet.svg";
 assets.wpn_ice.src    = "../../assets/images/items/ice_shard.svg";
 
 assets.jungle_guard.src = "../../assets/images/entities/mobs/guard.png";
+
+// Скелет Босс (entities/bosses/)
+assets.skeleton_boss.src   = "../../assets/images/entities/bosses/skeleton.png";
+assets.skeleton_arm.src    = "../../assets/images/entities/bosses/arm_skeleton.png";
+assets.skeleton_minion.src = "../../assets/images/entities/bosses/skeleton_minion.png";

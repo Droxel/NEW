@@ -12,6 +12,7 @@ import { desertConfig, iceConfig, jungleConfig, pillarConfig } from "../../data/
 
 // Импорт Менеджера Структур
 import { StructureManager } from "../structures/StructureManager.js";
+import { BossTorch, BossPillar } from '../objects/BossDecorations.js';
 
 export class Chunk {
     constructor(id, worldInstance) {
@@ -118,38 +119,98 @@ dungeonData.forEach(data => {
         // ✅ ВМЕСТО обычного объекта создаем экземпляр класса
         this.objects.push(new JungleSeal(data.x, data.y, data.width, data.height));
     }
+else if (data.type === "boss_torch") {
+        console.log("🔥 Спавн факела! Проверяем параметры:", data);
+        this.objects.push(new BossTorch(data));
+    }
+    else if (data.type === "boss_pillar") {
+        console.log("🏛️ Спавн колонны! Проверяем параметры:", data);
+        this.objects.push(new BossPillar(data));
+    }
 });
+
     }
 
-update(dt, player) { // <-- Принимаем player
-    this.objects.forEach(obj => {
-        // Для объектов, добавленных напрямую (как JungleGuard)
-        if (obj.update) obj.update(dt, player);
-        
-        // Для объектов, обернутых в { instance: ... } (если у них появится update)
-        if (obj.instance && typeof obj.instance.update === 'function') {
-            obj.instance.update(dt, player);
-        }
-    });
+update(dt, player) {
+    // 1. Обновляем все объекты в чанке
+    if (this.objects) {
+        for (let i = this.objects.length - 1; i >= 0; i--) {
+            const obj = this.objects[i];
 
-    // Динамическая очистка печати...
-    if (GameState.bossesDefeated['jungle_boss']) {
+            // Определяем цель для обновления: либо инстанс, либо сам объект
+            const target = (obj.instance && typeof obj.instance.update === 'function') ? obj.instance : 
+                           (typeof obj.update === 'function' ? obj : null);
+
+            if (target) {
+                // Это заставляет огонь разгораться, двигать частицы и т.д.
+                target.update(dt, player); 
+            }
+
+            // Дополнительная логика (например, сбор ягод с кустов)
+            if (obj.type === "life_bush" && obj.instance && !obj.instance.isBroken) {
+                const fruitData = obj.instance.checkCollision(player);
+                if (fruitData) window.dropItemToWorld(fruitData);
+            }
+        }
+    }
+
+    // 2. Специфическая логика удаления (например, печать джунглей)
+    if (GameState.bossesDefeated && GameState.bossesDefeated['jungle_boss']) {
         this.objects = this.objects.filter(obj => obj.type !== "jungle_seal");
     }
 }
 
-draw(ctx) {
+draw(ctx, camera = { x: 0, y: 0 }) {
+    const bgTypes = ["dungeon_bg", "dungeon_bg_smooth"];
+    const wallTypes = ["dungeon_wall", "dungeon_wall_smooth", "blue_block"];
+
+    // --- СЛОЙ 1: ГЛУБОКИЙ ФОН (ТЕМНОТА) ---
     this.objects.forEach(obj => {
-        // Если у объекта есть свой метод отрисовки (как у JungleGuard) — используем его
-        if (obj.draw) {
-            obj.draw(ctx);
-        } else {
-            // Обычная отрисовка для простых объектов (деревья, печать)
-            // (Тут должен быть твой существующий код отрисовки через ctx.drawImage)
+        if (bgTypes.includes(obj.type)) {
+            ctx.fillStyle = "#0a0a0a";
+            ctx.fillRect(obj.x - camera.x, obj.y - camera.y, (obj.width || 40) + 1, (obj.height || 40) + 1);
         }
     });
-}
 
+    // --- СЛОЙ 2: ДЕКОРАЦИИ ТРОННОГО ЗАЛА (Колонны и Факелы) ---
+    // Рисуем их ДО стен, чтобы они казались встроенными в интерьер
+    this.objects.forEach(obj => {
+        if (obj.type === "boss_torch" || obj.type === "boss_pillar") {
+            if (typeof obj.draw === 'function') {
+                obj.draw(ctx, camera); 
+            }
+        }
+    });
+
+    // --- СЛОЙ 3: ФИЗИЧЕСКИЕ СТЕНЫ ---
+    // Рисуются поверх колонн, чтобы перекрывать их края, если нужно
+    this.objects.forEach(obj => {
+        if (wallTypes.includes(obj.type)) {
+            ctx.fillStyle = "#1a1a1a";
+            ctx.fillRect(obj.x - camera.x, obj.y - camera.y, (obj.width || 40) + 1, (obj.height || 40) + 1);
+        }
+    });
+
+    // --- СЛОЙ 4: ИНТЕРАКТИВ И МИР (Деревья, Сундуки, Кусты) ---
+    this.objects.forEach(obj => {
+        // Пропускаем уже отрисованное
+        if (bgTypes.includes(obj.type) || wallTypes.includes(obj.type) || 
+            obj.type === "boss_torch" || obj.type === "boss_pillar") return;
+
+        if (obj.type === "chest") {
+            const img = assets[obj.instance?.isOpen ? "chestopen" : "chestunopened"];
+            if (img?.complete) ctx.drawImage(img, obj.x - camera.x, obj.y - camera.y, obj.width, obj.height);
+        } 
+        else if (obj.draw) {
+            obj.draw(ctx, camera); 
+        }
+    });
+
+    // --- СЛОЙ 5: ФИНАЛЬНЫЕ ОБЪЕКТЫ (Статуи и Алтари) ---
+    if (this.statues) {
+        this.statues.forEach(s => s.draw(ctx, assets));
+    }
+}
     generateStatues(startX, endX, world) {
         // (Твой старый код статуй без изменений)
         const centerX = startX + 512;

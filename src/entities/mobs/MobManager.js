@@ -27,15 +27,17 @@ update(dt, player) {
         for (let i = 0; i < this.mobs.length; i++) {
             const mob = this.mobs[i];
 
+
 const distToPlayerX = Math.abs(player.x - mob.x);
 
-// Если моб слишком далеко — удаляем сразу
 if (distToPlayerX > 1800) {
-    if (!(mob instanceof GiantMob)) {
+    // Добавь проверку: НЕ удалять, если это скелет-миньон
+    if (!(mob instanceof GiantMob) && !(mob.constructor.name === "SkeletonMinion")) {
         mob.markedForDeletion = true;
         continue;
     }
 }
+
             // ------------------------------------------------
 
             mob.update(dt, player, this.mobs);

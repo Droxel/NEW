@@ -42,6 +42,8 @@ import { biomeWeaponManager } from "./entities/weapons/BiomeWeapon.js";
 
 import { lightingManager } from "./world/LightingManager.js";
 
+import { getLights as getSkeletonLights } from "./entities/bosses/skeleton/SkeletonRenderer.js";
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -161,6 +163,11 @@ document.addEventListener('keydown', (e) => {
             }
         }
     }
+// 4. ОТКЛЮЧАТЕЛЬ ТЬМЫ (Добавь это сюда)
+    if (e.code === 'KeyL') {
+        lightingManager.isEnabled = !lightingManager.isEnabled;
+        console.log("Darkness is now:", lightingManager.isEnabled ? "ON" : "OFF");
+    }
 });
 
 document.addEventListener('keyup', (e) => {
@@ -193,22 +200,21 @@ if (gameOver.isShown) {
 
     if (!gameOver.isShown) {
 // --- МУЗЫКА ---
-        const boss = bossManager.boss;
-        let targetTheme = "ambient";
-        let fadeTime = 4000; // По умолчанию плавно
+const boss = bossManager.boss; // <--- ДОБАВЬ ЭТУ СТРОКУ
+let targetTheme = "ambient";   // Инициализируем значения по умолчанию
+let fadeTime = 4000;
 
 if (boss && boss.isAlive) {
-            // Карта соответствия: ключ босса -> название файла музыки
-            const bossMusicMap = {
-                'desert_boss': 'desert_boss',
-                'forest_boss': 'forest_boss',
-                'jungle_boss': 'junglm_boss' // Точно как название твоего файла
-            };
-            
-            // Берем нужный трек или ставим 'evil' как запасной, если для босса нет музыки
-            targetTheme = bossMusicMap[bossManager.currentBossKey] || 'evil'; 
-            fadeTime = 0; // Босс начался — музыка врубается резко!
-        }
+    const bossMusicMap = {
+        'desert_boss': 'desert_boss',
+        'forest_boss': 'forest_boss',
+        'jungle_boss': 'junglm_boss',
+        'skeleton_boss': 'skeleton_boss' 
+    };
+    
+    targetTheme = bossMusicMap[bossManager.currentBossKey] || 'evil'; 
+    fadeTime = 0; 
+}
         else if (mobManager.isPointInDungeon(player.x + player.size / 2, player.y + player.size / 2)) {
             targetTheme = "danjunglei"; 
         } 
@@ -260,23 +266,54 @@ if (world.chunkManager) {
         merchant.update(player, dt);
         allNPCs.forEach(npc => npc.update(player, dt));
         
-        player.update();
-        lightingManager.update(player, world, dt);
-        // --- ОБНОВЛЕНИЕ ОБЪЕКТОВ МИРА (Стражи, сундуки и т.д.) ---
+player.update();
+lightingManager.update(dt); // Оставляем только dt, как в классе
+// --- ОБНОВЛЕНИЕ ОБЪЕКТОВ МИРА ---
 if (world.chunkManager) {
     const chunkId = world.chunkManager.getChunkId(player.x);
     const chunk = world.chunkManager.chunks.get(chunkId);
     
     if (chunk && chunk.objects) {
-        chunk.objects.forEach(obj => {
-            // Если у объекта есть метод update (как у нашего Стража)
-            if (obj.instance && typeof obj.instance.update === 'function') {
-                // ПЕРЕДАЕМ ИГРОКА, чтобы страж его видел
-                obj.instance.update(player); 
+        for (let i = chunk.objects.length - 1; i >= 0; i--) {
+            const obj = chunk.objects[i];
+
+            // ИСПРАВЛЕНИЕ: Пытаемся обновить либо obj.instance, либо сам obj
+            const target = (obj.instance && typeof obj.instance.update === 'function') ? obj.instance : 
+                           (typeof obj.update === 'function' ? obj : null);
+
+            if (target) {
+                target.update(dt, player);
             }
-        });
-    }
-}
+
+                    // 2. Кусты жизни
+                    if (obj.type === "life_bush" && !obj.instance.isBroken) {
+                        const fruitData = obj.instance.checkCollision(player);
+                        if (fruitData) window.dropItemToWorld(fruitData);
+                    }
+
+                    // 3. ТРИГГЕР СПАВНА БОССА В БОЛЬШОЙ КОМНАТЕ
+                    if (obj.type === "boss_spawn_trigger") {
+                        // Считаем дистанцию от игрока до центра триггера
+                        const dx = player.x - obj.x;
+                        const dy = player.y - obj.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        // Если игрок подошел близко (например, на 600 пикселей — он уже в комнате)
+                        if (distance < 600) {
+                            console.log("🔥 Игрок вошел в Тронный Зал! Спавним босса!");
+                            
+                            // Вызываем босса. Убедись, что ключ босса правильный!
+                            // В DungeonPieces.js ты проверяешь 'skeleton_boss', а музыка стоит на 'jungle_boss'. 
+                            // Впиши сюда нужный ID босса:
+                            bossManager.spawnBoss('skeleton_boss', obj.x, obj.y - 150); 
+
+                            // Удаляем триггер из чанка, чтобы не заспавнить 100 боссов
+                            chunk.objects.splice(i, 1);
+                        }
+                    }
+                }
+            }
+        }
         biomeWeaponManager.update();
         
         if (window.inventoryUI) window.inventoryUI.update();
@@ -336,10 +373,51 @@ ui.update();
         ctx.translate(shakeX, shakeY);
     }
 
-    // Рисуем основной мир
-draw(ctx, player, world, time, bossManager.boss, sky, bgManager, petManager, mobManager, droppedItems);
+// Внутри gameLoop в main.js, перед разделом --- 2. РИСУЕМ МИР ---
 
-lightingManager.draw(ctx, player, cameraX, cameraY, world, []);
+const currentLights = [];
+
+// 1. Свет игрока
+currentLights.push({ 
+    x: player.x + player.size / 2, 
+    y: player.y + player.size / 2, 
+    radius: 180, 
+    intensity: 1.0 
+});
+
+// 2. Собираем свет от ВСЕХ объектов в текущем чанке
+if (world.chunkManager) {
+    const chunkId = world.chunkManager.getChunkId(player.x);
+    const chunk = world.chunkManager.chunks.get(chunkId);
+    if (chunk && chunk.objects) {
+        chunk.objects.forEach(obj => {
+            // Проверяем наличие света у самого объекта или у его instance
+            const lightSource = obj.light ? obj : (obj.instance?.light ? obj.instance : null);
+            
+            if (lightSource && lightSource.light) {
+                currentLights.push({
+                    ...lightSource.light,
+                    // Если это факел/колонна, мерцание добавится в LightingManager
+                    isTorch: lightSource.type === "boss_torch" || lightSource.type === "boss_pillar"
+                });
+            }
+        });
+    }
+}
+// Если у босса "темная аура", он должен возвращать intensity: -1.0
+if (bossManager.boss && bossManager.boss.isAlive) {
+    if (typeof bossManager.boss.getLights === 'function') {
+        const bossLights = bossManager.boss.getLights();
+        if (Array.isArray(bossLights)) {
+            currentLights.push(...bossLights); 
+        }
+    }
+}
+    // --- 2. РИСУЕМ МИР ---
+    draw(ctx, player, world, time, bossManager.boss, sky, bgManager, petManager, mobManager, droppedItems);
+
+    // --- 3. РИСУЕМ ТЬМУ (Теперь с источниками света!) ---
+    lightingManager.draw(ctx, player, cameraX, cameraY, world, currentLights);
     // Рисуем выпавшие предметы с учетом камеры
     ctx.save();
     ctx.translate(-cameraX, -cameraY);

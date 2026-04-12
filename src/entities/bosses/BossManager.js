@@ -1,8 +1,9 @@
-// BossManager.js
-import { CubeBoss } from "./CubeBoss.js";     // Лежат в той же папке
+/* src/entities/bosses/BossManager.js */
+import { CubeBoss } from "./CubeBoss.js";
 import { DesertBoss } from "./DesertBoss.js"; 
 import { JungleBoss } from "./JungleBoss.js";
-import { audioManager } from "../../core/AudioManager.js"; // Выходим из entities/bosses/ в src/
+import { SkeletonBoss } from "./SkeletonBoss.js";
+import { audioManager } from "../../core/AudioManager.js";
 import { GameState } from "../../core/GameState.js";
 import { world } from "../../world/World.js";
 import { BIOME_CORES } from "../../data/lootConfig.js";
@@ -10,86 +11,102 @@ import { DroppedItem } from "../../world/objects/DroppedItem.js";
 
 export const bossManager = {
     boss: null,
+    currentBossKey: null,
     
     // Реестр классов боссов
     registry: {
         'cube_boss': CubeBoss,
-        'desert_boss': DesertBoss, // <--- ИСПОЛЬЗУЕМ НОВЫЙ КЛАСС
+        'desert_boss': DesertBoss,
         'ice_boss': CubeBoss,      
         'jungle_boss': JungleBoss,
-        'forest_boss': CubeBoss  
+        'forest_boss': CubeBoss,
+        'skeleton_boss': SkeletonBoss, 
     },
 
-spawn(bossKey, x, y) {
-        if (this.boss) this.boss = null;
+    // Метод для получения света от босса (для освещения)
+    getLights() {
+        if (this.boss && typeof this.boss.getLights === 'function') {
+            return this.boss.getLights();
+        }
+        return [];
+    },
+
+    // Основной метод спавна
+    spawnBoss(bossKey, x, y, scene = null) {
+        if (this.boss) {
+            console.warn("[BossManager] Очищаем старого босса перед новым спавном.");
+            this.boss = null;
+        }
 
         const BossClass = this.registry[bossKey];
-        if (!BossClass) return false;
+        if (!BossClass) {
+            console.error(`%c[BossManager] ❌ Класс для "${bossKey}" не найден в реестре!`, "color: red;");
+            return false;
+        }
 
-        this.currentBossKey = bossKey; // <--- ЗАПОМИНАЕМ ТИП БОССА
-        this.boss = new BossClass(x); 
+        this.currentBossKey = bossKey;
+        // Создаем экземпляр босса
+        this.boss = new BossClass(x, y, scene); 
         
-        // УДАЛИ ИЛИ ЗАКОММЕНТИРУЙ ЭТУ СТРОКУ:
-        // audioManager.playMusic('boss_theme'); 
-        
+        console.log(
+            `%c[WORLD] ⚔️ Босс ${bossKey.toUpperCase()} заспавнен!`, 
+            "color: #ff4500; font-weight: bold; background: #222; padding: 2px 5px;"
+        );
         return true;
     },
 
-// src/entities/bosses/BossManager.js
+    // Вспомогательный метод (если используется в других частях кода)
+    spawn(bossKey, x, y) {
+        return this.spawnBoss(bossKey, x, y);
+    },
 
-update(player) {
-    if (this.boss) {
-        this.boss.update(player);
+    update(player, dt) {
+        if (!this.boss) return;
 
-        // Условие: босс мертв и анимация смерти (таймер) завершилась
-        if (!this.boss.isAlive && this.boss.timers.death > 100) {
-            console.log("🎉 Босс побежден, генерируем лут для:", this.currentBossKey);
-            
-            // 1. Берем данные из конфига
-            const coreData = BIOME_CORES[this.currentBossKey];
-            
-            if (coreData) {
-    const centerX = this.boss.x + (this.boss.width || 32) / 2;
-    
-    // ПРАВИЛЬНЫЙ СПАВН: Берем высоту поверхности земли прямо под боссом
-    const groundY = world.getHeight(centerX, true); 
+        this.boss.update(player, dt);
 
-    // Спавним ядро точно над землей (на 50 пикселей выше поверхности)
-    // Теперь оно НЕ заспавнится под землей, даже если босс огромный
-    const droppedCore = new DroppedItem(centerX, groundY - 50, { ...coreData });
-
-    // Даем красивый импульс вылета
-    droppedCore.vx = (Math.random() - 0.5) * 6; 
-    droppedCore.vy = -7; 
-
-    if (!window.droppedItems) window.droppedItems = []; 
-    window.droppedItems.push(droppedCore);
-
-    console.log("💎 Ядро босса вылетело на поверхность!");
-
-            } else {
-                console.warn("⚠️ Лут не найден в lootConfig.js для:", this.currentBossKey);
-            }
-
-            // 5. Логика прогрессии мира
-            if (!GameState.bossesDefeated[this.currentBossKey]) {
-                GameState.bossesDefeated[this.currentBossKey] = true;
-                if (world.corruptionManager) world.corruptionManager.spreadCorruption(this.currentBossKey);
-                if (world.replaceStatuesWithAltars) world.replaceStatuesWithAltars(this.currentBossKey);
-            }
-
-            // 6. Завершение битвы
-            this.stopBossMusic();
-            this.boss = null; 
-            this.currentBossKey = null; // Очищаем ключ, битва окончена
+        // Логика смерти и выпадения лута
+        if (!this.boss.isAlive && this.boss.timers && this.boss.timers.death > 100) {
+            this.handleBossDeath();
         }
-    }
-},
+    },
 
-    draw(ctx) {
-        // Рисуем всегда, пока объект существует
+handleBossDeath() {
+        console.log("🎉 Босс побежден:", this.currentBossKey);
+        const coreData = BIOME_CORES[this.currentBossKey];
+        
+        if (coreData) {
+            const centerX = this.boss.x + (this.boss.width || 32) / 2;
+            const groundY = world.getHeight(centerX, true); 
+            const droppedCore = new DroppedItem(centerX, groundY - 50, { ...coreData });
+
+            droppedCore.vx = (Math.random() - 0.5) * 6; 
+            droppedCore.vy = -7; 
+
+            if (!window.droppedItems) window.droppedItems = []; 
+            window.droppedItems.push(droppedCore);
+        }
+
+        // --- ЛОГИКА ПРОГРЕССИИ (Исправлено) ---
+        if (!GameState.bossesDefeated[this.currentBossKey]) {
+            GameState.bossesDefeated[this.currentBossKey] = true;
+            
+            // Распространяем порчу
+            if (world.corruptionManager) world.corruptionManager.spreadCorruption(this.currentBossKey);
+            
+            // ВОТ ЭТА СТРОЧКА БЫЛА ПРОПУЩЕНА: Заменяем статуи на алтари
+            if (world.replaceStatuesWithAltars) {
+                world.replaceStatuesWithAltars(this.currentBossKey);
+            }
+        }
+
+        this.stopBossMusic();
+        this.boss = null; 
+        this.currentBossKey = null;
+    },
+    draw(ctx, cameraX, cameraY) {
         if (this.boss) {
-            this.boss.draw(ctx);
+            this.boss.draw(ctx, cameraX, cameraY); 
         }
     },
 

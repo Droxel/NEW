@@ -6,8 +6,8 @@ import { GrapplingHook } from "./tools/GrapplingHook.js";
 
 export const player = {
     // ХАРАКТЕРИСТИКИ
-    hp: 30,
-    maxHp: 30,
+    hp: 300,
+    maxHp: 300,
     invulnerableTimer: 0,
     timeSinceLastHit: 0,
     regenTimer: 0,
@@ -53,10 +53,9 @@ export const player = {
     },
 
 jump() {
-        // Проверяем, в воде ли мы прямо сейчас
-        const waterData = world.getWaterData(this.x);
-        const inWater = waterData.isWater && (this.y + 10 > waterData.level);
-
+    // ПЕРЕДАЕМ this.y, чтобы Water.js проверил и дно тоже
+    const waterData = world.getWaterData(this.x, this.y); 
+    const inWater = waterData.isWater; // Теперь просто доверяем объекту waterData
         // Если мы висим на крюке
         if (this.hook && this.hook.active && this.hook.hooked) {
             this.hook.release();
@@ -148,31 +147,33 @@ checkWallCollisions(axis) {
         }
 
 // 2. ПРОВЕРКА ВОДЫ
-        const waterData = world.getWaterData(this.x);
-        const inWater = waterData.isWater && (this.y + 10 > waterData.level);
-        this.isInWater = inWater; // Сохраняем состояние для других проверок
+// Передаем и X, и Y. Теперь getWaterData сама проверит, 
+// находится ли игрок между поверхностью (level) и дном (bottom)
+const waterData = world.getWaterData(this.x, this.y);
+const inWater = waterData.isWater; 
 
-        if (inWater) {
-            this.velocityX *= 0.5; 
-            // Увеличили с 0.7 до 0.9, чтобы падать в воде чуть быстрее (не так заторможенно)
-            if (this.velocityY > 0) this.velocityY *= 0.9; 
-            
-            this.currentColor = "#0a1240"; 
-            
-            this.airTimer++;
-            if (this.airTimer >= 60) {
-                if (this.air > 0) {
-                    this.air--;
-                } else {
-                    this.takeDamage(1);
-                }
-                this.airTimer = 0;
-            }
+this.isInWater = inWater; 
+
+if (inWater) {
+    this.velocityX *= 0.5; 
+    if (this.velocityY > 0) this.velocityY *= 0.9; 
+    
+    this.currentColor = "#0a1240"; 
+    
+    this.airTimer++;
+    if (this.airTimer >= 60) {
+        if (this.air > 0) {
+            this.air--;
         } else {
-            this.currentColor = this.baseColor;
-            this.air = this.maxAir;
-            this.airTimer = 0;
+            this.takeDamage(1);
         }
+        this.airTimer = 0;
+    }
+} else {
+    this.currentColor = this.baseColor;
+    this.air = this.maxAir;
+    this.airTimer = 0;
+}
 
         // 3. ДВИЖЕНИЕ
         if (this.hook && this.hook.active && this.hook.hooked) {
