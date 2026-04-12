@@ -230,33 +230,22 @@ refresh() {
     for (let i = 0; i < 15; i++) {
         const item = this.currentChest.slots[i];
         const slotDiv = slots[i];
+        
+        // Вместо innerHTML = "", проверяем, изменился ли предмет
+        const itemKey = item ? `${item.id}-${item.count}` : 'empty';
+        if (slotDiv.dataset.itemKey === itemKey && slotDiv.dataset.selected === String(this.selectedIndex === i)) {
+            continue; // Пропускаем тяжелую отрисовку, если ничего не поменялось
+        }
+
         slotDiv.innerHTML = "";
+        slotDiv.dataset.itemKey = itemKey;
+        slotDiv.dataset.selected = this.selectedIndex === i;
 
-        const isDraggingThis = dragData.isDragging && dragData.sourceIndex === i && dragData.sourceArray === this.currentChest.slots;
+        // Стилизация через классы
+        slotDiv.className = 'slot' + (this.selectedIndex === i ? ' selected' : '');
 
-        // ИСПРАВЛЕНО: Тултипы теперь в renderer
-        slotDiv.onmouseenter = (e) => {
-            if (item && !isDraggingThis && this.inventoryUI.renderer) {
-                this.inventoryUI.renderer.showTooltip(item, e);
-            }
-        };
-
-        slotDiv.onmouseleave = () => {
-            if (this.inventoryUI.renderer) this.inventoryUI.renderer.hideTooltip();
-        }; 
-
-            // Стилизация выделения
-            const isSelected = (this.selectedIndex === i);
-            slotDiv.style.borderColor = isSelected ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.2)";
-            slotDiv.style.background = isSelected ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.1)";
-            slotDiv.style.boxShadow = isSelected ? "0 0 8px rgba(255, 255, 255, 0.4)" : "none";
-
- if (item && !isDraggingThis) {
-            // ИСПРАВЛЕНО: Отрисовка предмета через renderer
+        if (item) {
             this.inventoryUI.renderer.renderItemInSlot(slotDiv, item, false);
-            if (slotDiv.firstChild) {
-                slotDiv.firstChild.style.pointerEvents = "none";
-            }
         }
     }
 }

@@ -218,31 +218,35 @@ refresh() {
         } 
     } 
 
-    renderGrid(gridElement, dataArray, isMainGrid) { 
-        const slots = gridElement.children; 
-        for (let i = 0; i < slots.length; i++) { 
-            const item = dataArray[i]; 
-            const slotDiv = slots[i]; 
-            
-            slotDiv.innerHTML = "";  
-            slotDiv.onclick = null; 
-             
-            if (isMainGrid && this.ui.selectedSlotIndex === i) { 
-                slotDiv.style.border = "2px solid #ffeb3b"; 
-                slotDiv.style.backgroundColor = "rgba(255, 235, 59, 0.1)"; 
-            } else { 
-                slotDiv.style.border = "";  
-                slotDiv.style.backgroundColor = ""; 
-            } 
+renderGrid(gridElement, dataArray, isMainGrid) { 
+    const slots = gridElement.children; 
+    for (let i = 0; i < slots.length; i++) { 
+        const item = dataArray[i]; 
+        const slotDiv = slots[i]; 
+        
+        // 1. Управляем выделением через классы (CSS), а не прямые стили
+        const isSelected = (isMainGrid && this.ui.selectedSlotIndex === i);
+        slotDiv.classList.toggle('selected-slot', isSelected);
 
-            if (item && item.count > 0) {
-                this.renderItemInSlot(slotDiv, item, false, i, isMainGrid); 
-            } else {
-                dataArray[i] = null;
-            }
-        } 
+        // 2. Обновляем содержимое слота ТОЛЬКО если оно изменилось
+        const currentItemId = slotDiv.dataset.itemId;
+        const newItemId = item ? `${item.id}_${item.count}` : "empty";
+
+        if (currentItemId !== newItemId) {
+            this.updateSlotContent(slotDiv, item, i, isMainGrid);
+            slotDiv.dataset.itemId = newItemId;
+        }
+    } 
+}
+
+updateSlotContent(slotDiv, item, index, isMainGrid) {
+    slotDiv.innerHTML = ""; // Очищаем только если реально нужно сменить контент
+    if (item && item.count > 0) {
+        this.renderItemInSlot(slotDiv, item, false, index, isMainGrid);
+    } else {
+        // Если слот пустой, можно вернуть иконку-заглушку или оставить пустым
     }
-
+}
     renderItemInSlot(slotDiv, item, showTimer, index, isMainGrid) { 
         const img = document.createElement('img'); 
         if (item.icon) img.src = item.icon; 

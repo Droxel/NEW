@@ -15,6 +15,7 @@ export class Settings {
 
         // Кнопки разрешения
         const resButtons = {
+            'res-ultra-low': 0.25, // Ультра низкое (четверть от обычного разрешения)
             'res-low': 0.5,    // Низкое
             'res-mid': 0.8,   // Среднее
             'res-normal': 1.0, // Обычное
