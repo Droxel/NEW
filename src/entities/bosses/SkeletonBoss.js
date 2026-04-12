@@ -18,7 +18,7 @@ export class SkeletonBoss {
         
         this.width = 120;
         this.height = 150;
-        this.maxHp = 500;
+        this.maxHp = 800;
         this.hp = this.maxHp;
         this.isAlive = true;
         this.vy = 0;

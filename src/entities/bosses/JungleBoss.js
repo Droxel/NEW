@@ -6,7 +6,7 @@ import { mobManager } from "../mobs/MobManager.js";
 import { JungleMinion } from "./JungleMinion.js";
 
 const BOSS_CONFIG = {
-    hp: 60,
+    hp: 600,
     size: 120,
     gravity: 0.5,
     colors: {

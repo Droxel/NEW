@@ -6,8 +6,8 @@ import { GrapplingHook } from "./tools/GrapplingHook.js";
 
 export const player = {
     // ХАРАКТЕРИСТИКИ
-    hp: 300,
-    maxHp: 300,
+    hp: 30,
+    maxHp: 30,
     invulnerableTimer: 0,
     timeSinceLastHit: 0,
     regenTimer: 0,
