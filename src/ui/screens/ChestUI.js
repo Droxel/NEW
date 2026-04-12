@@ -6,128 +6,89 @@ export class ChestUI {
         this.inventoryUI = inventoryUI;
         this.isOpen = false;
         this.currentChest = null;
-        this.selectedIndex = null; 
-        this.createUI();
+        this.selectedIndex = null;
         
+        // Создаем стили один раз при инициализации
+        this.injectStyles();
+        this.createUI();
+
         window.openChestUI = (chest) => this.open(chest);
         window.closeChestUI = () => this.close();
     }
 
+    injectStyles() {
+        if (document.getElementById('chest-ui-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'chest-ui-styles';
+        style.innerHTML = `
+            .chest-overlay { display: none; flex-direction: column; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); gap: 15px; z-index: 1100; pointer-events: none; }
+            .chest-box { padding: 15px; background: rgba(0, 0, 0, 0.85); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); pointer-events: auto; }
+            .chest-grid { display: grid; grid-template-columns: repeat(5, 32px); gap: 6px; }
+            .chest-slot { width: 32px; height: 32px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; display: flex; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: border-color 0.2s; }
+            .chest-slot:hover { border-color: rgba(255,255,255,0.8); }
+            .chest-slot.selected { border-color: #ffcc00 !important; background: rgba(255, 204, 0, 0.1); }
+            .btn-base { padding: 10px 15px; font-size: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.8); color: white; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+            .btn-base:hover { background: rgba(50,50,50,0.9); }
+            .btn-close { background: rgba(150, 30, 30, 0.8); }
+            .btn-close:hover { background: rgba(200, 50, 50, 0.9); }
+        `;
+        document.head.appendChild(style);
+    }
+
     createUI() {
         this.overlay = document.createElement('div');
-        this.overlay.style.cssText = `
-            display: none;
-            flex-direction: column;
-            position: fixed;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            gap: 15px;
-            z-index: 1100;
-            pointer-events: none;
-        `;
+        this.overlay.className = 'chest-overlay';
 
         this.chestBox = document.createElement('div');
-        this.chestBox.style.cssText = `
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            pointer-events: auto;
-        `;
+        this.chestBox.className = 'chest-box';
 
         const title = document.createElement('h3');
         title.innerText = "СУНДУК";
-        title.style.cssText = `
-            margin: 0 0 12px 0;
-            font-size: 14px;
-            color: rgba(255,255,255,0.9);
-            text-align: center;
-            font-weight: normal;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        `;
-        this.chestBox.appendChild(title);
-
-        this.gridElement = document.createElement('div');
-        this.gridElement.style.cssText = `
-            display: grid;
-            grid-template-columns: repeat(5, 32px);
-            gap: 6px;
-        `;
+        title.style.cssText = "margin: 0 0 12px 0; font-size: 14px; color: white; text-align: center; letter-spacing: 2px; font-weight: normal;";
         
+        this.gridElement = document.createElement('div');
+        this.gridElement.className = 'chest-grid';
+
+        // Используем делегирование событий
+        this.gridElement.onclick = (e) => {
+            const slot = e.target.closest('.chest-slot');
+            if (slot) this.selectSlot(parseInt(slot.dataset.index));
+        };
+
+        this.gridElement.onmousedown = (e) => {
+            const slot = e.target.closest('.chest-slot');
+            if (slot) this.onSlotMouseDown(e, parseInt(slot.dataset.index));
+        };
+
         for (let i = 0; i < 15; i++) {
             const slot = document.createElement('div');
-            slot.style.cssText = `
-                width: 32px;
-                height: 32px;
-                background: rgba(255,255,255,0.1);
-                border: 1px solid rgba(255,255,255,0.2);
-                border-radius: 4px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                position: relative;
-                cursor: pointer;
-                transition: all 0.2s;
-            `;
-            
-            // Наведение (hover) через JS
-            slot.onmouseover = () => { 
-                if (this.selectedIndex !== i) slot.style.borderColor = "rgba(255,255,255,0.8)"; 
-            };
-            slot.onmouseout = () => this.refresh(); // Просто перерисовываем состояние
-            
-            slot.onclick = () => this.selectSlot(i);
-            slot.onmousedown = (e) => this.onSlotMouseDown(e, i);
+            slot.className = 'chest-slot';
+            slot.dataset.index = i;
             this.gridElement.appendChild(slot);
         }
-        this.chestBox.appendChild(this.gridElement);
+
+        this.chestBox.append(title, this.gridElement);
         this.overlay.appendChild(this.chestBox);
 
+        // Кнопки
         const btnContainer = document.createElement('div');
         btnContainer.style.cssText = "display: flex; gap: 8px; justify-content: center; pointer-events: auto;";
 
-        const btnBaseStyle = `
-            padding: 10px 15px;
-            font-size: 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-        `;
-
-        this.btnTake = document.createElement('button');
-        this.btnTake.innerText = "ВЗЯТЬ";
-        this.btnTake.style.cssText = btnBaseStyle;
-        this.btnTake.onclick = () => this.takeSelected();
-
-        this.btnTakeAll = document.createElement('button');
-        this.btnTakeAll.innerText = "ВСЁ";
-        this.btnTakeAll.style.cssText = btnBaseStyle;
-        this.btnTakeAll.onclick = () => this.takeAll();
-
-        this.btnClose = document.createElement('button');
-        this.btnClose.innerText = "ЗАКРЫТЬ"; 
-        this.btnClose.style.cssText = btnBaseStyle + "background: rgba(150, 30, 30, 0.8);";
-        this.btnClose.onclick = () => this.close();
-
-        [this.btnTake, this.btnTakeAll].forEach(btn => {
-            btn.onmouseover = () => btn.style.background = "rgba(50,50,50,0.9)";
-            btn.onmouseout = () => btn.style.background = "rgba(0,0,0,0.8)";
-        });
-        this.btnClose.onmouseover = () => this.btnClose.style.background = "rgba(200, 50, 50, 0.9)";
-        this.btnClose.onmouseout = () => this.btnClose.style.background = "rgba(150, 30, 30, 0.8)";
+        this.btnTake = this.createBtn("ВЗЯТЬ", () => this.takeSelected());
+        this.btnTakeAll = this.createBtn("ВСЁ", () => this.takeAll());
+        this.btnClose = this.createBtn("ЗАКРЫТЬ", () => this.close(), "btn-close");
 
         btnContainer.append(this.btnTake, this.btnTakeAll, this.btnClose);
         this.overlay.appendChild(btnContainer);
         document.body.appendChild(this.overlay);
+    }
+
+    createBtn(text, handler, extraClass = "") {
+        const btn = document.createElement('button');
+        btn.className = `btn-base ${extraClass}`;
+        btn.innerText = text;
+        btn.onclick = handler;
+        return btn;
     }
 
     selectSlot(index) {
@@ -224,29 +185,32 @@ close() {
 }
 
 refresh() {
-    if (!this.currentChest) return;
-    const slots = this.gridElement.children;
+        if (!this.currentChest) return;
+        const slots = this.gridElement.children;
 
-    for (let i = 0; i < 15; i++) {
-        const item = this.currentChest.slots[i];
-        const slotDiv = slots[i];
-        
-        // Вместо innerHTML = "", проверяем, изменился ли предмет
-        const itemKey = item ? `${item.id}-${item.count}` : 'empty';
-        if (slotDiv.dataset.itemKey === itemKey && slotDiv.dataset.selected === String(this.selectedIndex === i)) {
-            continue; // Пропускаем тяжелую отрисовку, если ничего не поменялось
-        }
+        for (let i = 0; i < 15; i++) {
+            const item = this.currentChest.slots[i];
+            const slotDiv = slots[i];
+            const isSelected = this.selectedIndex === i;
+            
+            const itemKey = item ? `${item.id}-${item.count}` : 'empty';
+            
+            // Если состояние не изменилось, ВООБЩЕ не трогаем DOM
+            if (slotDiv.dataset.itemKey === itemKey && slotDiv.dataset.selected === String(isSelected)) {
+                continue; 
+            }
 
-        slotDiv.innerHTML = "";
-        slotDiv.dataset.itemKey = itemKey;
-        slotDiv.dataset.selected = this.selectedIndex === i;
+            slotDiv.dataset.itemKey = itemKey;
+            slotDiv.dataset.selected = isSelected;
+            
+            // Вместо innerHTML = "", очищаем только если нужно
+            slotDiv.textContent = ""; 
+            slotDiv.classList.toggle('selected', isSelected);
 
-        // Стилизация через классы
-        slotDiv.className = 'slot' + (this.selectedIndex === i ? ' selected' : '');
-
-        if (item) {
-            this.inventoryUI.renderer.renderItemInSlot(slotDiv, item, false);
+            if (item) {
+                // Рендерим предмет только если он есть
+                this.inventoryUI.renderer.renderItemInSlot(slotDiv, item, false);
+            }
         }
     }
-}
 }

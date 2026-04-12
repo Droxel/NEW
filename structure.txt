@@ -158,16 +158,23 @@ C:.
     |   main.js
     |   
     +---core
-    |       AssetLoader.js
-    |       AudioManager.js
-    |       Braw.js
-    |       DebugCommands.js
-    |       GameState.js
-    |       Input.js
-    |       RitualManager.js
-    |       SaveManager.js
-    |       Time.js
-    |       
+    |   |   AssetLoader.js
+    |   |   AudioManager.js
+    |   |   Braw.js
+    |   |   DebugCommands.js
+    |   |   GameState.js
+    |   |   InputManager.js
+    |   |   MusicController.js
+    |   |   RitualManager.js
+    |   |   SaveManager.js
+    |   |   Time.js
+    |   |   
+    |   \---input
+    |           InputState.js
+    |           Keyboard.js
+    |           Mobile.js
+    |           Pointer.js
+    |           
     +---data
     |       config.js
     |       lootConfig.js
@@ -219,6 +226,10 @@ C:.
     |   +---player
     |   |   |   Inventory.js
     |   |   |   Player.js
+    |   |   |   PlayerCollision.js
+    |   |   |   PlayerHealth.js
+    |   |   |   PlayerMovement.js
+    |   |   |   PlayerVisuals.js
     |   |   |   
     |   |   \---tools
     |   |           BiomeWeaponItem.js

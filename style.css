@@ -376,3 +376,88 @@ canvas {
     width: 100%;
     height: 100%;
 }
+/* --- НОВЫЕ КЛАССЫ ДЛЯ ОПТИМИЗАЦИИ ИНВЕНТАРЯ --- */
+
+.full-size-img {
+    width: 100%;
+    height: 100%;
+}
+
+.inventory-overlay {
+    display: none; 
+    align-items: center; 
+    gap: 20px;
+}
+
+.use-btn-overlay {
+    width: 70px; height: 70px; background: rgba(0,0,0,0.6); 
+    border: 2px solid #555; border-radius: 12px; cursor: pointer; 
+    display: flex; align-items: center; justify-content: center; 
+    transition: 0.2s; opacity: 0.3; pointer-events: none; flex-shrink: 0; 
+}
+
+.use-btn-overlay.ready {
+    opacity: 1;
+    pointer-events: auto;
+    border: 2px solid #ffeb3b;
+}
+
+.use-btn-text {
+    color: white; 
+    font-size: 10px; 
+    text-align: center;
+}
+
+.section-title {
+    margin-top: 0; 
+    color: white; 
+    font-size: 14px;
+}
+
+/* Стили элементов внутри слота */
+.slot-img {
+    width: 70%; 
+    height: 70%; 
+    object-fit: contain; 
+    pointer-events: none;
+    position: absolute; /* Чтобы не смещать другие элементы */
+}
+
+.slot-count {
+    position: absolute; bottom: 1px; right: 2px; 
+    color: white; font-size: 10px; font-weight: bold; 
+    text-shadow: 1px 1px 0 #000; pointer-events: none; 
+    z-index: 2;
+}
+
+.slot-timer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.6); display: flex; justify-content: center; 
+    align-items: center; color: white; font-size: 12px; 
+    border-radius: 4px; pointer-events: none; z-index: 3;
+}
+
+.hotbar-num {
+    position: absolute; top: 1px; left: 2px; 
+    font-size: 9px; color: #ccc;
+    z-index: 2;
+}
+
+/* Стили для кнопки лечения мобилок */
+.potion-bg {
+    background-image: url('assets/images/items/xp.svg');
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.no-bg {
+    background-image: none !important;
+}
+
+/* Выделенный слот в главном гриде (синхронизировано с твоим CSS) */
+.selected-slot {
+    border-color: #ffeb3b !important;
+    background: rgba(255, 235, 59, 0.15) !important;
+    box-shadow: 0 0 12px rgba(255, 235, 59, 0.4), inset 0 0 5px rgba(255, 235, 59, 0.2);
+}

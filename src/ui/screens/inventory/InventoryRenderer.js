@@ -6,32 +6,26 @@ import { dragData } from "./InventoryEvents.js";
 export class InventoryRenderer {
     constructor(ui) {
         this.ui = ui; // Ссылка на диспетчер
+        this.gameBox = document.getElementById('game-box'); // Кэшируем сразу
     }
 
     createUI() { 
+        const fragment = document.createDocumentFragment(); // Используем фрагмент для батчинга DOM-операций
+
         const btn = document.createElement('div'); 
-        btn.innerHTML = '<img src="./assets/images/ui/cam.svg" style="width:100%; height:100%;">'; 
+        btn.innerHTML = '<img src="./assets/images/ui/cam.svg" class="full-size-img">'; 
         btn.className = 'inventory-toggle'; 
         btn.onclick = () => this.ui.toggle(); 
         
-        const gameBox = document.getElementById('game-box'); 
-        if(gameBox) gameBox.appendChild(btn);  
+        if (this.gameBox) this.gameBox.appendChild(btn);  
         else document.body.appendChild(btn); 
 
         this.overlay = document.createElement('div'); 
-        this.overlay.className = 'inventory-overlay'; 
-        this.overlay.style.display = 'none'; 
-        this.overlay.style.alignItems = 'center'; 
-        this.overlay.style.gap = '20px'; 
+        this.overlay.className = 'inventory-overlay'; // Стили ушли в CSS
 
         this.useBtn = document.createElement('div'); 
-        this.useBtn.style.cssText = ` 
-            width: 70px; height: 70px; background: rgba(0,0,0,0.6); 
-            border: 2px solid #555; border-radius: 12px; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            transition: 0.2s; opacity: 0.3; pointer-events: none; flex-shrink: 0; 
-        `; 
-        this.useBtn.innerHTML = `<span style="color:white; font-size:10px; text-align:center;">ВЫБЕРИ<br>ПРЕДМЕТ</span>`; 
+        this.useBtn.className = 'use-btn-overlay'; // Стили ушли в CSS
+        this.useBtn.innerHTML = `<span class="use-btn-text">ВЫБЕРИ<br>ПРЕДМЕТ</span>`; 
         this.useBtn.onclick = () => this.ui.handleUseItem(); 
         this.overlay.appendChild(this.useBtn); 
 
@@ -54,61 +48,67 @@ export class InventoryRenderer {
         this.overlay.appendChild(currencySection.container); 
         this.overlay.appendChild(bubbleSection.container);  
          
-        document.body.appendChild(this.overlay); 
+        fragment.appendChild(this.overlay); 
+        document.body.appendChild(fragment); // Добавляем все в DOM за 1 раз
     } 
 
-createSection(title, count, cssClass) { 
+    createSection(title, count, cssClass) { 
         const container = document.createElement('div'); 
-        container.innerHTML = `<h3 style="margin-top:0; color: white; font-size: 14px;">${title}</h3>`; 
+        container.innerHTML = `<h3 class="section-title">${title}</h3>`; 
+        
         const grid = document.createElement('div'); 
         grid.className = `grid ${cssClass}`; 
 
-        // Вспомогательная функция для получения актуального массива данных
         const getTargetArray = () => {
-            if (cssClass === 'main-grid') return this.ui.inventory.mainSlots; 
-            if (cssClass === 'bubble-grid') return this.ui.inventory.bubbleSlots; 
-            if (cssClass === 'currency-grid') return this.ui.inventory.currencySlots; 
-            if (cssClass === 'accessory-grid') return this.ui.inventory.accessorySlots; 
-            if (cssClass === 'chest-grid') return this.ui.currentChest ? this.ui.currentChest.slots : null;
-            return null;
+            switch(cssClass) {
+                case 'main-grid': return this.ui.inventory.mainSlots;
+                case 'bubble-grid': return this.ui.inventory.bubbleSlots;
+                case 'currency-grid': return this.ui.inventory.currencySlots;
+                case 'accessory-grid': return this.ui.inventory.accessorySlots;
+                case 'chest-grid': return this.ui.currentChest ? this.ui.currentChest.slots : null;
+                default: return null;
+            }
         };
 
         for (let i = 0; i < count; i++) { 
             const slot = document.createElement('div'); 
             slot.className = 'slot'; 
-            slot.style.touchAction = 'none';  
-            slot.style.userSelect = 'none'; 
-            slot.style.webkitUserSelect = 'none'; 
+            slot.dataset.slotIndex = i; 
+            slot.dataset.gridType = cssClass; 
 
-            // Обработка зажима (ПК)
+            // ПРЕДСОЗДАЕМ элементы, чтобы не делать innerHTML = "" при рендере
+            const img = document.createElement('img');
+            img.className = 'slot-img';
+            img.style.display = 'none';
+
+            const countDiv = document.createElement('div');
+            countDiv.className = 'slot-count';
+
+            const timerDiv = document.createElement('div');
+            timerDiv.className = 'slot-timer';
+            timerDiv.style.display = 'none';
+
+            slot.appendChild(img);
+            slot.appendChild(countDiv);
+            slot.appendChild(timerDiv);
+
             slot.onmousedown = (e) => {
                 const targetArray = getTargetArray();
-                if (!targetArray) return;
-                
-                const item = targetArray[i];
-                if (!item) return;  
-                
+                if (!targetArray || !targetArray[i]) return;  
                 e.preventDefault(); 
-                this.ui.events.startDrag(item, targetArray, i, e.clientX, e.clientY, 0); 
+                this.ui.events.startDrag(targetArray[i], targetArray, i, e.clientX, e.clientY, 0); 
             };
             
-            // Обработка касания (Мобилки)
             slot.ontouchstart = (e) => {
                 const targetArray = getTargetArray();
-                if (!targetArray) return;
-
-                const item = targetArray[i];
-                if (!item) return; 
-
+                if (!targetArray || !targetArray[i]) return;
                 e.preventDefault(); 
                 const touch = e.touches[0]; 
                 this.ui.events.touchStartX = touch.clientX; 
                 this.ui.events.touchStartY = touch.clientY; 
-                this.ui.events.startDrag(item, targetArray, i, touch.clientX, touch.clientY, -60); 
+                this.ui.events.startDrag(targetArray[i], targetArray, i, touch.clientX, touch.clientY, -60); 
             };
              
-            slot.dataset.slotIndex = i; 
-            slot.dataset.gridType = cssClass; 
             grid.appendChild(slot); 
         } 
         container.appendChild(grid); 
@@ -118,18 +118,35 @@ createSection(title, count, cssClass) {
     createHotbar() { 
         this.hotbarContainer = document.createElement('div'); 
         this.hotbarContainer.id = 'hotbar'; 
-        this.hotbarContainer.style.cssText = "position:absolute; left:160px; top:10px; display:flex; gap:5px;"; 
-        const gameBox = document.getElementById('game-box'); 
-        if(gameBox) gameBox.appendChild(this.hotbarContainer); 
+        
+        if(this.gameBox) this.gameBox.appendChild(this.hotbarContainer); 
         else document.body.appendChild(this.hotbarContainer); 
 
         for (let i = 0; i < 5; i++) { 
             const slot = document.createElement('div'); 
             slot.className = 'slot'; 
+            
             const num = document.createElement('span'); 
+            num.className = 'hotbar-num';
             num.innerText = i + 1; 
-            num.style.cssText = "position:absolute; top:1px; left:2px; font-size:9px; color:#ccc;"; 
+
+            // Предсоздаем элементы контента
+            const img = document.createElement('img');
+            img.className = 'slot-img';
+            img.style.display = 'none';
+
+            const countDiv = document.createElement('div');
+            countDiv.className = 'slot-count';
+
+            const timerDiv = document.createElement('div');
+            timerDiv.className = 'slot-timer';
+            timerDiv.style.display = 'none';
+
             slot.appendChild(num); 
+            slot.appendChild(img);
+            slot.appendChild(countDiv);
+            slot.appendChild(timerDiv);
+
             this.hotbarContainer.appendChild(slot); 
         } 
         this.refreshHotbar(); 
@@ -149,39 +166,34 @@ createSection(title, count, cssClass) {
         this.tooltip.innerHTML = `<b>${item.name}</b><br><i>${item.description || ''}</i>`; 
         this.tooltip.style.display = 'block'; 
          
-        if (x > window.innerWidth - 150) this.tooltip.style.left = (x - 160) + 'px'; 
-        else this.tooltip.style.left = (x + 15) + 'px'; 
-        
-        this.tooltip.style.top = (y + 15) + 'px'; 
+        this.tooltip.style.left = (x > window.innerWidth - 150) ? `${x - 160}px` : `${x + 15}px`; 
+        this.tooltip.style.top = `${y + 15}px`; 
     } 
 
     hideTooltip() { 
         if(this.tooltip) this.tooltip.style.display = 'none'; 
     } 
 
-refresh() { 
-    // Обновляем стандартные гриды игрока
-    this.renderGrid(this.mainGridElement, this.ui.inventory.mainSlots, true); 
-    this.renderGrid(this.currencyGridElement, this.ui.inventory.currencySlots, false); 
-    this.renderGrid(this.bubbleGridElement, this.ui.inventory.bubbleSlots, false);  
-    this.renderGrid(this.accGridElement, this.ui.inventory.accessorySlots, false); 
-    
-    // !!! СУНДУК: Если у тебя есть элемент сетки сундука, обновляй и его
-    if (this.chestGridElement && this.ui.currentChest) {
-        this.renderGrid(this.chestGridElement, this.ui.currentChest.slots, false);
-    }
+    refresh() { 
+        this.renderGrid(this.mainGridElement, this.ui.inventory.mainSlots, true); 
+        this.renderGrid(this.currencyGridElement, this.ui.inventory.currencySlots, false); 
+        this.renderGrid(this.bubbleGridElement, this.ui.inventory.bubbleSlots, false);  
+        this.renderGrid(this.accGridElement, this.ui.inventory.accessorySlots, false); 
+        
+        if (this.chestGridElement && this.ui.currentChest) {
+            this.renderGrid(this.chestGridElement, this.ui.currentChest.slots, false);
+        }
 
-    this.refreshHotbar(); 
-    this.updateUseButtonState(); 
-    
-    // Проверка крюка
-    const hookJoy = document.getElementById("hook-joystick-container"); 
-    if (hookJoy) { 
-        const hasHook = this.ui.inventory.hasHook(); 
-        hookJoy.style.display = hasHook ? "block" : "none"; 
-        player.hasHookInInventory = hasHook; 
-    } 
-}
+        this.refreshHotbar(); 
+        this.updateUseButtonState(); 
+        
+        const hookJoy = document.getElementById("hook-joystick-container"); 
+        if (hookJoy) { 
+            const hasHook = this.ui.inventory.hasHook(); 
+            hookJoy.style.display = hasHook ? "block" : "none"; 
+            player.hasHookInInventory = hasHook; 
+        } 
+    }
 
     refreshHotbar() { 
         const hotbarSlots = this.hotbarContainer.querySelectorAll('.slot'); 
@@ -190,18 +202,13 @@ refresh() {
         for(let i = 0; i < 5; i++) { 
             const item = this.ui.inventory.mainSlots[i]; 
             const slotDiv = hotbarSlots[i]; 
-            const num = slotDiv.querySelector('span'); 
-            slotDiv.innerHTML = ""; 
-            slotDiv.appendChild(num); 
-            if (item) this.renderItemInSlot(slotDiv, item, true, i, false);  
+            this.updateSlotDOM(slotDiv, item, true, i, false);
         } 
 
         if (this.ui.mobileHealBtn) { 
             if (hasPotionInInventory) { 
-                this.ui.mobileHealBtn.style.backgroundImage = `url('assets/images/items/xp.svg')`; 
-                this.ui.mobileHealBtn.style.backgroundSize = "70%"; 
-                this.ui.mobileHealBtn.style.backgroundRepeat = "no-repeat"; 
-                this.ui.mobileHealBtn.style.backgroundPosition = "center"; 
+                this.ui.mobileHealBtn.classList.remove('inactive', 'no-bg');
+                this.ui.mobileHealBtn.classList.add('potion-bg');
 
                 if (player.potionCooldown > 0) { 
                     this.ui.mobileHealBtn.classList.add('inactive'); 
@@ -211,86 +218,84 @@ refresh() {
                     this.ui.mobileHealBtn.innerText = ""; 
                 } 
             } else { 
-                this.ui.mobileHealBtn.style.backgroundImage = 'none'; 
-                this.ui.mobileHealBtn.classList.add('inactive'); 
+                this.ui.mobileHealBtn.classList.add('inactive', 'no-bg');
+                this.ui.mobileHealBtn.classList.remove('potion-bg');
                 this.ui.mobileHealBtn.innerText = ""; 
             } 
         } 
     } 
 
-renderGrid(gridElement, dataArray, isMainGrid) { 
-    const slots = gridElement.children; 
-    for (let i = 0; i < slots.length; i++) { 
-        const item = dataArray[i]; 
-        const slotDiv = slots[i]; 
-        
-        // 1. Управляем выделением через классы (CSS), а не прямые стили
-        const isSelected = (isMainGrid && this.ui.selectedSlotIndex === i);
-        slotDiv.classList.toggle('selected-slot', isSelected);
+    renderGrid(gridElement, dataArray, isMainGrid) { 
+        const slots = gridElement.children; 
+        for (let i = 0; i < slots.length; i++) { 
+            const item = dataArray[i]; 
+            const slotDiv = slots[i]; 
+            
+            const isSelected = (isMainGrid && this.ui.selectedSlotIndex === i);
+            slotDiv.classList.toggle('selected-slot', isSelected);
 
-        // 2. Обновляем содержимое слота ТОЛЬКО если оно изменилось
-        const currentItemId = slotDiv.dataset.itemId;
-        const newItemId = item ? `${item.id}_${item.count}` : "empty";
+            const newItemId = item ? `${item.id}_${item.count}_${player.potionCooldown}` : "empty";
 
-        if (currentItemId !== newItemId) {
-            this.updateSlotContent(slotDiv, item, i, isMainGrid);
-            slotDiv.dataset.itemId = newItemId;
-        }
-    } 
-}
-
-updateSlotContent(slotDiv, item, index, isMainGrid) {
-    slotDiv.innerHTML = ""; // Очищаем только если реально нужно сменить контент
-    if (item && item.count > 0) {
-        this.renderItemInSlot(slotDiv, item, false, index, isMainGrid);
-    } else {
-        // Если слот пустой, можно вернуть иконку-заглушку или оставить пустым
-    }
-}
-    renderItemInSlot(slotDiv, item, showTimer, index, isMainGrid) { 
-        const img = document.createElement('img'); 
-        if (item.icon) img.src = item.icon; 
-        else if (item.type === 'crystal' && assets.crystal?.src) img.src = assets.crystal.src; 
-         
-        img.style.cssText = "width:70%; height:70%; object-fit:contain; pointer-events:none;"; 
-         
-        const countDiv = document.createElement('div'); 
-        countDiv.innerText = item.count > 1 ? item.count : ""; 
-        countDiv.style.cssText = ` 
-            position: absolute; bottom: 1px; right: 2px; 
-            color: white; font-size: 10px; font-weight: bold; 
-            text-shadow: 1px 1px 0 #000; pointer-events:none; 
-        `; 
-
-        slotDiv.appendChild(img); 
-        slotDiv.appendChild(countDiv); 
-         
-        if (showTimer && item.id === 'potion_hp' && player.potionCooldown > 0) { 
-            const timerDiv = document.createElement('div'); 
-            timerDiv.style.cssText = "position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; color:white; font-size:12px; border-radius:4px; pointer-events:none;"; 
-            timerDiv.innerText = Math.ceil(player.potionCooldown / 60); 
-            slotDiv.appendChild(timerDiv); 
+            if (slotDiv.dataset.itemId !== newItemId) {
+                this.updateSlotDOM(slotDiv, item, false, i, isMainGrid);
+                slotDiv.dataset.itemId = newItemId;
+            }
         } 
+    }
 
-        slotDiv.onclick = (e) => { 
-            e.stopPropagation(); 
-            if (isMainGrid) this.ui.events.selectSlot(index, item, 'main-grid'); 
-            if (item) this.showTooltip(item, e); 
-            else this.hideTooltip(); 
-        }; 
-    } 
+    // НОВАЯ ФУНКЦИЯ: Обновляет только свойства, не ломая DOM
+    updateSlotDOM(slotDiv, item, showTimer, index, isMainGrid) {
+        const img = slotDiv.querySelector('.slot-img');
+        const countDiv = slotDiv.querySelector('.slot-count');
+        const timerDiv = slotDiv.querySelector('.slot-timer');
+
+        if (item && item.count > 0) {
+            let imgSrc = item.icon;
+            if (!imgSrc && item.type === 'crystal' && assets.crystal?.src) {
+                imgSrc = assets.crystal.src;
+            }
+            
+            if (imgSrc) {
+                img.src = imgSrc;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+
+            countDiv.innerText = item.count > 1 ? item.count : "";
+
+            if (showTimer && item.id === 'potion_hp' && player.potionCooldown > 0) {
+                timerDiv.innerText = Math.ceil(player.potionCooldown / 60);
+                timerDiv.style.display = 'flex';
+            } else if (timerDiv) {
+                timerDiv.style.display = 'none';
+            }
+
+            slotDiv.onclick = (e) => { 
+                e.stopPropagation(); 
+                if (isMainGrid) this.ui.events.selectSlot(index, item, 'main-grid'); 
+                this.showTooltip(item, e); 
+            }; 
+        } else {
+            // Очищаем слот
+            if (img) img.style.display = 'none';
+            if (countDiv) countDiv.innerText = "";
+            if (timerDiv) timerDiv.style.display = 'none';
+            slotDiv.onclick = (e) => {
+                e.stopPropagation();
+                if (isMainGrid) this.ui.events.selectSlot(index, null, 'main-grid');
+                this.hideTooltip();
+            };
+        }
+    }
 
     updateUseButtonState() { 
         if (this.ui.selectedItem && this.ui.selectedItem.count > 0 && this.ui.selectedItem.id === 'life_fruit') { 
-            this.useBtn.style.opacity = "1"; 
-            this.useBtn.style.pointerEvents = "auto"; 
+            this.useBtn.classList.add('ready');
             this.useBtn.innerHTML = `<img src="${this.ui.selectedItem.icon}" style="width:80%; height:80%; object-fit:contain;">`; 
-            this.useBtn.style.border = "2px solid #ffeb3b"; 
         } else { 
-            this.useBtn.style.opacity = "0.3"; 
-            this.useBtn.style.pointerEvents = "none"; 
-            this.useBtn.innerHTML = `<span style="color:white; font-size:10px; text-align:center;">ВЫБЕРИ<br>ПРЕДМЕТ</span>`; 
-            this.useBtn.style.border = "2px solid #555"; 
+            this.useBtn.classList.remove('ready');
+            this.useBtn.innerHTML = `<span class="use-btn-text">ВЫБЕРИ<br>ПРЕДМЕТ</span>`; 
         } 
     } 
 }
