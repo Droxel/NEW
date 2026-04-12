@@ -28,29 +28,33 @@ export class Statue {
         }
     }
 
-draw(ctx, assets) { // Убрали camX, camY из аргументов
-        const img = assets[this.imgKey]; 
+draw(ctx, assets) {
+    const img = assets[this.imgKey]; 
+    
+    // ПРОВЕРКА: Если объекта нет, он еще грузится ИЛИ он загрузился битым (naturalWidth === 0)
+    if (!img || !img.complete || img.naturalWidth === 0) {
+        ctx.fillStyle = 'red';
+        // Рисуем красный прямоугольник, чтобы ты видел, где должна быть статуя
+        ctx.fillRect(this.x - this.width/2, this.y - this.height, this.width, this.height);
         
-        // Если картинка не загрузилась, рисуем красный прямоугольник для теста
-        if (!img || !img.complete) {
-            ctx.fillStyle = 'red';
-            // Рисуем относительно центра x, и y - высота (так как y - это земля)
-            ctx.fillRect(this.x - this.width/2, this.y - this.height, this.width, this.height);
-            return;
+        // Помощь в отладке: пишем в консоль, какой именно ключ хромает
+        if (img && img.complete && img.naturalWidth === 0) {
+            console.warn(`Картинка по ключу "${this.imgKey}" битая! Проверь путь в AssetLoader.`);
         }
-
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-
-        // Рисуем саму статую
-        ctx.drawImage(
-            img,
-            this.x - this.width / 2, 
-            this.y - this.height,    
-            this.width,
-            this.height
-        );
-        
-        ctx.restore();
+        return;
     }
+
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+
+    ctx.drawImage(
+        img,
+        this.x - this.width / 2, 
+        this.y - this.height,    
+        this.width,
+        this.height
+    );
+    
+    ctx.restore();
+}
 }
