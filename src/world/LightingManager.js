@@ -80,7 +80,7 @@ export class LightingManager {
 ctx.save();
 // Вместо setTransform используем просто отрисовку поверх всего экрана
 // Если используешь камеру, убедись, что рисуешь в экранных координатах
-ctx.setTransform(1, 0, 0, 1, 0, 0); 
+//ctx.setTransform(1, 0, 0, 1, 0, 0); 
 ctx.drawImage(this.bufferCanvas, 0, 0, CONFIG.width, CONFIG.height);
 ctx.restore();
     }
