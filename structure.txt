@@ -203,10 +203,13 @@ C:.
     |   |   |       
     |   |   \---states
     |   +---mobs
+    |   |       DropManager.js
     |   |       GiantMob.js
     |   |       JungleSkeleton.js
     |   |       Mob.js
     |   |       MobManager.js
+    |   |       MobSpawner.js
+    |   |       ParticleManager.js
     |   |       SlimeMob.js
     |   |       
     |   +---npcs

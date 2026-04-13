@@ -1,3 +1,4 @@
+//Pointer.js
 import { merchant } from "../../entities/npcs/Merchant.js";
 import { MerchantUI } from "../../ui/screens/MerchantUI.js"; 
 import { cameraX, cameraY } from "../Braw.js"; 

@@ -60,12 +60,29 @@ export class ChestUI {
             if (slot) this.onSlotMouseDown(e, parseInt(slot.dataset.index));
         };
 
-        for (let i = 0; i < 15; i++) {
-            const slot = document.createElement('div');
-            slot.className = 'chest-slot';
-            slot.dataset.index = i;
-            this.gridElement.appendChild(slot);
-        }
+for (let i = 0; i < 15; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'chest-slot'; // Твой стиль для сундука
+    slot.dataset.index = i;
+
+    // ДОБАВЛЯЕМ СТРУКТУРУ ДЛЯ РЕНДЕРЕРА
+    const img = document.createElement('img');
+    img.className = 'slot-img';
+    img.style.display = 'none';
+
+    const countDiv = document.createElement('div');
+    countDiv.className = 'slot-count';
+
+    const timerDiv = document.createElement('div');
+    timerDiv.className = 'slot-timer';
+    timerDiv.style.display = 'none';
+
+    slot.appendChild(img);
+    slot.appendChild(countDiv);
+    slot.appendChild(timerDiv);
+
+    this.gridElement.appendChild(slot);
+}
 
         this.chestBox.append(title, this.gridElement);
         this.overlay.appendChild(this.chestBox);
@@ -185,32 +202,29 @@ close() {
 }
 
 refresh() {
-        if (!this.currentChest) return;
-        const slots = this.gridElement.children;
+    if (!this.currentChest) return;
+    const slots = this.gridElement.children;
 
-        for (let i = 0; i < 15; i++) {
-            const item = this.currentChest.slots[i];
-            const slotDiv = slots[i];
-            const isSelected = this.selectedIndex === i;
-            
-            const itemKey = item ? `${item.id}-${item.count}` : 'empty';
-            
-            // Если состояние не изменилось, ВООБЩЕ не трогаем DOM
-            if (slotDiv.dataset.itemKey === itemKey && slotDiv.dataset.selected === String(isSelected)) {
-                continue; 
-            }
-
-            slotDiv.dataset.itemKey = itemKey;
-            slotDiv.dataset.selected = isSelected;
-            
-            // Вместо innerHTML = "", очищаем только если нужно
-            slotDiv.textContent = ""; 
-            slotDiv.classList.toggle('selected', isSelected);
-
-            if (item) {
-                // Рендерим предмет только если он есть
-                this.inventoryUI.renderer.renderItemInSlot(slotDiv, item, false);
-            }
+    for (let i = 0; i < 15; i++) {
+        const item = this.currentChest.slots[i];
+        const slotDiv = slots[i];
+        const isSelected = this.selectedIndex === i;
+        
+        const itemKey = item ? `${item.id}-${item.count}` : 'empty';
+        
+        if (slotDiv.dataset.itemKey === itemKey && slotDiv.dataset.selected === String(isSelected)) {
+            continue; 
         }
+
+        slotDiv.dataset.itemKey = itemKey;
+        slotDiv.dataset.selected = isSelected;
+        
+        // УДАЛЯЕМ slotDiv.textContent = ""; — это ломает структуру!
+        slotDiv.classList.toggle('selected', isSelected);
+
+        // ВЫЗЫВАЕМ ПРАВИЛЬНЫЙ МЕТОД
+        // Аргументы: slotDiv, item, showTimer, index, isMainGrid
+        this.inventoryUI.renderer.updateSlotDOM(slotDiv, item, false, i, false);
     }
+}
 }

@@ -8,6 +8,7 @@ import { GrapplingHook } from "./tools/GrapplingHook.js";
 import { handleJump, updateMovement } from "./PlayerMovement.js";
 import { takeDamage, eatPotion, updateHealthAndAir } from "./PlayerHealth.js";
 import { updateVisuals } from "./PlayerVisuals.js";
+import { checkWallCollisions } from "./PlayerCollision.js";
 
 export const player = {
     // === ХАРАКТЕРИСТИКИ ===
@@ -26,10 +27,12 @@ export const player = {
     bubbleInstance: null, hook: null, hasHookInInventory: false,
     baseColor: "#3b52da", currentColor: "#02030c", color: "#192774",
 
-    // === ДЕЛЕГИРУЕМ МЕТОДЫ ===
+// === ДЕЛЕГИРУЕМ МЕТОДЫ ===
     takeDamage(amount) { takeDamage(this, amount); },
     jump() { handleJump(this); },
     eatPotion() { eatPotion(this); },
+    // ДОБАВЬ ЭТУ СТРОКУ:
+    checkWallCollisions(axis) { checkWallCollisions(this, axis); },
 
     spawn(startX = 100) {
         this.x = startX;
