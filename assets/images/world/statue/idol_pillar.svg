@@ -1,0 +1,31 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 32 64"
+    width="32"
+    height="64"
+>
+    <!-- Основание -->
+    <rect x="6" y="54" width="20" height="6" rx="2"
+          fill="#6a6a6a"/>
+
+    <!-- Основной столб -->
+    <rect x="8" y="4" width="16" height="50" rx="4"
+          fill="#8a8a8a"/>
+
+    <!-- Глаза -->
+    <circle cx="13" cy="18" r="2"
+            fill="#bdbdbd"/>
+    <circle cx="19" cy="18" r="2"
+            fill="#bdbdbd"/>
+
+    <!-- Лёгкие трещины -->
+    <path d="M14 26 L16 32 L15 38"
+          stroke="#707070"
+          stroke-width="1"
+          fill="none"/>
+
+    <path d="M18 30 L17 36 L19 42"
+          stroke="#707070"
+          stroke-width="1"
+          fill="none"/>
+</svg>

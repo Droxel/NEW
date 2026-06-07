@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 64" width="32" height="64">
+
+    <!-- Основание -->
+    <rect x="6" y="54" width="20" height="6" rx="2"
+          fill="#a8d8ff"/>
+
+    <!-- Столб -->
+    <rect x="8" y="4" width="16" height="50" rx="2"
+          fill="#cfeeff"/>
+
+    <!-- Глаза -->
+    <circle cx="13" cy="18" r="2" fill="#ffffff"/>
+    <circle cx="19" cy="18" r="2" fill="#ffffff"/>
+
+    <!-- Ледяные сколы -->
+    <path d="M10 28 L8 36 L11 44"
+          stroke="#9ccfe8"
+          stroke-width="1"
+          fill="none"/>
+
+    <path d="M22 26 L24 34 L21 42"
+          stroke="#9ccfe8"
+          stroke-width="1"
+          fill="none"/>
+
+</svg>

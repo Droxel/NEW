@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Единый контур для всего предмета -->
+  <path d="M32 50C20 40 14 32 14 24C14 18 19 13 25 13C28 13 31 15 32 17C33 15 36 13 39 13C45 13 50 18 50 24C50 32 44 40 32 50Z" 
+        stroke="#2A0000" stroke-width="4" stroke-linejoin="round" fill="#2A0000"/>
+
+  <!-- Основной цвет сердца -->
+  <path d="M32 46C22 37 17 30 17 24C17 20 20 16 25 16C27 16 30 17 32 20C34 17 37 16 39 16C44 16 47 20 47 24C47 30 42 37 32 46Z" 
+        fill="#FF3B3B"/>
+
+  <!-- Веточка с листиком (минималистично) -->
+  <path d="M32 16V8C32 8 38 6 42 8" stroke="#2A0000" stroke-width="4" stroke-linecap="round"/>
+  <path d="M32 16V8C32 8 38 6 42 8" stroke="#4E7A1E" stroke-width="2" stroke-linecap="round"/>
+  
+  <rect x="36" y="4" width="8" height="4" rx="2" fill="#2A0000"/>
+  <rect x="37" y="5" width="6" height="2" rx="1" fill="#8DA317"/>
+
+  <!-- Мягкий блик на сердце -->
+  <rect x="20" y="19" width="5" height="3" rx="1.5" fill="white" opacity="0.3"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Внешняя обводка (темная) -->
+  <path d="M6 26C6 22 10 20 12 18C12 14 15 10 16 8C17 10 20 14 20 18C22 20 26 22 26 26H6Z" 
+        fill="#3D2410" stroke="#3D2410" stroke-width="2" stroke-linejoin="round"/>
+  
+  <!-- Основное тело (светлее) -->
+  <path d="M8 25C8 22 11 21 13 19C13 16 15 12 16 10C17 12 19 16 19 19C21 21 24 22 24 25H8Z" 
+        fill="#7A431D"/>
+
+  <!-- Небольшой блик для мягкости -->
+  <rect x="13" y="19" width="2" height="2" rx="1" fill="#8B5A2B"/>
+</svg>

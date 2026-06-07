@@ -1,0 +1,32 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 64 64"
+    width="64"
+    height="64"
+>
+    <!-- Тело рюкзака -->
+    <rect x="14" y="14" width="36" height="40" rx="8" ry="8"
+          fill="#8B5A2B" stroke="#4E2E16" stroke-width="2"/>
+
+    <!-- Верхний карман -->
+    <rect x="18" y="18" width="28" height="14" rx="6" ry="6"
+          fill="#A97142" stroke="#4E2E16" stroke-width="1.5"/>
+
+    <!-- Нижний карман -->
+    <rect x="20" y="36" width="24" height="12" rx="4" ry="4"
+          fill="#A97142" stroke="#4E2E16" stroke-width="1.5"/>
+
+    <!-- Молния -->
+    <line x1="32" y1="18" x2="32" y2="32"
+          stroke="#E6D3A3" stroke-width="2"/>
+
+    <!-- Лямки -->
+    <path d="M14 22 C8 28, 8 40, 14 46"
+          fill="none" stroke="#4E2E16" stroke-width="3"/>
+    <path d="M50 22 C56 28, 56 40, 50 46"
+          fill="none" stroke="#4E2E16" stroke-width="3"/>
+
+    <!-- Петля сверху -->
+    <path d="M26 14 C28 8, 36 8, 38 14"
+          fill="none" stroke="#4E2E16" stroke-width="3"/>
+</svg>

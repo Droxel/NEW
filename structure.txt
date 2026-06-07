@@ -1,0 +1,415 @@
+Структура папок
+Серийный номер тома: 389B-D8B9
+C:.
+|   cordova.js
+|   cordova_plugins.js
+|   giant_test.html
+|   index.html
+|   service-worker.js
+|   structure.txt
+|   style.css
+|   version.json
+|   
++---assets
+|   +---audio
+|   |   +---music
+|   |   |       ambient.mp3
+|   |   |       CHudesenka_-_Ladoshki_76625190.mp3
+|   |   |       danjunglei.mp3
+|   |   |       desert_boss.mp3
+|   |   |       evil.mp3
+|   |   |       forest_boss.mp3
+|   |   |       ice_boss.mp3
+|   |   |       junglm_boss.mp3
+|   |   |       kraken.mp3
+|   |   |       ship.mp3
+|   |   |       skeleton_boss.mp3
+|   |   |       
+|   |   \---sfx
+|   |       +---boss
+|   |       |   +---ice_boss
+|   |       |   |       crunch.wav
+|   |       |   |       crunch2.wav
+|   |       |   |       crystal_broken.wav
+|   |       |   |       fallen_stone.wav
+|   |       |   |       shot.wav
+|   |       |   |       
+|   |       |   \---kreken
+|   |       |           rev_cracken.mp3
+|   |       |           
+|   |       +---giants
+|   |       |       breath.mp3
+|   |       |       hit.mp3
+|   |       |       step.mp3
+|   |       |       worth.mp3
+|   |       |       
+|   |       +---mob
+|   |       |       meow.wav
+|   |       |       purring-cat.wav
+|   |       |       
+|   |       +---residents
+|   |       |       no-3-v.mp3
+|   |       |       rozgovor1.mp3
+|   |       |       rozgovor2.mp3
+|   |       |       
+|   |       +---strikes
+|   |       |       buzzing.wav
+|   |       |       gas.wav
+|   |       |       hit.wav
+|   |       |       portal.wav
+|   |       |       roar.wav
+|   |       |       shot.wav
+|   |       |       vortex.wav
+|   |       |       wave.wav
+|   |       |       
+|   |       \---world
+|   |           |   Earthquake.wav
+|   |           |   
+|   |           +---ocean
+|   |           |       inflations.wav
+|   |           |       splash1.wav
+|   |           |       splash2.wav
+|   |           |       splash3.wav
+|   |           |       splash4.wav
+|   |           |       underwater-sounds-2.wav
+|   |           |       underwater.wav
+|   |           |       waves.wav
+|   |           |       waves_sand.wav
+|   |           |       
+|   |           +---ship
+|   |           |       roar.wav
+|   |           |       tree_cracking.wav
+|   |           |       
+|   |           \---sky
+|   |                   thunder_1.mp3
+|   |                   thunder_2.mp3
+|   |                   
+|   \---images
+|       +---biomes
+|       |       desert.png
+|       |       forest.png
+|       |       jungles.png
+|       |       Mountains.png
+|       |       ocean.png
+|       |       village.png
+|       |       winter.png
+|       |       
+|       +---entities
+|       |   +---bosses
+|       |   |   |   arm_skeleton.png
+|       |   |   |   Desertt.png
+|       |   |   |   jungles.png
+|       |   |   |   kyk.png
+|       |   |   |   re.png
+|       |   |   |   skeleton.png
+|       |   |   |   skeleton_minion.png
+|       |   |   |   
+|       |   |   \---ice_boss
+|       |   |           crystal_boss.png
+|       |   |           ice_block.png
+|       |   |           icicle.png
+|       |   |           Icy_boss.png
+|       |   |           Icy_boss2.png
+|       |   |           protection_crystal.png
+|       |   |           
+|       |   +---mobs
+|       |   |   |   arm_giant.png
+|       |   |   |   body_giant.png
+|       |   |   |   fist.png
+|       |   |   |   guard.png
+|       |   |   |   head_giant.png
+|       |   |   |   skeletjungey.png
+|       |   |   |   
+|       |   |   +---kraken
+|       |   |   |       golova_krakin.png
+|       |   |   |       tentacles1.png
+|       |   |   |       tentacles10.png
+|       |   |   |       tentacles2.png
+|       |   |   |       tentacles3.png
+|       |   |   |       tentacles4.png
+|       |   |   |       tentacles5.png
+|       |   |   |       tentacles6.png
+|       |   |   |       tentacles7.png
+|       |   |   |       tentacles8.png
+|       |   |   |       tentacles9.png
+|       |   |   |       
+|       |   |   \---ocean
+|       |   |           clownfish.png
+|       |   |           dory_cabin.png
+|       |   |           fugu_fish.png
+|       |   |           fugu_fish2.png
+|       |   |           miduza1.png
+|       |   |           miduza2.png
+|       |   |           
+|       |   \---pets
+|       |           ghost.png
+|       |           
+|       +---items
+|       |       Amulet of regeneration.svg
+|       |       book.svg
+|       |       broken sword.svg
+|       |       bubble.svg
+|       |       bubble_pitomets.svg
+|       |       core_desert.svg
+|       |       core_forest.svg
+|       |       core_jungles.svg
+|       |       crystal.png
+|       |       desert_knife.svg
+|       |       essence.svg
+|       |       fang_jungles.svg
+|       |       fruit of life.svg
+|       |       hand_staff.svg
+|       |       hook.svg
+|       |       mace.svg
+|       |       poo.svg
+|       |       ring.svg
+|       |       rope.svg
+|       |       stone.svg
+|       |       threads.svg
+|       |       wooden_mallet.svg
+|       |       xp.svg
+|       |       
+|       +---mod
+|       |       fennec.png
+|       |       
+|       +---ui
+|       |       cam.svg
+|       |       fon_menu.png
+|       |       
+|       \---world
+|           |   bush of life.svg
+|           |   
+|           +---altars
+|           |       a_desert.svg
+|           |       a_forest.svg
+|           |       a_glazed.svg
+|           |       a_jungli.svg
+|           |       
+|           +---chests
+|           |       chestopen.svg
+|           |       chestunopened.svg
+|           |       jungle_chest_closed.svg
+|           |       jungle_chest_locked.svg
+|           |       jungle_chest_open.svg
+|           |       
+|           +---ocean
+|           |       seaweed1.png
+|           |       seaweed2.png
+|           |       seaweed3.png
+|           |       
+|           +---ship
+|           |       cabin.png
+|           |       cursed_crystal.png
+|           |       deck.png
+|           |       mast.png
+|           |       sideboard.png
+|           |       
+|           +---statue
+|           |       idol_desert.svg
+|           |       idol_ice.svg
+|           |       idol_jungle.svg
+|           |       idol_pillar.svg
+|           |       
+|           +---trees
+|           |       distorted_tree.svg
+|           |       tree1.svg
+|           |       tree2.svg
+|           |       tree3.svg
+|           |       tree4.svg
+|           |       tree5.svg
+|           |       tree6.svg
+|           |       
+|           \---village
+|                   consoles.svg
+|                   fire.svg
+|                   flowerbed.svg
+|                   flower_pots.svg
+|                   fountain.svg
+|                   house.svg
+|                   house_2.svg
+|                   house_3.svg
+|                   house_4.svg
+|                   kuznya.svg
+|                   tower.svg
+|                   trading_tent.svg
+|                   
+\---src
+    |   main.js
+    |   
+    +---core
+    |   |   AssetLoader.js
+    |   |   AudioManager.js
+    |   |   Braw.js
+    |   |   DebugCommands.js
+    |   |   GameState.js
+    |   |   InputManager.js
+    |   |   MusicController.js
+    |   |   RitualManager.js
+    |   |   SaveManager.js
+    |   |   Time.js
+    |   |   
+    |   \---input
+    |           InputState.js
+    |           Keyboard.js
+    |           Mobile.js
+    |           Pointer.js
+    |           
+    +---data
+    |       config.js
+    |       lootConfig.js
+    |       OceanSpawnConfig.js
+    |       progression.js
+    |       spawnConfig.js
+    |       statueConfigs.js
+    |       structureBlueprints.js
+    |       villageBlueprints.js
+    |       
+    +---entities
+    |   +---bosses
+    |   |   |   Boss.js
+    |   |   |   BossManager.js
+    |   |   |   CubeBoss.js
+    |   |   |   DesertBoss.js
+    |   |   |   IceBoss.js
+    |   |   |   JungleBoss.js
+    |   |   |   JungleMinion.js
+    |   |   |   SkeletonBoss.js
+    |   |   |   SkeletonMinion.js
+    |   |   |   
+    |   |   +---ice_boss
+    |   |   |       BossCrystals.js
+    |   |   |       IceBoss.js
+    |   |   |       IceBossAttacks.js
+    |   |   |       IceBossRenderer.js
+    |   |   |       IceProjectiles.js
+    |   |   |       
+    |   |   +---kraken
+    |   |   |       Kraken.js
+    |   |   |       KrakenManager.js
+    |   |   |       KrakenRenderer.js
+    |   |   |       KrakenTrigger.js
+    |   |   |       
+    |   |   \---skeleton
+    |   |           SkeletonAttacks.js
+    |   |           SkeletonProjectiles.js
+    |   |           SkeletonRenderer.js
+    |   |           
+    |   +---mobs
+    |   |   |   DropManager.js
+    |   |   |   GiantMob.js
+    |   |   |   JungleSkeleton.js
+    |   |   |   Mob.js
+    |   |   |   MobManager.js
+    |   |   |   MobSpawner.js
+    |   |   |   ParticleManager.js
+    |   |   |   SlimeMob.js
+    |   |   |   
+    |   |   \---ocean
+    |   |           BaseSeaCreature.js
+    |   |           Fish.js
+    |   |           Jellyfish.js
+    |   |           OceanCreatureManager.js
+    |   |           Pufferfish.js
+    |   |           
+    |   +---npcs
+    |   |   |   GlassesMerchant.js
+    |   |   |   Merchant.js
+    |   |   |   NPC.js
+    |   |   |   
+    |   |   \---residents
+    |   |           Resident.js
+    |   |           ResidentManager.js
+    |   |           
+    |   +---pets
+    |   |       GhostPet.js
+    |   |       PetEquipment.js
+    |   |       PetManager.js
+    |   |       RockPet.js
+    |   |       
+    |   +---player
+    |   |   |   Inventory.js
+    |   |   |   Player.js
+    |   |   |   PlayerCollision.js
+    |   |   |   PlayerHealth.js
+    |   |   |   PlayerMovement.js
+    |   |   |   PlayerVisuals.js
+    |   |   |   
+    |   |   \---tools
+    |   |           BiomeWeaponItem.js
+    |   |           Bubble.js
+    |   |           GrapplingHook.js
+    |   |           
+    |   +---ship
+    |   |       CursedShip.js
+    |   |       
+    |   \---weapons
+    |           BiomeWeapon.js
+    |           DesertWeapon.js
+    |           ForestWeapon.js
+    |           JungleWeapon.js
+    |           
+    +---ui
+    |   |   UIManager.js
+    |   |   
+    |   +---components
+    |   |       ZoomUI.js
+    |   |       
+    |   \---screens
+    |       |   ChestUI.js
+    |       |   GameOver.js
+    |       |   InventoryUI.js
+    |       |   MainMenu.js
+    |       |   MerchantUI.js
+    |       |   Settings.js
+    |       |   
+    |       \---inventory
+    |               InventoryEvents.js
+    |               InventoryRenderer.js
+    |               
+    \---world
+        |   CorruptionManager.js
+        |   LightingManager.js
+        |   Ocean.js
+        |   Seed.js
+        |   Water.js
+        |   World.js
+        |   
+        +---chunk
+        |       Chunk.js
+        |       ChunkManager.js
+        |       
+        +---objects
+        |       Altar.js
+        |       BossDecorations.js
+        |       Chest.js
+        |       ChestManager.js
+        |       DroppedItem.js
+        |       JungleChest.js
+        |       JungleGuard.js
+        |       JungleSeal.js
+        |       LifeBush.js
+        |       LifeBushManager.js
+        |       Statue.js
+        |       
+        +---sky
+        |       BackgroundManager.js
+        |       Cloud.js
+        |       Sky.js
+        |       Weather.js
+        |       
+        +---structures
+        |   |   DungeonGenerator.js
+        |   |   StructureManager.js
+        |   |   VillageGenerator.js
+        |   |   
+        |   +---dungeon
+        |   |       DungeonCarver.js
+        |   |       DungeonPieces.js
+        |   |       
+        |   \---village
+        |           VillageAssembler.js
+        |           
+        \---terrain
+                BiomeMap.js
+                Height.js
+                

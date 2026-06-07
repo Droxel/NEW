@@ -1,0 +1,50 @@
+<svg width="120" height="160" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Сухой, ломаный ствол -->
+  <path d="
+    M60 150
+    L55 130
+    L62 115
+    L50 95
+    L65 80
+    L55 60
+    L63 45
+    L58 25
+  "
+  stroke="#2b1f1f"
+  stroke-width="6"
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"/>
+
+  <!-- Ломаные ветки -->
+  <path d="M62 115 L80 105 L75 95" stroke="#2b1f1f" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M50 95 L35 85 L40 75" stroke="#2b1f1f" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M63 60 L80 50 L78 40" stroke="#2b1f1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M55 60 L40 50 L42 40" stroke="#2b1f1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Сухая, редкая крона -->
+  <path d="
+    M60 25
+    L50 35
+    L55 45
+    L45 50
+    L55 60
+    L70 55
+    L80 50
+    L75 40
+    L65 35
+    Z
+  "
+  fill="#4a2f5a"
+  opacity="0.8"/>
+
+  <!-- Пятна порчи (более резкие) -->
+  <circle cx="52" cy="48" r="3" fill="#7a4a8a"/>
+  <circle cx="68" cy="52" r="3" fill="#7a4a8a"/>
+
+  <!-- Трещины (больше и агрессивнее) -->
+  <path d="M58 130 L62 120 L57 110 L61 100" stroke="#1a0f1f" stroke-width="2"/>
+  <path d="M55 90 L60 80 L56 70" stroke="#1a0f1f" stroke-width="2"/>
+
+</svg>

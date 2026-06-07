@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="7 24 50 33" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ограждение -->
+  <rect x="8" y="44" width="48" height="12" rx="1" fill="#5d4037" stroke="#3e2723" stroke-width="2"/>
+  
+  <!-- Земля -->
+  <rect x="12" y="40" width="40" height="8" fill="#4e342e"/>
+  
+  <!-- Красный цветок -->
+  <rect x="18" y="32" width="4" height="8" fill="#2e7d32"/>
+  <rect x="16" y="28" width="8" height="6" fill="#f44336"/>
+  
+  <!-- Желтый цветок -->
+  <rect x="32" y="28" width="4" height="12" fill="#2e7d32"/>
+  <rect x="30" y="24" width="8" height="6" fill="#fdd835"/>
+  
+  <!-- Розовый цветок -->
+  <rect x="44" y="34" width="4" height="6" fill="#2e7d32"/>
+  <rect x="42" y="30" width="8" height="6" fill="#f06292"/>
+</svg>

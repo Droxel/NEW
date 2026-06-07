@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Игра</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="loading-screen">
+    <h2 id="loader-title">Загрузка игры...</h2>
+    <div class="loader-bar-container">
+      <div id="loader-fill"></div>
+    </div>
+    <div id="status-message" class="status-text">Проверка ресурсов...</div>
+  </div>
+
+  <div id="main-menu" class="hidden">
+    <div class="menu-content" id="menu-main">
+        <h1 style="color: white; margin-bottom: 30px; letter-spacing: 2px;">Kyb</h1>
+        <button id="btn-play" class="menu-btn">ВЫБРАТЬ МИР</button>
+        <button id="btn-create-menu" class="menu-btn">СОЗДАТЬ МИР</button>
+<button id="btn-settings" class="menu-btn">НАСТРОЙКИ</button>    </div>
+<div class="menu-content hidden" id="menu-settings">
+        <h2 style="color: white;">Настройки графики</h2>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <button id="res-ultra-low" class="menu-btn" style="font-size: 14px; background: #8e44ad;">УЛЬТРА НИЗКОЕ (0.25x)</button>
+            
+            <button id="res-low" class="menu-btn" style="font-size: 14px;">НИЗКОЕ (0.5x)</button>
+            <button id="res-mid" class="menu-btn" style="font-size: 14px;">СРЕДНЕЕ (0.8x)</button>
+            <button id="res-normal" class="menu-btn" style="font-size: 14px;">ОБЫЧНОЕ (1.0x)</button>
+        </div>
+        <button id="btn-settings-back" class="menu-btn" style="background: #e74c3c;">НАЗАД</button>
+    </div>
+    <div class="menu-content hidden" id="menu-select-world">
+        <h2 style="color: white;">Выбор мира</h2>
+        <div id="worlds-list" style="max-height: 200px; overflow-y: auto; color: white; margin-bottom: 15px;"></div>
+        <button id="btn-back-from-select" class="menu-btn" style="background: #e74c3c;">НАЗАД</button>
+    </div>
+
+    <div class="menu-content hidden" id="menu-create-world">
+        <h2 style="color: white;">Новый мир</h2>
+        <div style="display: flex; gap: 10px; align-items: center; justify-content: center; margin-bottom: 15px;">
+             <input type="text" id="input-world-name" placeholder="Название мира" class="menu-input">
+        </div>
+        <input type="number" id="input-world-seed" placeholder="Сид" class="menu-input" style="margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px;">
+            <button id="btn-create-confirm" class="menu-btn">СОЗДАТЬ</button>
+            <button id="btn-back-from-create" class="menu-btn" style="background: #e74c3c;">ОТМЕНА</button>
+        </div>
+    </div>
+  </div>
+</div> <div id="game-over-screen" style="
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(138, 3, 3, 0.8); 
+      color: white; 
+      display: none; /* Важно: через JS будем менять на flex */
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 99999;">
+      <h1 style="font-size: 60px; text-shadow: 2px 2px 10px black;">ВЫ ПОГИБЛИ</h1>
+      <button id="btn-respawn" class="menu-btn" style="background: #27ae60; margin-bottom: 10px;">ВОЗРОДИТЬСЯ</button>
+      <button id="btn-to-menu" class="menu-btn" style="background: #e74c3c;">В МЕНЮ</button>
+  </div>
+
+  <div class="game-wrapper">
+  <div class="game-wrapper">
+      <div class="game-box">
+          <canvas id="game"></canvas>
+          
+<div id="player-stats-container">
+    <div id="health-ui"></div>
+    <div id="air-ui"></div>
+</div>
+<div id="zoom-ui" class="zoom-ui-container">
+    <div id="zoom-out" class="zoom-btn">-</div>
+    <input type="range" id="zoom-slider" class="zoom-slider" min="0.8" max="1.2" step="0.01" value="1.0">
+    <div id="zoom-in" class="zoom-btn">+</div>
+</div>
+          <div class="controls" id="game-controls" style="display: none;">
+              <div class="move">
+                  <button id="left">◀</button>
+                  <button id="right">▶</button>
+              </div>
+              <div class="actions">
+                  <button id="heal-btn" class="inactive">🧪</button>
+                  <button id="jump">▲</button>
+              </div>
+          </div>
+          
+          <div id="hook-joystick-container" style="position: fixed; bottom: 160px; right: 30px; width: 120px; height: 120px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; touch-action: none; z-index: 1000; display: none;">
+    <div id="hook-joystick-stick" style="position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; background: #5c3a21; border: 2px solid #fff; border-radius: 50%; pointer-events: none;"></div>
+</div>
+      </div>
+  </div>
+
+<script type="module">
+      import { MainMenu } from './src/ui/screens/MainMenu.js';
+      import { Settings } from './src/ui/screens/Settings.js'; // Добавь этот импорт
+      import { SaveManager } from './src/core/SaveManager.js'; // И этот
+
+      const fill = document.getElementById('loader-fill');
+      const status = document.getElementById('status-message');
+
+      // --- СИСТЕМА ОБНОВЛЕНИЙ И ОФФЛАЙНА ---
+      async function checkUpdateAndRegisterSW() {
+          if ('serviceWorker' in navigator) {
+              try {
+                  // 1. Проверяем новую версию на сервере (добавляем ?t=..., чтобы обойти кэш браузера)
+                  const response = await fetch('./version.json?t=' + new Date().getTime());
+                  const serverData = await response.json();
+                  const localVersion = localStorage.getItem('game_version');
+
+                  // 2. Если версия обновилась
+                  if (localVersion && localVersion !== serverData.version) {
+                      console.log(`🚀 Доступно обновление: ${localVersion} -> ${serverData.version}`);
+                      
+                      // Чистим старые кэши
+                      const cacheNames = await caches.keys();
+                      await Promise.all(cacheNames.map(name => caches.delete(name)));
+                      
+                      // Удаляем старый Service Worker
+                      const registrations = await navigator.serviceWorker.getRegistrations();
+                      for (let reg of registrations) {
+                          await reg.unregister();
+                      }
+
+                      // Сохраняем новую версию и перезагружаем страницу
+                      localStorage.setItem('game_version', serverData.version);
+                      window.location.reload(true);
+                      return; // Прерываем текущий запуск, ждем перезагрузки
+                  }
+
+                  // Если это первый заход - просто сохраняем версию
+                  if (!localVersion) {
+                      localStorage.setItem('game_version', serverData.version);
+                  }
+
+                  // 3. Регистрируем Service Worker для оффлайна
+                  await navigator.serviceWorker.register('./service-worker.js');
+                  console.log('✅ Оффлайн-режим активирован');
+
+              } catch (error) {
+                  console.log('📶 Нет интернета. Запускаем оффлайн версию.');
+              }
+          }
+      }
+
+      // --- ЗАПУСК ИГРЫ ---
+      async function initGame() {
+          if(status) status.innerText = "Проверка обновлений...";
+          
+          // Сначала проверяем обновления и подрубаем оффлайн
+          await checkUpdateAndRegisterSW();
+
+          if(fill) fill.style.width = "100%";
+          if(status) status.innerText = "Запуск...";
+
+setTimeout(() => {
+              const loadingScreen = document.getElementById('loading-screen');
+              if(loadingScreen) loadingScreen.classList.add('hidden');
+              
+              // 1. Создаем функцию изменения размера (ее можно вынести в window для доступа из настроек)
+window.applyResolution = () => {
+    // Просто вызываем функцию из основного модуля или повторяем логику
+    // Но лучше всего — если resize доступен глобально
+    if (typeof resize === 'function') {
+        resize();
+    } else {
+        // Если main.js еще не загружен, просто обновим физику холста
+        const canvas = document.getElementById("game");
+        const settings = SaveManager.getSettings();
+        const scale = settings.resolution || 1.0;
+        canvas.width = window.innerWidth * scale;
+        canvas.height = window.innerHeight * scale;
+    }
+};
+
+              // 2. Инициализируем настройки
+              const settingsUI = new Settings(
+                  () => menu.showMain(),      // Назад в главное меню
+                  () => window.applyResolution() // Применить масштаб
+              );
+
+              const menu = new MainMenu(() => {
+                  // Логика кнопки "Играть"
+                  const controls = document.getElementById('game-controls');
+                  if (controls) controls.style.display = 'flex';
+                  
+                  window.applyResolution(); // Применяем разрешение при старте
+
+                  if (window.startGame) {
+                      window.startGame();
+                  } else {
+                      import('./src/main.js').then(m => {
+                          if(window.startGame) window.startGame();
+                      });
+                  }
+              });
+
+              menu.show();
+          }, 800);
+      }
+      
+      initGame();
+</script>
+</body>
+</html>

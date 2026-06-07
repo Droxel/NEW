@@ -1,0 +1,32 @@
+<svg class="weapon-svg" width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="rubyGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+    </defs>
+    <g transform="rotate(45 60 60)">
+        <!-- Рукоятка -->
+        <rect x="54" y="80" width="12" height="25" fill="#1F1A17"/>
+        
+        <!-- Золотые кольца на рукоятке -->
+        <rect x="53" y="80" width="14" height="4" fill="#D4AF37"/>
+        <rect x="53" y="101" width="14" height="4" fill="#D4AF37"/>
+        
+        <!-- Большой рубин на навершии -->
+        <circle cx="60" cy="110" r="7" fill="#8B0000"/>
+        <polygon points="60,105 65,110 60,115 55,110" fill="#E32636"/>
+        <polygon points="58,107 60,105 62,107 60,109" fill="#FFC0CB"/> <!-- Блик рубина -->
+        
+        <!-- Золотая гарда -->
+        <path d="M 35 80 Q 60 85 85 80 Q 75 75 60 78 Q 45 75 35 80 Z" fill="#DAA520"/>
+        
+        <!-- Лезвие (неровное, как из песчаника или кости) -->
+        <path d="M 52 78 L 54 60 L 50 45 L 55 30 L 60 10 L 65 30 L 70 45 L 66 60 L 68 78 Z" fill="#E5C07B"/>
+        <path d="M 60 10 L 65 30 L 70 45 L 66 60 L 68 78 L 60 78 Z" fill="#D19A66"/> <!-- Тень на правой половине лезвия -->
+        <path d="M 60 10 L 60 78" stroke="#F5D08B" stroke-width="1"/> <!-- Центральная грань -->
+        
+        <!-- Маленький светящийся рубинчик в центре гарды -->
+        <circle cx="60" cy="79" r="3.5" fill="#E32636" filter="url(#rubyGlow)"/>
+    </g>
+</svg>

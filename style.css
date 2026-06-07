@@ -1,0 +1,532 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Запрещаем скролл вообще */
+  background: #000; /* Черный фон для "ушей" если экран слишком длинный */
+  user-select: none; /* Чтобы текст не выделялся при нажатиях */
+  -webkit-tap-highlight-color: transparent; /* Убираем синюю рамку при клике в Android */
+}
+
+/* =========================================
+   1. МЕНЮ И ЭКРАН ЗАГРУЗКИ
+   ========================================= */
+#loading-screen {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: url('assets/images/ui/fon_menu.png') no-repeat center center;
+  background-size: cover;
+  color: white;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 10000; font-family: sans-serif;
+  text-shadow: 2px 2px 4px #000;
+}
+#loading-screen::before {
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7); z-index: -1;
+}
+.loader-bar-container {
+  width: 300px; height: 12px; background: rgba(0,0,0,0.5);
+  border-radius: 6px; margin-top: 20px; overflow: hidden;
+  border: 2px solid #5c3a21;
+}
+#loader-fill { 
+  width: 0%; height: 100%; background: #4CAF50; 
+  transition: width 0.3s; 
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.8); 
+}
+.status-text { margin-top: 10px; font-size: 14px; color: #ccc; }
+
+#main-menu {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: url('assets/images/ui/fon_menu.png') no-repeat center center;
+  background-size: cover;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9000; font-family: sans-serif;
+}
+#main-menu::before {
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.3); z-index: -1;
+}
+
+.menu-content {
+  display: flex; flex-direction: column; gap: 15px;
+  background: rgba(20, 20, 20, 0.85); padding: 40px; border-radius: 15px;
+  border: 2px solid #5c3a21; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  text-align: center; width: 340px; max-width: 90vw;
+}
+
+.menu-btn {
+  padding: 12px 20px; font-size: 18px; cursor: pointer;
+  background-color: #4CAF50; color: white; border: 2px solid rgba(0,0,0,0.3); border-radius: 8px;
+  transition: all 0.2s ease; font-weight: bold; text-transform: uppercase;
+  text-shadow: 1px 1px 2px #000; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+}
+.menu-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.15); box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.4); }
+.menu-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: inset 0 2px 0 rgba(0,0,0,0.2); }
+.menu-btn:disabled { background-color: #555; border-color: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+
+.menu-input {
+  padding: 12px; font-size: 16px; border-radius: 8px;
+  border: 2px solid #5c3a21; outline: none; width: 100%; box-sizing: border-box;
+  background: rgba(0,0,0,0.6); color: white; text-align: center;
+  transition: border-color 0.2s;
+}
+.menu-input::placeholder { color: #888; }
+.menu-input:focus { border-color: #4CAF50; }
+
+#worlds-list::-webkit-scrollbar { width: 8px; }
+#worlds-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 4px; }
+#worlds-list::-webkit-scrollbar-thumb { background: #5c3a21; border-radius: 4px; }
+#worlds-list::-webkit-scrollbar-thumb:hover { background: #7a4f2f; }
+
+.hidden { display: none !important; }
+
+/* =========================================
+   2. ОСНОВНАЯ ИГРА И ИНТЕРФЕЙС
+   ========================================= */
+.game-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.game-box {
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  border: none;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Кнопки управления ПОВЕРХ игры */
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0 40px;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.controls button {
+  pointer-events: auto;
+  opacity: 0.7;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  background: #444;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.move { display: flex; gap: 15px; pointer-events: none; }
+#left, #right { width: 90px; height: 90px; font-size: 35px; }
+
+.actions { display: flex; gap: 15px; align-items: flex-end; pointer-events: none; }
+#jump { width: 100px; height: 100px; font-size: 40px; margin-bottom: 20px; }
+
+#heal-btn {
+  width: 60px; height: 60px; font-size: 24px;
+  transition: opacity 0.2s, filter 0.2s;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+#heal-btn.inactive { opacity: 0.5; filter: grayscale(100%); }
+
+.controls button:active { background-color: #666; transform: scale(0.95); }
+
+/* =========================================
+   3. ЭФФЕКТЫ И ЭКРАН СМЕРТИ
+   ========================================= */
+.game-box.shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-2px, 0, 0); }
+  40%, 60% { transform: translate3d(2px, 0, 0); }
+}
+
+#game-over-screen {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 0, 0, 0.4); display: none;
+  justify-content: center; align-items: center;
+  z-index: 100; backdrop-filter: blur(2px);
+}
+.over-content { text-align: center; color: white; }
+.over-content h1 { font-size: 40px; margin-bottom: 20px; text-shadow: 2px 2px 5px black; }
+.over-content button {
+  padding: 15px 30px; font-size: 20px; cursor: pointer;
+  background: white; border: none; border-radius: 10px;
+  font-weight: bold; transition: 0.2s;
+}
+.over-content button:hover { transform: scale(1.1); background: #eee; }
+
+/* =========================================
+   4. ИНВЕНТАРЬ
+   ========================================= */
+.inventory-toggle { position: absolute; top: 10px; left: 10px; width: 36px; height: 36px; cursor: pointer; z-index: 20; }
+.inventory-toggle img { width: 100%; height: 100%; display: block; pointer-events: none; }
+
+.inventory-overlay {
+  display: none; flex-direction: row; align-items: flex-start;
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  padding: 15px; gap: 20px; background: rgba(0,0,0,0.85); 
+  border-radius: 10px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.inventory-overlay.active { display: flex; }
+
+.grid { display: grid; gap: 6px; margin: 0 auto; }
+.main-grid { grid-template-columns: repeat(5, 32px); }
+.accessory-grid { grid-template-columns: repeat(3, 32px); }
+.currency-grid { grid-template-columns: repeat(1, 32px); }
+
+.slot {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    user-select: none;
+    touch-action: none;
+
+    /* Оптимизация отрисовки */
+    will-change: background, border-color, transform; 
+    transform: translateZ(0); /* Включает аппаратное ускорение (GPU) */
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+/* Эффект наведения — теперь работает на уровне системы, не нагружая JS */
+.slot:hover {
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05); /* Легкое увеличение для сочности */
+    z-index: 2; /* Чтобы увеличенный слот был поверх соседей */
+}
+
+/* Выбранный слот */
+.slot.selected {
+    border-color: #ffeb3b !important;
+    background: rgba(255, 235, 59, 0.15) !important;
+    box-shadow: 0 0 12px rgba(255, 235, 59, 0.4), inset 0 0 5px rgba(255, 235, 59, 0.2);
+}
+
+/* Оптимизация картинок внутри слотов */
+.slot img {
+    width: 75%;
+    height: 75%;
+    object-fit: contain;
+    pointer-events: none;
+    image-rendering: pixelated; /* Сохраняем четкость пиксель-арта */
+}
+.inventory-overlay h3 {
+  margin: 0 0 8px 0; font-size: 12px; color: rgba(255,255,255,0.8);
+  text-align: center; font-weight: normal; text-transform: uppercase; 
+  letter-spacing: 1px; white-space: nowrap;
+}
+
+#hotbar {
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 5px; padding: 5px; background: rgba(0,0,0,0.4);
+  border-radius: 8px; z-index: 10;
+}
+
+.item-tooltip {
+  position: fixed; background: rgba(0, 0, 0, 0.9); color: white;
+  padding: 8px 12px; border: 1px solid #555; border-radius: 4px;
+  font-family: sans-serif; font-size: 12px; pointer-events: none; 
+  z-index: 2000; display: none; max-width: 200px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.item-tooltip b { display: block; color: #ffd700; margin-bottom: 4px; text-transform: uppercase; }
+.item-tooltip i { color: #aaa; }
+
+.inventory-actions {
+  display: flex; flex-direction: column; gap: 10px; padding: 10px;
+  background: rgba(0, 0, 0, 0.3); border-radius: 8px; margin-right: 15px;
+}
+.use-btn {
+  width: 60px; height: 60px; background: #4a4a4a; border: 2px solid #222;
+  border-radius: 8px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: all 0.2s; opacity: 0.5; filter: grayscale(1);
+}
+.use-btn.active { opacity: 1; filter: none; background: #5cb85c; border-color: #fff; box-shadow: 0 0 10px rgba(92, 184, 92, 0.6); }
+.use-btn img { width: 80%; height: 80%; }
+
+/* =========================================
+   5. ПОКАЗАТЕЛИ ИГРОКА (ХП И ВОЗДУХ)
+   ========================================= */
+
+/* Общий контейнер */
+#player-stats-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column-reverse; /* Воздух будет сверху */
+    align-items: flex-end;
+    gap: 3px; /* Большой отступ, чтобы ХП не наезжали на пузырьки */
+    z-index: 100;
+    pointer-events: none;
+}
+
+#health-ui {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 260px;
+    /* 2px — расстояние между рядами (сделай меньше, если нужно еще плотнее) */
+    /* 6px — расстояние между сердечками в одном ряду */
+    gap: 2px 6px; 
+}
+
+/* Сами сердечки */
+.heart {
+    width: 20px; 
+    height: 20px; 
+    background-color: #ff3333;
+    transform: rotate(45deg); 
+    position: relative; 
+    transition: all 0.2s;
+    box-shadow: -1px 1px 2px rgba(0,0,0,0.5);
+
+    /* ОТРИЦАТЕЛЬНЫЙ ОТСТУП СВЕРХУ */
+    /* Чем больше это число, тем сильнее ряды будут накладываться друг на друга */
+    margin-top: -5px; 
+}
+.heart::before, .heart::after {
+    content: ""; width: 20px; height: 20px; background-color: #ff3333;
+    border-radius: 50%; position: absolute;
+}
+.heart::before { top: -10px; left: 0; }
+.heart::after { top: 0; left: -10px; }
+.heart.empty, .heart.empty::before, .heart.empty::after { background-color: #444; }
+
+/* Блок воздуха */
+#air-ui {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 260px;
+    gap: 4px 6px;
+    margin-right: 10px; /* Сдвигает пузырьки немного влево */
+}
+
+/* Стили самих пузырьков */
+/* Пузырьки: твои, но 20px и с бликом */
+.bubble-ui {
+    width: 20px;
+    height: 20px;
+    background: #3498db;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(52, 152, 219, 0.6);
+    position: relative;
+    margin-top: 5px;   /* Чтобы не слипались с нижним рядом сердец */
+    transition: opacity 0.3s ease;
+}
+
+/* Тот самый блик */
+.bubble-ui::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 5px;
+    height: 5px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+/* Анимация исчезновения */
+.bubble-ui.pop {
+    transform: scale(1.4);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+}
+#game {
+    image-rendering: pixelated; /* Делает пиксели четкими при растягивании */
+    width: 100%;
+    height: 100%;
+}
+/* --- НОВЫЕ КЛАССЫ ДЛЯ ОПТИМИЗАЦИИ ИНВЕНТАРЯ --- */
+
+.full-size-img {
+    width: 100%;
+    height: 100%;
+}
+
+.inventory-overlay {
+    display: none; 
+    align-items: center; 
+    gap: 20px;
+}
+
+.use-btn-overlay {
+    width: 70px; height: 70px; background: rgba(0,0,0,0.6); 
+    border: 2px solid #555; border-radius: 12px; cursor: pointer; 
+    display: flex; align-items: center; justify-content: center; 
+    transition: 0.2s; opacity: 0.3; pointer-events: none; flex-shrink: 0; 
+}
+
+.use-btn-overlay.ready {
+    opacity: 1;
+    pointer-events: auto;
+    border: 2px solid #ffeb3b;
+}
+
+.use-btn-text {
+    color: white; 
+    font-size: 10px; 
+    text-align: center;
+}
+
+.section-title {
+    margin-top: 0; 
+    color: white; 
+    font-size: 14px;
+}
+
+/* Стили элементов внутри слота */
+.slot-img {
+    width: 70%; 
+    height: 70%; 
+    object-fit: contain; 
+    pointer-events: none;
+    position: absolute; /* Чтобы не смещать другие элементы */
+}
+
+.slot-count {
+    position: absolute; bottom: 1px; right: 2px; 
+    color: white; font-size: 10px; font-weight: bold; 
+    text-shadow: 1px 1px 0 #000; pointer-events: none; 
+    z-index: 2;
+}
+
+.slot-timer {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.6); display: flex; justify-content: center; 
+    align-items: center; color: white; font-size: 12px; 
+    border-radius: 4px; pointer-events: none; z-index: 3;
+}
+
+.hotbar-num {
+    position: absolute; top: 1px; left: 2px; 
+    font-size: 9px; color: #ccc;
+    z-index: 2;
+}
+
+/* Стили для кнопки лечения мобилок */
+.potion-bg {
+    background-image: url('assets/images/items/xp.svg');
+    background-size: 70%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.no-bg {
+    background-image: none !important;
+}
+
+/* Выделенный слот в главном гриде (синхронизировано с твоим CSS) */
+.selected-slot {
+    border-color: #ffeb3b !important;
+    background: rgba(255, 235, 59, 0.15) !important;
+    box-shadow: 0 0 12px rgba(255, 235, 59, 0.4), inset 0 0 5px rgba(255, 235, 59, 0.2);
+}
+/* =========================================
+   UI МАСШТАБИРОВАНИЯ (Мини-версия)
+   ========================================= */
+.zoom-ui-container {
+    position: absolute; 
+    bottom: 20px; /* Чуть ближе к краю */
+    left: 50%; 
+    transform: translateX(-50%); 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; /* Меньше расстояние между элементами */
+    z-index: 1000;
+    background: rgba(15, 15, 15, 0.8); 
+    padding: 4px 12px; /* Уменьшены внутренние отступы */
+    border-radius: 12px; /* Более строгий радиус для маленького размера */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: auto;
+}
+
+.zoom-btn {
+    font-size: 18px; /* Уменьшен шрифт иконок (+/-) */
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    user-select: none;
+    width: 24px; /* Компактные кнопки */
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px; /* Квадратные со скруглением подходят под мини-стиль */
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+    font-weight: 400; 
+}
+
+.zoom-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.zoom-btn:active {
+    transform: scale(0.85);
+}
+
+/* Компактный ползунок */
+.zoom-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 80px; /* Значительно короче (было 120px) */
+    height: 3px; /* Тоньше линия */
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    outline: none;
+}
+
+.zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px; /* Маленькая аккуратная точка */
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc; /* Чуть приглушил цвет */
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.zoom-slider::-webkit-slider-thumb:hover {
+    background: #fff;
+    transform: scale(1.2);
+}

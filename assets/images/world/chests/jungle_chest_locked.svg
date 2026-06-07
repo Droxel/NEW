@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Лианы на фоне -->
+  <path d="M12 15 Q 15 30 10 50" stroke="#2d5a27" stroke-width="2" fill="none"/>
+  <!-- Корпус -->
+  <rect x="10" y="28" width="44" height="22" rx="6" fill="#3d2b1f" stroke="#1a120b" stroke-width="4"/>
+  <!-- Мох -->
+  <rect x="14" y="40" width="12" height="6" rx="3" fill="#4a7023"/>
+  <!-- Крышка -->
+  <path d="M10 18 Q10 12 16 12 H48 Q54 12 54 18 V28 H10 Z" fill="#4e3b2a" stroke="#1a120b" stroke-width="4"/>
+  <path d="M40 12 Q 45 20 42 28" stroke="#2d5a27" stroke-width="2" fill="none"/>
+  <!-- Бляшка со скважиной -->
+  <rect x="28" y="26" width="8" height="12" rx="2" fill="#8d99ae" stroke="#2b2d42" stroke-width="2"/>
+  <circle cx="32" cy="30" r="1" fill="#2b2d42"/>
+  <rect x="31.5" y="31" width="1" height="3" fill="#2b2d42"/>
+</svg>
