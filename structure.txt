@@ -145,6 +145,7 @@ C:.
 |       |           ghost.png
 |       |           
 |       +---items
+|       |       air_bubble.svg
 |       |       Amulet of regeneration.svg
 |       |       book.svg
 |       |       broken sword.svg
@@ -265,6 +266,10 @@ C:.
     |       villageBlueprints.js
     |       
     +---entities
+    |   +---animals
+    |   |       AnimalManager.js
+    |   |       Fennec.js
+    |   |       
     |   +---bosses
     |   |   |   Boss.js
     |   |   |   BossManager.js
@@ -334,6 +339,9 @@ C:.
     |   |   |   PlayerMovement.js
     |   |   |   PlayerVisuals.js
     |   |   |   
+    |   |   +---accessories
+    |   |   |       AccessoryManager.js
+    |   |   |       
     |   |   \---tools
     |   |           BiomeWeaponItem.js
     |   |           Bubble.js

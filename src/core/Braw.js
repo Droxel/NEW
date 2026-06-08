@@ -461,6 +461,9 @@ if (world.cursedShip) {
     if (petManager) {
         petManager.draw(ctx, { x: renderCamX, y: renderCamY });
     }
+    if (player.accessories) {
+    player.accessories.render(ctx);
+}
 // 8. ПЕРЕДНИЙ БОРТИК КОРАБЛЯ (Чтобы игрок был "внутри")
 if (world.cursedShip) {
     drawShipFront(world.cursedShip);

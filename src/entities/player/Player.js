@@ -11,6 +11,8 @@ import { updateVisuals } from "./PlayerVisuals.js";
 import { checkWallCollisions } from "./PlayerCollision.js";
 import { krakenManager } from "../../entities/bosses/kraken/KrakenManager.js";
 
+import { AccessoryManager } from "./accessories/AccessoryManager.js";
+
 export const player = {
     // === ХАРАКТЕРИСТИКИ ===
     hp: 30, maxHp: 30, invulnerableTimer: 0, timeSinceLastHit: 0, regenTimer: 0,
@@ -28,11 +30,14 @@ export const player = {
     bubbleInstance: null, hook: null, hasHookInInventory: false,
     baseColor: "#3b52da", currentColor: "#02030c", color: "#192774",
 
-// === ДЕЛЕГИРУЕМ МЕТОДЫ ===
+    // === ИНИЦИАЛИЗАЦИЯ МЕНЕДЖЕРА АКСЕССУАРОВ ===
+    // Создаем экземпляр класса для конкретного игрока
+    accessories: null, 
+
+    // === ДЕЛЕГИРУЕМ МЕТОДЫ ===
     takeDamage(amount) { takeDamage(this, amount); },
     jump() { handleJump(this); },
     eatPotion() { eatPotion(this); },
-    // ДОБАВЬ ЭТУ СТРОКУ:
     checkWallCollisions(axis) { checkWallCollisions(this, axis); },
 
     spawn(startX = 100) {
@@ -42,24 +47,34 @@ export const player = {
         this.velocityY = 0;
         this.velocityX = 0;
         this.onGround = false;
+        
+        // Инициализируем менеджер при спавне, если еще не создан
+        if (!this.accessories) {
+            this.accessories = new AccessoryManager(this);
+        }
         console.log(`🚀 Игрок заспавнен на высоте: ${this.y}`);
     },
 
-update() {
+    update() {
         if (this.hp <= 0) return;
 
-        // 1. Таймеры, здоровье, воздух
+        // Гарантируем наличие менеджера аксессуаров
+        if (!this.accessories) this.accessories = new AccessoryManager(this);
+
+        // ОБНОВЛЯЕМ АКСЕССУАРЫ (сканируем слоты инвентаря и собираем баффы)
+        this.accessories.update();
+
+        // 1. Таймеры, здоровье, воздух (теперь внутри читаются данные из менеджера)
         updateHealthAndAir(this);
 
         // 2. Движение и коллизии
-        // БЫЛО: updateMovement(this);
-        // СТАЛО: Передаем текущий объект кракена из менеджера
         updateMovement(this, krakenManager.kraken);
 
         // 3. Визуальные эффекты (масштаб, вращение)
         updateVisuals(this);
 
-        // 4. Обновление систем (Пузырь и Крюк)
+        // 4. Логика старого пузыря-оружия/инструмента (раз ты говоришь, что Bubble.js — это другое)
+        // Если тебе все еще нужен старый пузырь из bubbleSlots, оставляем этот код:
         if (this.inventory?.bubbleSlots?.[0]) {
             if (!this.bubbleInstance) this.bubbleInstance = new Bubble(this);
             this.bubbleInstance.update(this.inventory.bubbleSlots[1]);

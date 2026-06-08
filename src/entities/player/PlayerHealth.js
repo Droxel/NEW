@@ -1,4 +1,6 @@
 //PlayerHealth.js
+import { AccessoryManager } from "./accessories/AccessoryManager.js"; // Добавляем импорт
+
 export function takeDamage(player, amount) {
     if (player.invulnerableTimer > 0) return;
     player.hp -= amount;
@@ -24,18 +26,28 @@ export function updateHealthAndAir(player) {
         }
     }
 
+    // Проверяем булевое свойство из нашего экземпляра менеджера
+    const hasBubble = player.accessories?.activeAccessories?.canBreatheUnderwater || false;
+
     // 2. Система дыхания в воде
     if (player.isInWater) {
         player.currentColor = "#0a1240"; 
         
-        player.airTimer++;
-        if (player.airTimer >= 60) {
-            if (player.air > 0) {
-                player.air--;
-            } else {
-                takeDamage(player, 1); // Вызываем локальную функцию takeDamage
-            }
+        if (hasBubble) {
+            // Если пузырь надет — воздух на максимум, удушья нет
+            player.air = player.maxAir;
             player.airTimer = 0;
+        } else {
+            // Обычная логика траты воздуха
+            player.airTimer++;
+            if (player.airTimer >= 60) {
+                if (player.air > 0) {
+                    player.air--;
+                } else {
+                    takeDamage(player, 1);
+                }
+                player.airTimer = 0;
+            }
         }
     } else {
         player.currentColor = player.baseColor;

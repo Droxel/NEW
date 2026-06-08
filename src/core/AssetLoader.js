@@ -147,6 +147,8 @@ miduza2: new Image(),
 
     fennec: new Image(),
 
+    air_bubble_item: new Image(),
+
 };
 
 
@@ -286,3 +288,5 @@ assets.tentacles9.src = "../../assets/images/entities/mobs/kraken/tentacles9.png
 assets.tentacles10.src = "../../assets/images/entities/mobs/kraken/tentacles10.png";
 
 assets.fennec.src = "../../assets/images/mod/fennec.png";
+
+assets.air_bubble_item.src = "../../assets/images/items/air_bubble.svg";

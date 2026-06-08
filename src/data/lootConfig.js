@@ -16,6 +16,16 @@ export const BIOME_WEAPONS = {
     'forest_boss': { id: 'wpn_forest', name: 'Древесный Молот', icon: 'assets/images/items/wooden_mallet.svg', type: 'biome_weapon', damage: 12 }, 
     'ice_boss':    { id: 'wpn_ice', name: 'Ледяной Осколок', icon: 'assets/images/items/book.svg', type: 'biome_weapon', damage: 20 }
 };
+// 1. Создаем предмет
+export const AIR_BUBBLE_ACCESSORY = {
+    id: 'air_bubble_acc',
+    name: 'Воздушный Пузырь',
+    description: 'Окутывает голову и позволяет дышать под водой.',
+    icon: 'assets/images/items/air_bubble.svg',
+    maxCount: 1,
+    type: 'accessory', // Важно! Указываем тип для инвентаря
+    accType: 'water_breathing' // Доп. тип на будущее для разных пузырей
+};
 // Добавляем определение Фрукта Жизни
 export const LIFE_FRUIT_ITEM = { 
     id: 'life_fruit', 
@@ -177,6 +187,7 @@ export function generateChestLoot(chestIndex, type = "common") {
         count: 1 
     };
     addItemToSlot(bubbleItem);
-
+// НОВЫЙ АКСЕССУАР ВОЗДУШНОГО ПУЗЫРЯ (ТЕСТ)
+    addItemToSlot(AIR_BUBBLE_ACCESSORY);
     return slots;
 }
