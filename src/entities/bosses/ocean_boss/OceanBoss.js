@@ -7,7 +7,14 @@ import { OceanBossKraken } from "./OceanBossKraken.js";
 // ХАРДКОРНАЯ НАСТРОЙКА БАЛАНСА
 export const BOSS_CONFIG = {
     maxHp: 500,
-    contactDamage: 1,
+    
+    // --- НАСТРОЙКА УРОНА ОТ АТАК (в пределах 2-3 сердечек) ---
+    contactDamage: 2,       // Урон от тарана/касания тела босса
+    laserDamage: 3,         // Урон от лазера
+    cycloneDamage: 2,       // Урон от циклонов (вихрей)
+    // --------------------------------------------------------
+
+    phase2Threshold: 0.70,
     phase2Threshold: 0.70,
     phase3Threshold: 0.35,
     

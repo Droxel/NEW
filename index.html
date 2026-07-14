@@ -99,14 +99,14 @@
 
 <script type="module">
       import { MainMenu } from './src/ui/screens/MainMenu.js';
-      import { Settings } from './src/ui/screens/Settings.js'; // Добавь этот импорт
-      import { SaveManager } from './src/core/SaveManager.js'; // И этот
+      import { Settings } from './src/ui/screens/Settings.js';
+      import { SaveManager } from './src/core/SaveManager.js';
+      import { UpdateNotifier } from './src/ui/components/UpdateNotifier.js'; // Импортируем сюда!
 
       const fill = document.getElementById('loader-fill');
       const status = document.getElementById('status-message');
 
       // --- СИСТЕМА ОБНОВЛЕНИЙ И ОФФЛАЙНА ---
-// --- СИСТЕМА ОБНОВЛЕНИЙ И ОФФЛАЙНА ---
       async function checkUpdateAndRegisterSW() {
           if ('serviceWorker' in navigator) {
               try {
@@ -114,15 +114,12 @@
                   const serverData = await response.json();
                   const localVersion = localStorage.getItem('game_version');
 
-                  // Если это первый заход в игру — записываем текущую версию
                   if (!localVersion) {
                       localStorage.setItem('game_version', serverData.version);
                   }
 
-                  // Регистрируем Service Worker для оффлайна
                   await navigator.serviceWorker.register('./service-worker.js');
                   console.log('✅ Оффлайн-режим активирован');
-
               } catch (error) {
                   console.log('📶 Нет интернета. Запускаем оффлайн версию.');
               }
@@ -131,46 +128,51 @@
 
       // --- ЗАПУСК ИГРЫ ---
       async function initGame() {
-          if(status) status.innerText = "Проверка обновлений...";
+          if(status) status.innerText = "Проверка ресурсов...";
+          if(fill) fill.style.width = "30%";
+
+          // Инициализируем систему оповещения и вешаем плашку в правый верхний угол
+          const updater = new UpdateNotifier();
+
+          // Проверяем обновления. Функция вернет промис, который заблокирует поток, 
+          // если появится окно (разрешится при нажатии кнопки "Позже").
+          await updater.checkUpdates();
           
-          // Сначала проверяем обновления и подрубаем оффлайн
+          if(status) status.innerText = "Проверка обновлений...";
+          if(fill) fill.style.width = "60%";
+          
+          // Параллельно регистрируем сервис-воркер
           await checkUpdateAndRegisterSW();
 
           if(fill) fill.style.width = "100%";
           if(status) status.innerText = "Запуск...";
 
-setTimeout(() => {
+          setTimeout(() => {
               const loadingScreen = document.getElementById('loading-screen');
               if(loadingScreen) loadingScreen.classList.add('hidden');
               
-              // 1. Создаем функцию изменения размера (ее можно вынести в window для доступа из настроек)
-window.applyResolution = () => {
-    // Просто вызываем функцию из основного модуля или повторяем логику
-    // Но лучше всего — если resize доступен глобально
-    if (typeof resize === 'function') {
-        resize();
-    } else {
-        // Если main.js еще не загружен, просто обновим физику холста
-        const canvas = document.getElementById("game");
-        const settings = SaveManager.getSettings();
-        const scale = settings.resolution || 1.0;
-        canvas.width = window.innerWidth * scale;
-        canvas.height = window.innerHeight * scale;
-    }
-};
+              window.applyResolution = () => {
+                  if (typeof resize === 'function') {
+                      resize();
+                  } else {
+                      const canvas = document.getElementById("game");
+                      const settings = SaveManager.getSettings();
+                      const scale = settings.resolution || 1.0;
+                      canvas.width = window.innerWidth * scale;
+                      canvas.height = window.innerHeight * scale;
+                  }
+              };
 
-              // 2. Инициализируем настройки
               const settingsUI = new Settings(
-                  () => menu.showMain(),      // Назад в главное меню
-                  () => window.applyResolution() // Применить масштаб
+                  () => menu.showMain(),
+                  () => window.applyResolution()
               );
 
               const menu = new MainMenu(() => {
-                  // Логика кнопки "Играть"
                   const controls = document.getElementById('game-controls');
                   if (controls) controls.style.display = 'flex';
                   
-                  window.applyResolution(); // Применяем разрешение при старте
+                  window.applyResolution();
 
                   if (window.startGame) {
                       window.startGame();

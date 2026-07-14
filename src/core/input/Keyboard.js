@@ -85,21 +85,15 @@ export function setupKeyboard(player, state) {
         } 
     });
 
-    // Обработка Клика и Тапа по экрану для активации Статуи Атлантиды
-    const handlePointerDown = (e) => {
-        // Определяем экранные координаты в зависимости от типа события (мышь или тач)
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
+    // Оставляем mousedown ТОЛЬКО для ПК-игроков, играющих с мышкой (по желанию кликнуть по статуе)
+    document.addEventListener("mousedown", (e) => {
         const canvas = document.querySelector("canvas");
         if (!canvas) return;
 
         const rect = canvas.getBoundingClientRect();
-        // Получаем позицию клика относительно канваса
-        const canvasX = clientX - rect.left;
-        const canvasY = clientY - rect.top;
+        const canvasX = e.clientX - rect.left;
+        const canvasY = e.clientY - rect.top;
 
-        // Переводим в мировые координаты игры с учетом камеры
         const worldClickX = canvasX + cameraX;
         const worldClickY = canvasY + cameraY;
 
@@ -109,37 +103,31 @@ export function setupKeyboard(player, state) {
         if (!chunk || !chunk.objects) return;
 
         for (let obj of chunk.objects) {
-            // Ищем объект статуи босса океана
             if (obj && typeof obj.interact === 'function') {
-                // Проверяем, попал ли клик в границы текстуры статуи
-                // Предполагаем стандартные размеры статуи, например ширина 96 и высота 128 (или подставьте свои значения obj.width/obj.height)
-                const width = obj.width || 96;
-                const height = obj.height || 128;
+                const width = (obj.config && obj.config.width) || obj.width || 250;
+                const height = (obj.config && obj.config.height) || obj.height || 350;
 
-                // Так как drawY обычно считается от верха, а координаты объекта могут быть от центра или от левого верхнего угла:
-                const insideX = worldClickX >= obj.x && worldClickX <= obj.x + width;
-                const insideY = worldClickY >= obj.y && worldClickY <= obj.y + height;
+                const statueLeft = obj.x - width / 2;
+                const statueTop = obj.y - height;
+
+                const insideX = worldClickX >= statueLeft && worldClickX <= statueLeft + width;
+                const insideY = worldClickY >= statueTop && worldClickY <= statueTop + height;
 
                 if (insideX && insideY) {
-                    // Дополнительно проверяем расстояние от игрока до статуи (чтобы нельзя было активировать с другого конца карты)
-                    const dx = (player.x + player.size / 2) - (obj.x + width / 2);
-                    const dy = player.y - (obj.y + height / 2);
+                    const dx = (player.x + player.size / 2) - obj.x;
+                    const dy = player.y - (obj.y - height / 2);
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     const radius = (obj.config && obj.config.interactionRadius) || 250;
 
                     if (distance <= radius) {
-                        console.log("🗿 Статуя Атлантиды активирована по клику/тапу!");
+                        console.log("🗿 [PC] Статуя Босса Океана активирована кликом мыши!");
                         obj.interact(player);
                         break;
                     }
                 }
             }
         }
-    };
-
-    // Регистрируем на клик мыши и тап пальцем
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown, { passive: true });
+    });
 }
 
 function handleInteractionKey(player) {
@@ -154,36 +142,32 @@ function handleInteractionKey(player) {
             const chest = obj.instance;
             const dx = (player.x + player.size / 2) - (chest.x + chest.width / 2);
             const dy = player.y - chest.y;
-            // Проверяем дистанцию (используем чуть больший радиус из main.js)
             if (Math.sqrt(dx * dx + dy * dy) < 60 || Math.abs(player.x - (chest.x + chest.width/2)) < 50) {
                 chest.interact();
-                return; // Выходим, если открыли сундук
+                return;
             }
         }
     }
 
-// Проверка обычных статуй (твои старые статуи из биомов)
+    // Проверка обычных статуй
     if (chunk.statues) {
         chunk.statues.forEach(statue => {
             statue.interact(player, bossManager);
         });
     }
 
-    // Проверка статуи Атлантиды (ищет её внутри chunk.objects)
+    // Проверка статуи Атлантиды
     if (chunk.objects) {
         for (let obj of chunk.objects) {
-            // Если у объекта есть метод interact и это экземпляр класса Statue
             if (obj && typeof obj.interact === 'function') {
                 const dx = (player.x + player.size / 2) - obj.x;
                 const dy = player.y - obj.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-
-                // Берем радиус из конфига статуи (у тебя там 200)
                 const radius = (obj.config && obj.config.interactionRadius) || 200;
 
                 if (distance <= radius) {
-                    console.log("🗿 Активация статуи Атлантиды!");
-                    obj.interact(player); // Вызываем метод interact прямо у созданного класса
+                    console.log("🗿 Активация статуи Атлантиды по кнопке E!");
+                    obj.interact(player);
                     break;
                 }
             }

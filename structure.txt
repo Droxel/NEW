@@ -88,171 +88,174 @@ C:.
 |   |                   thunder_1.mp3
 |   |                   thunder_2.mp3
 |   |                   
-|   \---images
-|       +---biomes
-|       |       desert.png
-|       |       forest.png
-|       |       jungles.png
-|       |       Mountains.png
-|       |       ocean.png
-|       |       village.png
-|       |       winter.png
-|       |       
-|       +---effects
-|       |       bubble.png
-|       |       
-|       +---entities
-|       |   +---bosses
-|       |   |   |   arm_skeleton.png
-|       |   |   |   Desertt.png
-|       |   |   |   jungles.png
-|       |   |   |   kyk.png
-|       |   |   |   re.png
-|       |   |   |   skeleton.png
-|       |   |   |   skeleton_minion.png
-|       |   |   |   
-|       |   |   +---ice_boss
-|       |   |   |       crystal_boss.png
-|       |   |   |       ice_block.png
-|       |   |   |       icicle.png
-|       |   |   |       Icy_boss.png
-|       |   |   |       Icy_boss2.png
-|       |   |   |       protection_crystal.png
-|       |   |   |       
-|       |   |   \---ocean_boss
-|       |   |           ocean_boss.png
-|       |   |           ocean_boss1.png
-|       |   |           ocean_boss2.png
-|       |   |           
-|       |   +---mobs
-|       |   |   |   arm_giant.png
-|       |   |   |   body_giant.png
-|       |   |   |   fist.png
-|       |   |   |   guard.png
-|       |   |   |   head_giant.png
-|       |   |   |   skeletjungey.png
-|       |   |   |   
-|       |   |   +---kraken
-|       |   |   |       golova_krakin.png
-|       |   |   |       tentacles1.png
-|       |   |   |       tentacles10.png
-|       |   |   |       tentacles2.png
-|       |   |   |       tentacles3.png
-|       |   |   |       tentacles4.png
-|       |   |   |       tentacles5.png
-|       |   |   |       tentacles6.png
-|       |   |   |       tentacles7.png
-|       |   |   |       tentacles8.png
-|       |   |   |       tentacles9.png
-|       |   |   |       
-|       |   |   \---ocean
-|       |   |           clownfish.png
-|       |   |           dory_cabin.png
-|       |   |           fugu_fish.png
-|       |   |           fugu_fish2.png
-|       |   |           miduza1.png
-|       |   |           miduza2.png
-|       |   |           
-|       |   \---pets
-|       |           ghost.png
-|       |           
-|       +---items
-|       |       air_bubble.svg
-|       |       Amulet of regeneration.svg
-|       |       book.svg
-|       |       broken sword.svg
-|       |       bubble.svg
-|       |       bubble_pitomets.svg
-|       |       core_desert.svg
-|       |       core_forest.svg
-|       |       core_jungles.svg
-|       |       crystal.png
-|       |       desert_knife.svg
-|       |       essence.svg
-|       |       fang_jungles.svg
-|       |       fruit of life.svg
-|       |       hand_staff.svg
-|       |       hook.svg
-|       |       mace.svg
-|       |       poo.svg
-|       |       ring.svg
-|       |       rope.svg
-|       |       stone.svg
-|       |       threads.svg
-|       |       wooden_mallet.svg
-|       |       xp.svg
-|       |       
-|       +---mod
-|       |       fennec.png
-|       |       
-|       +---ui
-|       |       cam.svg
-|       |       fon_menu.png
-|       |       
-|       \---world
-|           |   bush of life.svg
-|           |   
-|           +---altars
-|           |       a_desert.svg
-|           |       a_forest.svg
-|           |       a_glazed.svg
-|           |       a_jungli.svg
-|           |       
-|           +---Atlantis
-|           |       column.png
-|           |       fragment.png
-|           |       ruin.png
-|           |       statuya_bossa_okeana.png
-|           |       statuya_paskhi.png
-|           |       
-|           +---chests
-|           |       chestopen.svg
-|           |       chestunopened.svg
-|           |       jungle_chest_closed.svg
-|           |       jungle_chest_locked.svg
-|           |       jungle_chest_open.svg
-|           |       
-|           +---ocean
-|           |       seaweed1.png
-|           |       seaweed2.png
-|           |       seaweed3.png
-|           |       
-|           +---ship
-|           |       cabin.png
-|           |       cursed_crystal.png
-|           |       deck.png
-|           |       mast.png
-|           |       sideboard.png
-|           |       
-|           +---statue
-|           |       idol_desert.svg
-|           |       idol_ice.svg
-|           |       idol_jungle.svg
-|           |       idol_pillar.svg
-|           |       
-|           +---trees
-|           |       distorted_tree.svg
-|           |       tree1.svg
-|           |       tree2.svg
-|           |       tree3.svg
-|           |       tree4.svg
-|           |       tree5.svg
-|           |       tree6.svg
-|           |       
-|           \---village
-|                   consoles.svg
-|                   fire.svg
-|                   flowerbed.svg
-|                   flower_pots.svg
-|                   fountain.svg
-|                   house.svg
-|                   house_2.svg
-|                   house_3.svg
-|                   house_4.svg
-|                   kuznya.svg
-|                   tower.svg
-|                   trading_tent.svg
-|                   
+|   +---images
+|   |   +---biomes
+|   |   |       desert.png
+|   |   |       forest.png
+|   |   |       jungles.png
+|   |   |       Mountains.png
+|   |   |       ocean.png
+|   |   |       village.png
+|   |   |       winter.png
+|   |   |       
+|   |   +---effects
+|   |   |       bubble.png
+|   |   |       
+|   |   +---entities
+|   |   |   +---bosses
+|   |   |   |   |   arm_skeleton.png
+|   |   |   |   |   Desertt.png
+|   |   |   |   |   jungles.png
+|   |   |   |   |   kyk.png
+|   |   |   |   |   re.png
+|   |   |   |   |   skeleton.png
+|   |   |   |   |   skeleton_minion.png
+|   |   |   |   |   
+|   |   |   |   +---ice_boss
+|   |   |   |   |       crystal_boss.png
+|   |   |   |   |       ice_block.png
+|   |   |   |   |       icicle.png
+|   |   |   |   |       Icy_boss.png
+|   |   |   |   |       Icy_boss2.png
+|   |   |   |   |       protection_crystal.png
+|   |   |   |   |       
+|   |   |   |   \---ocean_boss
+|   |   |   |           ocean_boss.png
+|   |   |   |           ocean_boss1.png
+|   |   |   |           ocean_boss2.png
+|   |   |   |           
+|   |   |   +---mobs
+|   |   |   |   |   arm_giant.png
+|   |   |   |   |   body_giant.png
+|   |   |   |   |   fist.png
+|   |   |   |   |   guard.png
+|   |   |   |   |   head_giant.png
+|   |   |   |   |   skeletjungey.png
+|   |   |   |   |   
+|   |   |   |   +---kraken
+|   |   |   |   |       golova_krakin.png
+|   |   |   |   |       tentacles1.png
+|   |   |   |   |       tentacles10.png
+|   |   |   |   |       tentacles2.png
+|   |   |   |   |       tentacles3.png
+|   |   |   |   |       tentacles4.png
+|   |   |   |   |       tentacles5.png
+|   |   |   |   |       tentacles6.png
+|   |   |   |   |       tentacles7.png
+|   |   |   |   |       tentacles8.png
+|   |   |   |   |       tentacles9.png
+|   |   |   |   |       
+|   |   |   |   \---ocean
+|   |   |   |           clownfish.png
+|   |   |   |           dory_cabin.png
+|   |   |   |           fugu_fish.png
+|   |   |   |           fugu_fish2.png
+|   |   |   |           miduza1.png
+|   |   |   |           miduza2.png
+|   |   |   |           
+|   |   |   \---pets
+|   |   |           ghost.png
+|   |   |           
+|   |   +---items
+|   |   |       air_bubble.svg
+|   |   |       Amulet of regeneration.svg
+|   |   |       book.svg
+|   |   |       broken sword.svg
+|   |   |       bubble.svg
+|   |   |       bubble_pitomets.svg
+|   |   |       core_desert.svg
+|   |   |       core_forest.svg
+|   |   |       core_jungles.svg
+|   |   |       crystal.png
+|   |   |       desert_knife.svg
+|   |   |       essence.svg
+|   |   |       fang_jungles.svg
+|   |   |       fruit of life.svg
+|   |   |       hand_staff.svg
+|   |   |       hook.svg
+|   |   |       mace.svg
+|   |   |       poo.svg
+|   |   |       ring.svg
+|   |   |       rope.svg
+|   |   |       stone.svg
+|   |   |       threads.svg
+|   |   |       wooden_mallet.svg
+|   |   |       xp.svg
+|   |   |       
+|   |   +---mod
+|   |   |       fennec.png
+|   |   |       
+|   |   +---ui
+|   |   |       cam.svg
+|   |   |       fon_menu.png
+|   |   |       
+|   |   \---world
+|   |       |   bush of life.svg
+|   |       |   
+|   |       +---altars
+|   |       |       a_desert.svg
+|   |       |       a_forest.svg
+|   |       |       a_glazed.svg
+|   |       |       a_jungli.svg
+|   |       |       
+|   |       +---Atlantis
+|   |       |       column.png
+|   |       |       fragment.png
+|   |       |       ruin.png
+|   |       |       statuya_bossa_okeana.png
+|   |       |       statuya_paskhi.png
+|   |       |       
+|   |       +---chests
+|   |       |       chestopen.svg
+|   |       |       chestunopened.svg
+|   |       |       jungle_chest_closed.svg
+|   |       |       jungle_chest_locked.svg
+|   |       |       jungle_chest_open.svg
+|   |       |       
+|   |       +---ocean
+|   |       |       seaweed1.png
+|   |       |       seaweed2.png
+|   |       |       seaweed3.png
+|   |       |       
+|   |       +---ship
+|   |       |       cabin.png
+|   |       |       cursed_crystal.png
+|   |       |       deck.png
+|   |       |       mast.png
+|   |       |       sideboard.png
+|   |       |       
+|   |       +---statue
+|   |       |       idol_desert.svg
+|   |       |       idol_ice.svg
+|   |       |       idol_jungle.svg
+|   |       |       idol_pillar.svg
+|   |       |       
+|   |       +---trees
+|   |       |       distorted_tree.svg
+|   |       |       tree1.svg
+|   |       |       tree2.svg
+|   |       |       tree3.svg
+|   |       |       tree4.svg
+|   |       |       tree5.svg
+|   |       |       tree6.svg
+|   |       |       
+|   |       \---village
+|   |               consoles.svg
+|   |               fire.svg
+|   |               flowerbed.svg
+|   |               flower_pots.svg
+|   |               fountain.svg
+|   |               house.svg
+|   |               house_2.svg
+|   |               house_3.svg
+|   |               house_4.svg
+|   |               kuznya.svg
+|   |               tower.svg
+|   |               trading_tent.svg
+|   |               
+|   \---screenshot
+|           screenshot..PNG
+|           
 \---src
     |   main.js
     |   
@@ -387,6 +390,7 @@ C:.
     |   |   UIManager.js
     |   |   
     |   +---components
+    |   |       UpdateNotifier.js
     |   |       ZoomUI.js
     |   |       
     |   \---screens

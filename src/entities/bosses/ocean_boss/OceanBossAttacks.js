@@ -80,11 +80,15 @@ update(player, dt) {
             this.dashCounter = BOSS_CONFIG.dashCount[`phase${this.boss.phase}`];
             this.dashDir = this.boss.x > player.x ? 1 : -1; 
         } 
-        else if (attackName === 'laser') {
+else if (attackName === 'laser') {
             this.timer = BOSS_CONFIG.laserChargeTime; 
             this.laserAngle = Math.atan2(player.y - this.boss.y, player.x - this.boss.x);
+            
             this.activeLaser = new LaserBeam(this.boss);
-            this.boss.myProjectiles.push(this.activeLaser); // В личный массив!
+            // ПЕРЕДАЕМ УРОН ИЗ КОНФИГА:
+            this.activeLaser.damage = BOSS_CONFIG.laserDamage; 
+            
+            this.boss.myProjectiles.push(this.activeLaser);
         }
         else if (attackName === 'cyclone') {
             this.timer = 0.3; 
@@ -188,9 +192,11 @@ updateLaser(player, dt) {
                 const cx = this.boss.x + Math.cos(angle) * dist;
                 const cy = this.boss.y + Math.sin(angle) * dist;
                 
-                const cyclone = new HomingCyclone(cx, cy, player, this.boss.phase);
-                this.boss.myProjectiles.push(cyclone); // В личный массив!
-
+const cyclone = new HomingCyclone(cx, cy, player, this.boss.phase);
+                // ПЕРЕДАЕМ УРОН ИЗ КОНФИГА:
+                cyclone.damage = BOSS_CONFIG.cycloneDamage; 
+                
+                this.boss.myProjectiles.push(cyclone);
                 if (this.cyclonesToSpawn <= 0) {
                     this.finishAttack();
                 }

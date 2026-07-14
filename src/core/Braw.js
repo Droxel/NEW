@@ -573,6 +573,8 @@ export function Braw(
     }
 
 // --- СЛОЙ 5: ПЕРЕДНИЙ ПОЛУПРОЗРАЧНЫЙ СЛОЙ ВОДЫ ПОВЕРХ ВСЕХ ОБЪЕКТОВ С ИСКАЖЕНИЕМ ---
+    const maxDistForDistortion = 500; // Радиус искажения вокруг игрока в пикселях
+
     for (let x = startX; x < endX; x += step) {
         const waterData = world.getWaterData(x); 
         
@@ -580,6 +582,10 @@ export function Braw(
             const wLevel = waterData.level + player.size;
             const wBottom = waterData.bottom + player.size;
             const safeTime = (typeof time === "object" && time !== null) ? (time.value ?? time.time ?? time.now ?? 0) : (time || 0);
+
+            // Проверяем, находится ли текущий столбец воды рядом с игроком
+            const distToPlayer = Math.abs(x - player.x);
+            const shouldDistort = distToPlayer < maxDistForDistortion;
 
             if (waterData.isOcean) {
                 const wt = waterData.depthFactor || 0;
@@ -597,32 +603,37 @@ export function Braw(
 
                 ctx.fillStyle = `rgba(${wr}, ${wg}, ${wb}, ${alpha})`;
 
-                // Эффект подводного искажения: рисуем воду тонкими горизонтальными слоями
                 const totalHeight = Math.max(0, wBottom - currentWaterY);
-                const sliceH = 8; // Высота каждого сегмента искажения
-                
-                for (let offsetHeight = 0; offsetHeight < totalHeight; offsetHeight += sliceH) {
-                    const currentSliceY = currentWaterY + offsetHeight;
-                    // Синусоида волны зависит от X, текущей глубины (Y) и времени
-                    const distortionX = Math.sin(x * 0.02 + currentSliceY * 0.04 + safeTime * 2.5) * 4;
 
-                    ctx.fillRect(
-                        x + distortionX, 
-                        currentSliceY, 
-                        step + 0.5, 
-                        Math.min(sliceH, totalHeight - offsetHeight)
-                    );
+                if (shouldDistort && totalHeight > 0) {
+                    // Оптимизированный эффект искажения (только около игрока)
+                    const sliceH = 12; // Немного увеличили шаг высоты (с 8 до 12) для еще большей производительности
+                    
+                    for (let offsetHeight = 0; offsetHeight < totalHeight; offsetHeight += sliceH) {
+                        const currentSliceY = currentWaterY + offsetHeight;
+                        const distortionX = Math.sin(x * 0.02 + currentSliceY * 0.04 + safeTime * 2.5) * 4;
+
+                        ctx.fillRect(
+                            x + distortionX, 
+                            currentSliceY, 
+                            step + 0.5, 
+                            Math.min(sliceH, totalHeight - offsetHeight)
+                        );
+                    }
+                } else {
+                    // Быстрая отрисовка без искажений (для заднего плана и оптимизации)
+                    ctx.fillRect(x, currentWaterY, step + 0.5, totalHeight);
                 }
 
-                // Рисуем пену на самом верху воды с легким искажением по X
+                // Рисуем пену на самом верху воды
                 let foamAlpha = (wt < 0.05) ? 0.7 : (wt < 0.4 && movingWave > 0.8 ? (movingWave - 0.8) * 4 : 0);
                 if (foamAlpha > 0) {
-                    const foamDistortion = Math.sin(x * 0.02 + currentWaterY * 0.04 + safeTime * 2.5) * 4;
+                    const foamDistortion = shouldDistort ? Math.sin(x * 0.02 + currentWaterY * 0.04 + safeTime * 2.5) * 4 : 0;
                     ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1, foamAlpha)})`;
                     ctx.fillRect(x + foamDistortion, currentWaterY - 1, step + 0.5, 5);
                 }
             } else {
-                // Обычные озера (тоже с небольшим искажением для атмосферы)
+                // Обычные озера
                 let lr = 0, lg = 0, lb = 0, tw = 0;
                 const mix = world.getBiomeMix(x);
                 for (const key in LAKE_COLORS) {
@@ -637,22 +648,26 @@ export function Braw(
                 ctx.fillStyle = `rgba(${Math.floor(lr)}, ${Math.floor(lg)}, ${Math.floor(lb)}, 0.35)`;
 
                 const totalHeight = Math.max(0, wBottom - wLevel);
-                const sliceH = 8;
-                for (let offsetHeight = 0; offsetHeight < totalHeight; offsetHeight += sliceH) {
-                    const currentSliceY = wLevel + offsetHeight;
-                    const distortionX = Math.sin(x * 0.03 + currentSliceY * 0.05 + safeTime * 2) * 2.5;
 
-                    ctx.fillRect(
-                        x + distortionX, 
-                        currentSliceY, 
-                        step + 0.5, 
-                        Math.min(sliceH, totalHeight - offsetHeight)
-                    );
+                if (shouldDistort && totalHeight > 0) {
+                    const sliceH = 12;
+                    for (let offsetHeight = 0; offsetHeight < totalHeight; offsetHeight += sliceH) {
+                        const currentSliceY = wLevel + offsetHeight;
+                        const distortionX = Math.sin(x * 0.03 + currentSliceY * 0.05 + safeTime * 2) * 2.5;
+
+                        ctx.fillRect(
+                            x + distortionX, 
+                            currentSliceY, 
+                            step + 0.5, 
+                            Math.min(sliceH, totalHeight - offsetHeight)
+                        );
+                    }
+                } else {
+                    ctx.fillRect(x, wLevel, step + 0.5, totalHeight);
                 }
             }
         }
     }
-
     ctx.restore(); 
 }
 

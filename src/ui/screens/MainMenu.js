@@ -1,10 +1,9 @@
-/* src/ui/MainMenu.js */
+//MainMenu.js
 import { SaveManager } from "../../core/SaveManager.js";
 import { WORLD_SEED, setWorldSeed } from "../../world/Seed.js";
-import { UpdateNotifier } from "../components/UpdateNotifier.js";
 
 export class MainMenu {
-constructor(onPlay) {
+    constructor(onPlay) {
         this.onPlay = onPlay; // Коллбэк запуска игры
 
         // Контейнеры
@@ -21,9 +20,6 @@ constructor(onPlay) {
         this.initEventListeners();
 
         this.menuSettings = document.getElementById('menu-settings');
-
-        // Инициализируем систему проверки обновлений и плашку с версией
-        this.updateNotifier = new UpdateNotifier();
     }
 
     initEventListeners() {
@@ -40,16 +36,19 @@ constructor(onPlay) {
         
         document.getElementById('btn-settings').onclick = () => this.showSettings();
     }
-showSettings() {
-    this.menuMain.classList.add('hidden');
-    this.menuSettings.classList.remove('hidden');
-}
-showMain() {
-    this.menuMain.classList.remove('hidden');
-    this.menuSelect.classList.add('hidden');
-    this.menuCreate.classList.add('hidden');
-    this.menuSettings.classList.add('hidden'); // Добавили эту строку
-}
+
+    showSettings() {
+        this.menuMain.classList.add('hidden');
+        this.menuSettings.classList.remove('hidden');
+    }
+
+    showMain() {
+        this.menuMain.classList.remove('hidden');
+        this.menuSelect.classList.add('hidden');
+        this.menuCreate.classList.add('hidden');
+        this.menuSettings.classList.add('hidden');
+    }
+
     showCreateWorld() {
         this.menuMain.classList.add('hidden');
         this.menuSelect.classList.add('hidden');
@@ -76,7 +75,6 @@ showMain() {
             return;
         }
 
-        // Рендерим список миров
         worldKeys.forEach(key => {
             const world = worlds[key];
             const div = document.createElement('div');
@@ -90,19 +88,16 @@ showMain() {
                 <button class="menu-btn" style="padding: 5px 10px; font-size: 12px; background: #e74c3c; margin-left: 10px;">X</button>
             `;
 
-            // Клик по карточке мира - запуск игры
             div.onclick = (e) => {
-                // Если кликнули на кнопку удаления - не запускаем игру
                 if (e.target.tagName === 'BUTTON') return; 
                 this.startGame(world);
             };
 
-            // Кнопка удаления
             const delBtn = div.querySelector('button');
             delBtn.onclick = () => {
                 if (confirm(`Удалить мир "${world.name}"? Это действие необратимо!`)) {
                     SaveManager.deleteWorld(world.id);
-                    this.renderWorldsList(); // Обновляем список
+                    this.renderWorldsList();
                 }
             };
 
@@ -114,32 +109,36 @@ showMain() {
         let name = this.inputName.value.trim() || 'Новый мир';
         let seedValue = this.inputSeed.value.trim();
         
-        // Если сид пустой - генерируем случайный (от 1 до 999999999)
         let seed = seedValue ? parseInt(seedValue, 10) : Math.floor(Math.random() * 999999999) + 1;
 
         const newWorld = SaveManager.saveWorld({
             name: name,
             seed: seed,
-            // Сюда потом будем добавлять инвентарь, позицию игрока и т.д.
             player: { hp: 100, x: 0, y: 0 } 
         });
 
         this.startGame(newWorld);
     }
 
-    startGame(worldData) {
-        // Устанавливаем сид для генератора
+startGame(worldData) {
         setWorldSeed(worldData.seed);
-        // Запоминаем, какой мир сейчас активен
         SaveManager.setCurrentWorldId(worldData.id);
 
+        // Скрываем плашку с версией при заходе в игру
+        const versionBadge = document.getElementById('game-version-badge');
+        if (versionBadge) versionBadge.style.display = 'none';
+
         this.hide();
-        this.onPlay(); // Передаем управление в index.html
+        this.onPlay();
     }
 
     show() {
         this.dom.classList.remove('hidden');
         this.showMain();
+        
+        // Показываем плашку с версией снова, если мы вернулись в меню
+        const versionBadge = document.getElementById('game-version-badge');
+        if (versionBadge) versionBadge.style.display = 'block';
     }
 
     hide() {

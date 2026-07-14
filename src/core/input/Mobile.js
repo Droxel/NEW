@@ -1,4 +1,7 @@
 //Mobile.js
+import { world } from "../../world/World.js";
+import { cameraX, cameraY } from "../Braw.js"; // Импортируем координаты камеры для перевода в мировые координаты
+
 export function setupMobile(player, state) {
     const leftBtn  = document.getElementById("left");
     const rightBtn = document.getElementById("right");
@@ -79,4 +82,64 @@ export function setupMobile(player, state) {
             vecX = 0; vecY = 0;
         });
     }
+
+    // --- ОБРАБОТКА ТАПА ПО ЭКРАНУ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ ---
+    const handleTouchStart = (e) => {
+        // Чтобы не срабатывало при нажатии на кнопки управления или джойстик
+        if (e.target.closest('#left') || e.target.closest('#right') || e.target.closest('#jump') || e.target.closest('#hook-joystick-container')) {
+            return;
+        }
+
+        const touch = e.touches[0];
+        const canvas = document.querySelector("canvas");
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const canvasX = touch.clientX - rect.left;
+        const canvasY = touch.clientY - rect.top;
+
+        // Переводим экранный тап в мировые координаты игры
+        const worldClickX = canvasX + cameraX;
+        const worldClickY = canvasY + cameraY;
+
+        const currentChunkId = world.chunkManager.getChunkId(player.x);
+        const chunk = world.chunkManager.chunks.get(currentChunkId);
+        
+        if (!chunk || !chunk.objects) return;
+
+        for (let obj of chunk.objects) {
+            // Ищем объект статуи, у которого есть функция взаимодействия
+            if (obj && typeof obj.interact === 'function') {
+                // Если у статуи есть конфиг, берем размеры из него, иначе используем стандартные
+                const width = (obj.config && obj.config.width) || obj.width || 250;
+                const height = (obj.config && obj.config.height) || obj.height || 350;
+
+                // В классе Statue координата x часто указывает на её центр, скорректируем это:
+                const statueLeft = obj.x - width / 2;
+                const statueTop = obj.y - height; // Так как спавн идет от земли вверх
+
+                // Проверяем попадание тапа в прямоугольник статуи
+                const insideX = worldClickX >= statueLeft && worldClickX <= statueLeft + width;
+                const insideY = worldClickY >= statueTop && worldClickY <= statueTop + height;
+
+                if (insideX && insideY) {
+                    // Проверяем дистанцию от игрока до центра статуи
+                    const dx = (player.x + player.size / 2) - obj.x;
+                    const dy = player.y - (obj.y - height / 2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const radius = (obj.config && obj.config.interactionRadius) || 250;
+
+                    if (distance <= radius) {
+                        console.log("🗿 [Mobile] Статуя Босса Океана активирована тапом!");
+                        obj.interact(player);
+                        break;
+                    } else {
+                        console.log("⚠️ Слишком далеко для активации статуи!");
+                    }
+                }
+            }
+        }
+    };
+
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
 }
