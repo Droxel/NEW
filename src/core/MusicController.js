@@ -5,8 +5,8 @@ import { getOceanMix } from "../world/Ocean.js";
 import { krakenManager } from "../entities/bosses/kraken/KrakenManager.js"; 
 
 export const musicController = {
-    // Добавим kraken в список треков боссов, чтобы музыка переключалась мгновенно, если нужно
-    bossTracks: ["desert_boss", "forest_boss", "junglm_boss", "skeleton_boss", "ice_boss", "kraken"], 
+    // ДОБАВЛЕНО: "ocean_boss" в список треков боссов
+    bossTracks: ["desert_boss", "forest_boss", "junglm_boss", "skeleton_boss", "ice_boss", "kraken", "ocean_boss"], 
     lastInWater: false,
     currentTheme: null, 
 
@@ -24,7 +24,9 @@ export const musicController = {
                 'forest_boss': 'forest_boss',
                 'jungle_boss': 'junglm_boss',
                 'skeleton_boss': 'skeleton_boss',
-                'ice_boss': 'ice_boss' 
+                'ice_boss': 'ice_boss',
+                // ДОБАВЛЕНО: если текущий ключ босса ocean_boss, включаем его трек
+                'ocean_boss': 'ocean_boss'
             };
             targetTheme = bossMusicMap[bossManager.currentBossKey] || 'evil'; 
             fadeTime = 0; 
@@ -32,7 +34,7 @@ export const musicController = {
         // --- ИСПРАВЛЕНО: ПРОВЕРКА КРАКЕНА ЧЕРЕЗ МЕНЕДЖЕР ---
         else if (krakenManager && krakenManager.kraken && !krakenManager.kraken.isDead) {
             targetTheme = "kraken";
-            fadeTime = 2000; // Плавное появление за 2 секунды
+            fadeTime = 2000;
         }
         // 2. КОРАБЛЬ
         else if (world.cursedShip && world.cursedShip.state !== 'sleeping') {

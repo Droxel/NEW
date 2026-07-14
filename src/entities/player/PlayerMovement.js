@@ -14,8 +14,37 @@ export function handleJump(player) {
         return;
     }
 
-    if (inWater) {
-        player.velocityY = -4; 
+if (inWater) {
+        // Проверим, действует ли на игрока магия кристалла прямо сейчас
+        let hasCrystalPower = false;
+        let bestFactor = 0;
+        const currentChunkIdx = Math.floor(player.x / (CONFIG.chunkSize || 1024));
+        
+        for (let c = currentChunkIdx - 1; c <= currentChunkIdx + 1; c++) {
+            const chunk = world.chunkManager.getChunk(c * (CONFIG.chunkSize || 1024));
+            if (chunk?.objects) {
+                chunk.objects.forEach(obj => {
+                    const crystal = obj.type === "cursed_crystal" ? obj : (obj.instance?.type === "cursed_crystal" ? obj.instance : null);
+                    if (crystal && crystal.effectRadius) {
+                        const dx = (player.x + player.size / 2) - (crystal.x + crystal.w / 2);
+                        const dy = (player.y + player.size / 2) - (crystal.y + crystal.h / 2);
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < crystal.effectRadius) {
+                            hasCrystalPower = true;
+                            const f = 1 - (dist / crystal.effectRadius);
+                            if (f > bestFactor) bestFactor = f;
+                        }
+                    }
+                });
+            }
+        }
+
+        if (hasCrystalPower) {
+            // Вместо вялого прыжка -4 даем мощный импульс вверх (чем ближе, тем сильнее к прыжку на суше)
+            player.velocityY = -4 - (CONFIG.jumpPower - 4) * bestFactor;
+        } else {
+            player.velocityY = -4; 
+        }
         player.onGround = false;
         return;
     }
@@ -56,12 +85,61 @@ export function updateMovement(player, kraken) {
     else {
         const MAX_FALL_SPEED = 25; 
         
+// Находим ближайший рабочий кристалл внутри загруженных чанков
+        let closestCrystalDist = Infinity;
+        let activeCrystal = null;
+
+        const currentChunkIdx = Math.floor(player.x / (CONFIG.chunkSize || 1024));
+        // Проверяем текущий, левый и правый чанки вокруг игрока
+        for (let c = currentChunkIdx - 1; c <= currentChunkIdx + 1; c++) {
+            const chunk = world.chunkManager.getChunk(c * (CONFIG.chunkSize || 1024));
+            if (chunk && chunk.objects) {
+                chunk.objects.forEach(obj => {
+                    // Проверяем, инициализирован ли инстанс кристалла
+                    const crystal = obj.type === "cursed_crystal" ? obj : (obj.instance?.type === "cursed_crystal" ? obj.instance : null);
+                    if (crystal && crystal.effectRadius) {
+                        const dx = (player.x + player.size / 2) - (crystal.x + crystal.w / 2);
+                        const dy = (player.y + player.size / 2) - (crystal.y + crystal.h / 2);
+                        const dist = Math.hypot(dx, dy);
+                        
+                        if (dist < crystal.effectRadius && dist < closestCrystalDist) {
+                            closestCrystalDist = dist;
+                            activeCrystal = crystal;
+                        }
+                    }
+                });
+            }
+        }
+
         if (!inWater) {
             player.velocityY = Math.min(player.velocityY + CONFIG.gravity, MAX_FALL_SPEED);
         } else {
-            player.velocityY = Math.min(player.velocityY + CONFIG.gravity * 0.3, 4);
-        }
+            if (activeCrystal) {
+                // Коэффициент близости: 1.0 в упор, 0.0 на краю радиуса
+                const effectFactor = 1 - (closestCrystalDist / activeCrystal.effectRadius);
+                
+                // Убираем вязкое торможение воды `player.velocityY *= 0.9`, которое выполнялось выше в updateMovement
+                // Для этого компенсируем деление обратно, если скорость падения положительная
+                if (player.velocityY > 0) {
+                    player.velocityY /= 0.9; 
+                }
 
+                // Сила гравитации: вплотную к кристаллу возвращается полноценная воздушная гравитация
+                const currentGravity = CONFIG.gravity * 0.3 + (CONFIG.gravity * 0.7 * effectFactor);
+                // Ограничение скорости падения в воде плавно увеличиваем с водных "4" до полноценных "25"
+                const currentMaxFall = 4 + (MAX_FALL_SPEED - 4) * effectFactor;
+
+                player.velocityY = Math.min(player.velocityY + currentGravity, currentMaxFall);
+
+                // Даем игроку нормально разогнаться по горизонтали (компенсируем деление на 0.5 из начала метода)
+                player.velocityX /= 0.5; 
+                // И даем дополнительное ускорение за счет силы кристалла
+                player.velocityX *= (1 + effectFactor * 5.8); // Будет летать!
+            } else {
+                // Обычная физика воды, если кристалл далеко
+                player.velocityY = Math.min(player.velocityY + CONFIG.gravity * 0.3, 4);
+            }
+        }
         const prevY = player.y;
 
         // Движение по оси X

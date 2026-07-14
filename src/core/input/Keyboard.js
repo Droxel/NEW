@@ -84,6 +84,62 @@ export function setupKeyboard(player, state) {
             zoomOut();
         } 
     });
+
+    // Обработка Клика и Тапа по экрану для активации Статуи Атлантиды
+    const handlePointerDown = (e) => {
+        // Определяем экранные координаты в зависимости от типа события (мышь или тач)
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        const canvas = document.querySelector("canvas");
+        if (!canvas) return;
+
+        const rect = canvas.getBoundingClientRect();
+        // Получаем позицию клика относительно канваса
+        const canvasX = clientX - rect.left;
+        const canvasY = clientY - rect.top;
+
+        // Переводим в мировые координаты игры с учетом камеры
+        const worldClickX = canvasX + cameraX;
+        const worldClickY = canvasY + cameraY;
+
+        const currentChunkId = world.chunkManager.getChunkId(player.x);
+        const chunk = world.chunkManager.chunks.get(currentChunkId);
+        
+        if (!chunk || !chunk.objects) return;
+
+        for (let obj of chunk.objects) {
+            // Ищем объект статуи босса океана
+            if (obj && typeof obj.interact === 'function') {
+                // Проверяем, попал ли клик в границы текстуры статуи
+                // Предполагаем стандартные размеры статуи, например ширина 96 и высота 128 (или подставьте свои значения obj.width/obj.height)
+                const width = obj.width || 96;
+                const height = obj.height || 128;
+
+                // Так как drawY обычно считается от верха, а координаты объекта могут быть от центра или от левого верхнего угла:
+                const insideX = worldClickX >= obj.x && worldClickX <= obj.x + width;
+                const insideY = worldClickY >= obj.y && worldClickY <= obj.y + height;
+
+                if (insideX && insideY) {
+                    // Дополнительно проверяем расстояние от игрока до статуи (чтобы нельзя было активировать с другого конца карты)
+                    const dx = (player.x + player.size / 2) - (obj.x + width / 2);
+                    const dy = player.y - (obj.y + height / 2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const radius = (obj.config && obj.config.interactionRadius) || 250;
+
+                    if (distance <= radius) {
+                        console.log("🗿 Статуя Атлантиды активирована по клику/тапу!");
+                        obj.interact(player);
+                        break;
+                    }
+                }
+            }
+        }
+    };
+
+    // Регистрируем на клик мыши и тап пальцем
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown, { passive: true });
 }
 
 function handleInteractionKey(player) {
@@ -106,10 +162,31 @@ function handleInteractionKey(player) {
         }
     }
 
-    // Проверка статуй
+// Проверка обычных статуй (твои старые статуи из биомов)
     if (chunk.statues) {
         chunk.statues.forEach(statue => {
             statue.interact(player, bossManager);
         });
+    }
+
+    // Проверка статуи Атлантиды (ищет её внутри chunk.objects)
+    if (chunk.objects) {
+        for (let obj of chunk.objects) {
+            // Если у объекта есть метод interact и это экземпляр класса Statue
+            if (obj && typeof obj.interact === 'function') {
+                const dx = (player.x + player.size / 2) - obj.x;
+                const dy = player.y - obj.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Берем радиус из конфига статуи (у тебя там 200)
+                const radius = (obj.config && obj.config.interactionRadius) || 200;
+
+                if (distance <= radius) {
+                    console.log("🗿 Активация статуи Атлантиды!");
+                    obj.interact(player); // Вызываем метод interact прямо у созданного класса
+                    break;
+                }
+            }
+        }
     }
 }

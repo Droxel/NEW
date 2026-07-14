@@ -303,7 +303,14 @@ function gameLoop(now) {
         intensity: 1.0 
     }];
 
-    // Добавляем свет от кораблей
+    // Добавляем свет от босса и его лазеров
+    if (bossManager && bossManager.boss && typeof bossManager.boss.getLightSources === 'function') {
+        currentLights.push(...bossManager.boss.getLightSources());
+    }
+    if (krakenManager && krakenManager.kraken && typeof krakenManager.kraken.getLightSources === 'function') {
+        currentLights.push(...krakenManager.kraken.getLightSources());
+    }
+
     if (world.cursedShip) {
         currentLights.push(...world.cursedShip.getLights());
     } else if (world.cursedShipsCandidates) {
@@ -311,14 +318,36 @@ function gameLoop(now) {
             currentLights.push(...ship.getLights());
         });
     }
-    if (world.chunkManager) {
-        const chunk = world.chunkManager.chunks.get(world.chunkManager.getChunkId(player.x));
-        chunk?.objects?.forEach(obj => {
-            const light = obj.light || obj.instance?.light;
-            if (light) currentLights.push({ ...light, isTorch: obj.type === "boss_torch" || obj.type === "boss_pillar" });
-        });
-    }
 
+    if (world.chunkManager) {
+        // Пробегаемся по ВСЕМ активным/загруженным чанкам, чтобы свет не тух за границей экрана
+        for (const chunk of world.chunkManager.chunks.values()) {
+            chunk?.objects?.forEach(obj => {
+                const light = obj.light || obj.instance?.light;
+                if (!light) return;
+
+                if (obj.type === "atlantis") {
+                    // Собираем свет Атлантиды один раз с правильными флагами
+                    currentLights.push({
+                        x: light.x,
+                        y: light.y,
+                        radius: light.radius,
+                        intensity: light.intensity,
+                        isAtlantis: true,
+                        isBossStatue: light.isBossStatue,
+                        isEasterStatue: light.isEasterStatue,
+                        isAmbientRuins: light.isAmbientRuins
+                    });
+                } else {
+                    // Обычный свет для факелов и прочих объектов
+                    currentLights.push({ 
+                        ...light, 
+                        isTorch: obj.type === "boss_torch" || obj.type === "boss_pillar" 
+                    });
+                }
+            });
+        }
+    }
 // --- 3. ОТРИСОВКА ---
     ctx.clearRect(0, 0, CONFIG.width, CONFIG.height);
 

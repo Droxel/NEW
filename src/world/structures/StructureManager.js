@@ -1,10 +1,12 @@
-//StructureManager.js
+// src/world/structures/StructureManager.js
 import { DungeonGenerator } from "./DungeonGenerator.js";
 import { VillageGenerator } from "./VillageGenerator.js";
+import { AtlantisGenerator } from "./atlantis/AtlantisGenerator.js"; // <-- ИСПРАВЛЕННЫЙ ПУТЬ
 
 export const StructureManager = {
     dungeonGenerator: new DungeonGenerator(),
     villageGenerator: new VillageGenerator(),
+    atlantisGenerator: new AtlantisGenerator(), // <-- ИНИЦИАЛИЗАЦИЯ
 
     generateStructuresForChunk(chunk, world) {
         const chunkX = chunk.id * 1024;
@@ -12,14 +14,14 @@ export const StructureManager = {
 
         // 1. Генерация Данжей
         const dungeonBlocks = this.dungeonGenerator.getDungeonBlocksForChunk(chunkX, chunkWidth, world);
-        dungeonBlocks.forEach(block => {
-            chunk.objects.push(block);
-        });
+        dungeonBlocks.forEach(block => chunk.objects.push(block));
 
-        // 2. Генерация Деревень (НОВОЕ)
+        // 2. Генерация Деревень
         const villageBlocks = this.villageGenerator.getVillageBlocksForChunk(chunkX, chunkWidth, world);
-        villageBlocks.forEach(block => {
-            chunk.objects.push(block);
-        });
+        villageBlocks.forEach(block => chunk.objects.push(block));
+
+        // 3. Генерация Атлантиды (НОВОЕ)
+        const atlantisBlocks = this.atlantisGenerator.getBlocksForChunk(chunkX, chunkWidth, world);
+        atlantisBlocks.forEach(block => chunk.objects.push(block));
     }
 };

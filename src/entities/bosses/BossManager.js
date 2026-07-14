@@ -9,19 +9,21 @@ import { world } from "../../world/World.js";
 import { BIOME_CORES } from "../../data/lootConfig.js";
 import { DroppedItem } from "../../world/objects/DroppedItem.js";
 import { IceBoss } from "./ice_boss/IceBoss.js";
+import { OceanBoss } from "./ocean_boss/OceanBoss.js";
 
 export const bossManager = {
     boss: null,
     currentBossKey: null,
     
-// Реестр классов боссов
+    // Реестр классов боссов
     registry: {
         'cube_boss': CubeBoss, 
         'desert_boss': DesertBoss,
         'ice_boss': IceBoss,      
         'jungle_boss': JungleBoss,
-        'forest_boss': CubeBoss, // <-- ИСПРАВЛЕНИЕ: Теперь лесная статуя заспавнит Ледяного босса
+        'forest_boss': CubeBoss, 
         'skeleton_boss': SkeletonBoss, 
+        'ocean_boss': OceanBoss, // <-- ДОБАВЛЯЕМ КЛЮЧ
     },
     // Метод для получения света от босса (для освещения)
     getLights() {

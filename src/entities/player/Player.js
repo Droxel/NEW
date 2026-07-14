@@ -11,14 +11,15 @@ import { updateVisuals } from "./PlayerVisuals.js";
 import { checkWallCollisions } from "./PlayerCollision.js";
 import { krakenManager } from "../../entities/bosses/kraken/KrakenManager.js";
 
+// ТОЧНЫЙ ПУТЬ и правильный импорт объекта с маленькой буквы
+import { gameOver } from "../../ui/screens/GameOver.js"; 
 import { AccessoryManager } from "./accessories/AccessoryManager.js";
 
 export const player = {
-    // === ХАРАКТЕРИСТИКИ ===
-    hp: 30, maxHp: 30, invulnerableTimer: 0, timeSinceLastHit: 0, regenTimer: 0,
+    // ... все твои характеристики без изменений ...
+    hp: 20, maxHp: 20, invulnerableTimer: 0, timeSinceLastHit: 0, regenTimer: 0,
     potionCooldown: 0, air: 10, maxAir: 10, airTimer: 0,
     
-    // === СОСТОЯНИЕ И ПОЗИЦИЯ ===
     rotation: 0, rotationSpeed: 0, rotationDir: 0,
     x: 100, y: CONFIG.groundY, size: 30,
     velocityX: 0, velocityY: 0, onGround: true, direction: 0,
@@ -26,15 +27,10 @@ export const player = {
     blink: 0, blinkTimer: 0, justLanded: false,
     isFlying: false, flySpeed: 10, isInWater: false,
     
-    // === ЭКИПИРОВКА И ИНВЕНТАРЬ ===
     bubbleInstance: null, hook: null, hasHookInInventory: false,
-    baseColor: "#3b52da", currentColor: "#02030c", color: "#192774",
-
-    // === ИНИЦИАЛИЗАЦИЯ МЕНЕДЖЕРА АКСЕССУАРОВ ===
-    // Создаем экземпляр класса для конкретного игрока
+    baseColor: "#3b52da", currentColor: "#02030c", color: "#e777fd",
     accessories: null, 
 
-    // === ДЕЛЕГИРУЕМ МЕТОДЫ ===
     takeDamage(amount) { takeDamage(this, amount); },
     jump() { handleJump(this); },
     eatPotion() { eatPotion(this); },
@@ -48,7 +44,6 @@ export const player = {
         this.velocityX = 0;
         this.onGround = false;
         
-        // Инициализируем менеджер при спавне, если еще не создан
         if (!this.accessories) {
             this.accessories = new AccessoryManager(this);
         }
@@ -56,25 +51,30 @@ export const player = {
     },
 
     update() {
-        if (this.hp <= 0) return;
+        // ЖЕЛЕЗНОЕ ПРАВИЛО: если ХП 0 или меньше, триггерим экран смерти и стопаем логику
+        if (this.hp <= 0) {
+            if (gameOver) {
+                gameOver.update(this); // Передаем ссылку на себя
+            }
+            return; 
+        }
 
         // Гарантируем наличие менеджера аксессуаров
         if (!this.accessories) this.accessories = new AccessoryManager(this);
 
-        // ОБНОВЛЯЕМ АКСЕССУАРЫ (сканируем слоты инвентаря и собираем баффы)
+        // ОБНОВЛЯЕМ АКСЕССУАРЫ
         this.accessories.update();
 
-        // 1. Таймеры, здоровье, воздух (теперь внутри читаются данные из менеджера)
+        // 1. Таймеры, здоровье, воздух
         updateHealthAndAir(this);
 
         // 2. Движение и коллизии
         updateMovement(this, krakenManager.kraken);
 
-        // 3. Визуальные эффекты (масштаб, вращение)
+        // 3. Визуальные эффекты
         updateVisuals(this);
 
-        // 4. Логика старого пузыря-оружия/инструмента (раз ты говоришь, что Bubble.js — это другое)
-        // Если тебе все еще нужен старый пузырь из bubbleSlots, оставляем этот код:
+        // 4. Пузыри
         if (this.inventory?.bubbleSlots?.[0]) {
             if (!this.bubbleInstance) this.bubbleInstance = new Bubble(this);
             this.bubbleInstance.update(this.inventory.bubbleSlots[1]);

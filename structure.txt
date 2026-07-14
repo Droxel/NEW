@@ -13,18 +13,22 @@ C:.
 +---assets
 |   +---audio
 |   |   +---music
-|   |   |       ambient.mp3
-|   |   |       CHudesenka_-_Ladoshki_76625190.mp3
-|   |   |       danjunglei.mp3
-|   |   |       desert_boss.mp3
-|   |   |       evil.mp3
-|   |   |       forest_boss.mp3
-|   |   |       ice_boss.mp3
-|   |   |       junglm_boss.mp3
-|   |   |       kraken.mp3
-|   |   |       ship.mp3
-|   |   |       skeleton_boss.mp3
-|   |   |       
+|   |   |   |   ambient.mp3
+|   |   |   |   CHudesenka_-_Ladoshki_76625190.mp3
+|   |   |   |   danjunglei.mp3
+|   |   |   |   desert_boss.mp3
+|   |   |   |   evil.mp3
+|   |   |   |   forest_boss.mp3
+|   |   |   |   ice_boss.mp3
+|   |   |   |   junglm_boss.mp3
+|   |   |   |   kraken.mp3
+|   |   |   |   ocean_boss.mp3
+|   |   |   |   ship.mp3
+|   |   |   |   skeleton_boss.mp3
+|   |   |   |   
+|   |   |   \---музон
+|   |   |           ocean_boss.mp3
+|   |   |           
 |   |   \---sfx
 |   |       +---boss
 |   |       |   +---ice_boss
@@ -94,6 +98,9 @@ C:.
 |       |       village.png
 |       |       winter.png
 |       |       
+|       +---effects
+|       |       bubble.png
+|       |       
 |       +---entities
 |       |   +---bosses
 |       |   |   |   arm_skeleton.png
@@ -104,13 +111,18 @@ C:.
 |       |   |   |   skeleton.png
 |       |   |   |   skeleton_minion.png
 |       |   |   |   
-|       |   |   \---ice_boss
-|       |   |           crystal_boss.png
-|       |   |           ice_block.png
-|       |   |           icicle.png
-|       |   |           Icy_boss.png
-|       |   |           Icy_boss2.png
-|       |   |           protection_crystal.png
+|       |   |   +---ice_boss
+|       |   |   |       crystal_boss.png
+|       |   |   |       ice_block.png
+|       |   |   |       icicle.png
+|       |   |   |       Icy_boss.png
+|       |   |   |       Icy_boss2.png
+|       |   |   |       protection_crystal.png
+|       |   |   |       
+|       |   |   \---ocean_boss
+|       |   |           ocean_boss.png
+|       |   |           ocean_boss1.png
+|       |   |           ocean_boss2.png
 |       |   |           
 |       |   +---mobs
 |       |   |   |   arm_giant.png
@@ -185,6 +197,13 @@ C:.
 |           |       a_forest.svg
 |           |       a_glazed.svg
 |           |       a_jungli.svg
+|           |       
+|           +---Atlantis
+|           |       column.png
+|           |       fragment.png
+|           |       ruin.png
+|           |       statuya_bossa_okeana.png
+|           |       statuya_paskhi.png
 |           |       
 |           +---chests
 |           |       chestopen.svg
@@ -290,9 +309,17 @@ C:.
     |   |   |       
     |   |   +---kraken
     |   |   |       Kraken.js
+    |   |   |       KrakenAttack.js
     |   |   |       KrakenManager.js
     |   |   |       KrakenRenderer.js
     |   |   |       KrakenTrigger.js
+    |   |   |       
+    |   |   +---ocean_boss
+    |   |   |       OceanBoss.js
+    |   |   |       OceanBossAttacks.js
+    |   |   |       OceanBossKraken.js
+    |   |   |       OceanBossRenderer.js
+    |   |   |       OceanProjectiles.js
     |   |   |       
     |   |   \---skeleton
     |   |           SkeletonAttacks.js
@@ -391,6 +418,7 @@ C:.
         |       BossDecorations.js
         |       Chest.js
         |       ChestManager.js
+        |       CursedCrystal.js
         |       DroppedItem.js
         |       JungleChest.js
         |       JungleGuard.js
@@ -410,6 +438,10 @@ C:.
         |   |   StructureManager.js
         |   |   VillageGenerator.js
         |   |   
+        |   +---atlantis
+        |   |       AtlantisGenerator.js
+        |   |       AtlantisPieces.js
+        |   |       
         |   +---dungeon
         |   |       DungeonCarver.js
         |   |       DungeonPieces.js

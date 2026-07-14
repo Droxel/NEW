@@ -1,11 +1,14 @@
-// src/core/gameOver.js
+//GameOver.js
 import { player } from "../../entities/player/Player.js";
 
 export const gameOver = {
     isShown: false,
+    playerRef: null, // Ссылка на игрока запишется при инициализации
 
-    // Инициализация (вызови это один раз при старте или прямо в файле)
-    init() {
+    // Инициализируем один раз при старте игры
+    init(playerInstance) {
+        if (playerInstance) this.playerRef = playerInstance;
+
         const respawnBtn = document.getElementById("btn-respawn");
         const menuBtn = document.getElementById("btn-to-menu");
 
@@ -18,35 +21,43 @@ export const gameOver = {
 
         if (menuBtn) {
             menuBtn.onclick = () => {
-                location.reload(); // Самый простой способ вернуться в меню
+                location.reload(); 
             };
         }
     },
 
-    update() {
-        if (player.hp <= 0 && !this.isShown) {
-            this.show();
+    // Метод update теперь принимает игрока, если ссылка не была сохранена ранее
+    update(player) {
+        const p = player || this.playerRef;
+        if (p && p.hp <= 0 && !this.isShown) {
+            this.show(p);
         }
     },
 
-    show() {
+    show(player) {
+        if (player) this.playerRef = player;
         this.isShown = true;
         const overlay = document.getElementById("game-over-screen");
         if (overlay) {
             overlay.style.display = "flex";
-            // Инициализируем кнопки, если еще не сделали этого
-            this.init(); 
+            // Передаем игрока в init на случай, если кнопки пересоздаются
+            this.init(this.playerRef); 
         }
     },
 
     restart() {
-        // Восстанавливаем игрока
-        player.hp = player.maxHp || 100;
-        player.x = 100; // Координаты спавна
-        player.y = 100;
-        player.velocityX = 0;
-        player.velocityY = 0;
-        player.invulnerableTimer = 120; // 2 секунды неуязвимости
+        if (!this.playerRef) {
+            console.error("Не удалось возродить игрока: ссылка на player отсутствует.");
+            return;
+        }
+
+        // Восстанавливаем игрока через его родной метод spawn
+        this.playerRef.spawn(100); 
+
+        // Восстанавливаем характеристики безопасности
+        this.playerRef.hp = this.playerRef.maxHp; 
+        this.playerRef.air = this.playerRef.maxAir; 
+        this.playerRef.invulnerableTimer = 120; // 2 секунды неуязвимости
 
         this.isShown = false;
         const overlay = document.getElementById("game-over-screen");

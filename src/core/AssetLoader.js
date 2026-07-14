@@ -149,6 +149,18 @@ miduza2: new Image(),
 
     air_bubble_item: new Image(),
 
+    atlantis_column: new Image(),
+    atlantis_fragment: new Image(),
+    atlantis_ruin: new Image(),
+    atlantis_statue_boss: new Image(),
+    atlantis_statue_easter: new Image(),
+
+    ocean_boss: new Image(),
+    ocean_boss1: new Image(),
+    ocean_boss2: new Image(),
+
+    bubble: new Image(),
+
 };
 
 
@@ -290,3 +302,16 @@ assets.tentacles10.src = "../../assets/images/entities/mobs/kraken/tentacles10.p
 assets.fennec.src = "../../assets/images/mod/fennec.png";
 
 assets.air_bubble_item.src = "../../assets/images/items/air_bubble.svg";
+
+// Прописываем пути (world/Atlantis/)
+assets.atlantis_column.src = "../../assets/images/world/Atlantis/column.png";
+assets.atlantis_fragment.src = "../../assets/images/world/Atlantis/fragment.png";
+assets.atlantis_ruin.src = "../../assets/images/world/Atlantis/ruin.png";
+assets.atlantis_statue_boss.src = "../../assets/images/world/Atlantis/statuya_bossa_okeana.png";
+assets.atlantis_statue_easter.src = "../../assets/images/world/Atlantis/statuya_paskhi.png";
+
+assets.ocean_boss.src = "../../assets/images/entities/bosses/ocean_boss/ocean_boss.png";
+assets.ocean_boss1.src = "../../assets/images/entities/bosses/ocean_boss/ocean_boss1.png";
+assets.ocean_boss2.src = "../../assets/images/entities/bosses/ocean_boss/ocean_boss2.png";
+
+assets.bubble.src = 'assets/images/effects/bubble.png';

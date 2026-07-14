@@ -1,4 +1,4 @@
-//PlayerCollision.js
+/* src/world/physics/PlayerCollision.js */
 import { world } from "../../world/World.js";
 
 export function checkWallCollisions(player, axis) {
