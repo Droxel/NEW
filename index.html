@@ -106,40 +106,20 @@
       const status = document.getElementById('status-message');
 
       // --- СИСТЕМА ОБНОВЛЕНИЙ И ОФФЛАЙНА ---
+// --- СИСТЕМА ОБНОВЛЕНИЙ И ОФФЛАЙНА ---
       async function checkUpdateAndRegisterSW() {
           if ('serviceWorker' in navigator) {
               try {
-                  // 1. Проверяем новую версию на сервере (добавляем ?t=..., чтобы обойти кэш браузера)
                   const response = await fetch('./version.json?t=' + new Date().getTime());
                   const serverData = await response.json();
                   const localVersion = localStorage.getItem('game_version');
 
-                  // 2. Если версия обновилась
-                  if (localVersion && localVersion !== serverData.version) {
-                      console.log(`🚀 Доступно обновление: ${localVersion} -> ${serverData.version}`);
-                      
-                      // Чистим старые кэши
-                      const cacheNames = await caches.keys();
-                      await Promise.all(cacheNames.map(name => caches.delete(name)));
-                      
-                      // Удаляем старый Service Worker
-                      const registrations = await navigator.serviceWorker.getRegistrations();
-                      for (let reg of registrations) {
-                          await reg.unregister();
-                      }
-
-                      // Сохраняем новую версию и перезагружаем страницу
-                      localStorage.setItem('game_version', serverData.version);
-                      window.location.reload(true);
-                      return; // Прерываем текущий запуск, ждем перезагрузки
-                  }
-
-                  // Если это первый заход - просто сохраняем версию
+                  // Если это первый заход в игру — записываем текущую версию
                   if (!localVersion) {
                       localStorage.setItem('game_version', serverData.version);
                   }
 
-                  // 3. Регистрируем Service Worker для оффлайна
+                  // Регистрируем Service Worker для оффлайна
                   await navigator.serviceWorker.register('./service-worker.js');
                   console.log('✅ Оффлайн-режим активирован');
 

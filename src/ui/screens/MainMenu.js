@@ -1,9 +1,10 @@
 /* src/ui/MainMenu.js */
 import { SaveManager } from "../../core/SaveManager.js";
 import { WORLD_SEED, setWorldSeed } from "../../world/Seed.js";
+import { UpdateNotifier } from "../components/UpdateNotifier.js";
 
 export class MainMenu {
-    constructor(onPlay) {
+constructor(onPlay) {
         this.onPlay = onPlay; // Коллбэк запуска игры
 
         // Контейнеры
@@ -20,6 +21,9 @@ export class MainMenu {
         this.initEventListeners();
 
         this.menuSettings = document.getElementById('menu-settings');
+
+        // Инициализируем систему проверки обновлений и плашку с версией
+        this.updateNotifier = new UpdateNotifier();
     }
 
     initEventListeners() {
